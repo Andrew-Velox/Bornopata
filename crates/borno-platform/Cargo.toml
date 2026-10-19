@@ -1,6 +1,6 @@
 [package]
 name = "borno-platform"
-description = "平台相关但不依赖系统 API 的部分：配置文件读写"
+description = "Shell-facing parts without system APIs: the config file and the Server and shell wire protocol"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,12 +9,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
-borno-core.workspace = true
-borno-dictionary.workspace = true
-borno-predict.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 toml.workspace = true
-toml_edit.workspace = true
-tracing.workspace = true

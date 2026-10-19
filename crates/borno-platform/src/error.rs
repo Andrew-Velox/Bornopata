@@ -1,8 +1,8 @@
+//! Errors of reading and writing the config file.
+
 use std::path::PathBuf;
 
-use thiserror::Error;
-
-#[derive(Debug, Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum ConfigError {
     #[error("failed to read config {path}: {source}")]
     Read {
@@ -22,18 +22,9 @@ pub enum ConfigError {
     Parse {
         path: PathBuf,
 
-        /// 装着不拆：`toml::de::Error` 一百多字节，直接放进枚举会把 `ConfigError`
-        /// （以及各壳聚合它的错误类型）撑过 clippy 的 128 字节阈值。
+        /// Boxed: `toml::de::Error` is over a hundred bytes and would push every error type that wraps this one
+        /// past clippy's size threshold.
         #[source]
         source: Box<toml::de::Error>,
-    },
-
-    #[error("cannot edit config {path} in place: {source}")]
-    Edit {
-        path: PathBuf,
-
-        /// 同上。
-        #[source]
-        source: Box<toml_edit::TomlError>,
     },
 }

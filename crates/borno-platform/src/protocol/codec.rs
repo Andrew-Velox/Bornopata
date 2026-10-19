@@ -1,18 +1,13 @@
-//! 线上帧格式：4 字节小端长度前缀 + JSON 消息体。Server 与 TSF DLL 两端共用这套读写，
-//! 所以放在平台层而不是某个 app 里。传输本身（命名管道等）在 app 侧，这里只切帧。
+//! Wire framing: a 4-byte little-endian length followed by a JSON body.
 
 use std::io::{self, Read, Write};
 
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
-/// 缺省命名管道名。Server 在这上面监听，DLL 用同名连上。放这里让两端共享同一个字面量。
-pub const DEFAULT_PIPE_NAME: &str = r"\\.\pipe\bornopata";
-
-/// 单帧上限，挡住坏长度前缀导致的巨量分配。
+/// Largest accepted frame; stops a corrupt length prefix from causing a huge allocation.
 const MAX_FRAME: u32 = 16 * 1024 * 1024;
 
-/// 编解码错误。
 #[derive(Debug, thiserror::Error)]
 pub enum CodecError {
     #[error("io: {0}")]
@@ -25,50 +20,84 @@ pub enum CodecError {
     TooLarge(usize),
 }
 
-/// 写一帧：长度前缀 + JSON，然后 flush。
+/// Writes one frame and flushes.
 pub fn write_message<W: Write, T: Serialize>(writer: &mut W, value: &T) -> Result<(), CodecError> {
     let body = serde_json::to_vec(value)?;
-    let len = u32::try_from(body.len()).map_err(|_| CodecError::TooLarge(body.len()))?;
-    if len > MAX_FRAME {
+    let length = u32::try_from(body.len()).map_err(|_| CodecError::TooLarge(body.len()))?;
+    if length > MAX_FRAME {
         return Err(CodecError::TooLarge(body.len()));
     }
-    writer.write_all(&len.to_le_bytes())?;
+    writer.write_all(&length.to_le_bytes())?;
     writer.write_all(&body)?;
     writer.flush()?;
     Ok(())
 }
 
-/// 读一帧。对端在帧边界干净关闭（读长度前缀时就是 EOF）返回 `Ok(None)`；
-/// 读到一半断开算错误（`UnexpectedEof`）。
+/// Reads one frame. `Ok(None)` means the peer closed cleanly at a frame boundary; closing in the middle is an error.
 pub fn read_message<R: Read, T: DeserializeOwned>(reader: &mut R) -> Result<Option<T>, CodecError> {
-    let mut len_buf = [0u8; 4];
-    if !read_fully_or_eof(reader, &mut len_buf)? {
-        return Ok(None);
+    let mut prefix = [0u8; 4];
+    let mut filled = 0;
+    while filled < prefix.len() {
+        match reader.read(&mut prefix[filled..]) {
+            Ok(0) if filled == 0 => return Ok(None),
+            Ok(0) => return Err(io::Error::from(io::ErrorKind::UnexpectedEof).into()),
+            Ok(count) => filled += count,
+            Err(error) if error.kind() == io::ErrorKind::Interrupted => {}
+            Err(error) => return Err(error.into()),
+        }
     }
-    let len = u32::from_le_bytes(len_buf);
-    if len > MAX_FRAME {
-        return Err(CodecError::TooLarge(len as usize));
+    let length = u32::from_le_bytes(prefix);
+    if length > MAX_FRAME {
+        return Err(CodecError::TooLarge(length as usize));
     }
-    let mut body = vec![0u8; len as usize];
+    let mut body = vec![0u8; length as usize];
     reader.read_exact(&mut body)?;
     Ok(Some(serde_json::from_slice(&body)?))
 }
 
-/// 填满 `buf`。开头就 EOF（一个字节没读到）返回 `Ok(false)`（干净关闭）；
-/// 读到一半 EOF 返回 `UnexpectedEof`；填满返回 `Ok(true)`。
-fn read_fully_or_eof<R: Read>(reader: &mut R, buf: &mut [u8]) -> io::Result<bool> {
-    let mut filled = 0;
-    while filled < buf.len() {
-        match reader.read(&mut buf[filled..])? {
-            0 if filled == 0 => return Ok(false),
-            0 => {
-                return Err(io::Error::new(
-                    io::ErrorKind::UnexpectedEof,
-                    "connection closed mid-frame",
-                ));
-            }
-            read => filled += read,
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn round_trips_several_messages_and_ends_cleanly() {
+        let mut wire = Vec::new();
+        write_message(&mut wire, &"আমি").unwrap();
+        write_message(&mut wire, &42u32).unwrap();
+        let mut reader = wire.as_slice();
+        assert_eq!(
+            read_message::<_, String>(&mut reader).unwrap().as_deref(),
+            Some("আমি")
+        );
+        assert_eq!(read_message::<_, u32>(&mut reader).unwrap(), Some(42));
+        assert_eq!(read_message::<_, u32>(&mut reader).unwrap(), None);
     }
-    Ok(true)
+
+    #[test]
+    fn a_frame_cut_short_is_an_error() {
+        let mut wire = Vec::new();
+        write_message(&mut wire, &"hello").unwrap();
+        wire.truncate(wire.len() - 1);
+        assert!(read_message::<_, String>(&mut wire.as_slice()).is_err());
+        assert!(read_message::<_, String>(&mut [1u8, 0].as_slice()).is_err());
+    }
+
+    #[test]
+    fn an_oversized_prefix_is_refused_before_allocating() {
+        let wire = u32::MAX.to_le_bytes();
+        assert!(matches!(
+            read_message::<_, String>(&mut wire.as_slice()),
+            Err(CodecError::TooLarge(_))
+        ));
+    }
+
+    #[test]
+    fn invalid_json_is_an_error() {
+        let mut wire = 3u32.to_le_bytes().to_vec();
+        wire.extend_from_slice(b"{{{");
+        assert!(matches!(
+            read_message::<_, String>(&mut wire.as_slice()),
+            Err(CodecError::Json(_))
+        ));
+    }
 }

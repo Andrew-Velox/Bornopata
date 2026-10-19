@@ -1,17 +1,19 @@
+//! One key as the shell reports it.
+
 use serde::{Deserialize, Serialize};
 
-use super::modifiers::KeyModifiers;
+use super::KeyModifiers;
 
-/// DLL 从 TSF `OnKeyDown` / `OnTestKeyDown` 抓到的一次按键，发给 Server 判定。
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct KeyEvent {
-    /// Windows 虚拟键码（`VK_*`）。翻页、方向键、退格、回车等靠它区分。
+    /// The key: the X11 keysym for printable keys, and the Windows virtual-key value for the function keys the
+    /// Fcitx5 plugin maps (`0x08` Backspace, `0x09` Tab, `0x0d` Enter, `0x1b` Escape, `0x25`-`0x28` arrows ...).
+    /// The numbers are historical; both sides share one table in the plugin's `key/mapping.cpp`.
     pub virtual_key: u32,
 
-    /// 这次按键产生的字符（`ToUnicode` 的结果）；功能键没有字符时为 `None`。
+    /// The character the key produces with the current modifiers; `None` for function and modifier keys.
     pub character: Option<char>,
 
-    /// 按下时的修饰键状态。
     pub modifiers: KeyModifiers,
 }
 
