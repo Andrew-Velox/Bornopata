@@ -39,7 +39,7 @@ pub fn key(text: &str) -> String {
             last_consonant = None;
         }
         // The same vowel twice in a row (typed "aa" after an a-sign) is one vowel.
-        if is_vowel_class(class) && out.chars().next_back() == Some(class) {
+        if is_vowel_class(class) && out.ends_with(class) {
             continue;
         }
         out.push(class);
