@@ -10,10 +10,6 @@ members = [
 ]
 # Pinyin-shaped crates kept on disk until the next phase ports them to the Bangla Engine (docs/plan/roadmap.md).
 exclude = [
-    "crates/borno-dictionary",
-    "crates/borno-translate",
-    "crates/borno-predict",
-    "crates/borno-neural",
     "crates/borno-platform",
     "apps/linux/server",
 ]
