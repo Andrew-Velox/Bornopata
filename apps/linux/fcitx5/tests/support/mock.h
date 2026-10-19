@@ -1,4 +1,4 @@
-//! 可控 Server 夹具，只模拟返回帧，记录插件发送的框架事实。
+//! A scriptable Server stand-in: it returns canned frames and records what the plugin sent.
 #pragma once
 #include "wire.h"
 #include <cstring>
@@ -16,9 +16,8 @@ struct Mock {
 
     std::vector<Json> messages;
 
-    /// 收到的 Poll 次数；rescore 模式第一条回换序帧。
-    int polls = 0;
-
+    /// Modes: "both" is the normal Server, "mismatch" answers with another protocol version,
+    /// "failure" hangs up after the first key reply.
     explicit Mock(const std::string &mode) {
         char path[] = "/tmp/borno-plugin-XXXXXX";
         assert(mkdtemp(path));
@@ -43,83 +42,44 @@ struct Mock {
     void join() { if (thread.joinable()) thread.join(); }
     void serve(const std::string &mode) {
         int fd = accept(listener, nullptr, nullptr);
-        auto opened = readMessage(fd).at("OpenSession");
+        auto opened = readMessage(fd).at("Open");
         const auto session = opened.at("session");
-        assert(opened.at("protocol") == 9);
-        writeMessage(fd, {{"Update", {{"session", session}, {"linux_ui", {{"version", mode == "mismatch" ? 2 : 3}}}}}});
+        assert(opened.at("protocol") == 1);
+        writeMessage(fd, {{"Opened", {{"session", session}, {"protocol", mode == "mismatch" ? 2 : 1}, {"mode", "Bangla"}}}});
         if (mode == "mismatch") { close(fd); return; }
-        auto identity = readMessage(fd).at("LinuxHello");
-        assert(identity.at("version") == 3);
-        identity.erase("version"); identity.erase("session");
-        identity["revision"] = 0;
-        writeMessage(fd, {{"LinuxHello", {{"version", 3}, {"session", session}, {"preedit", mode == "inline" || mode == "window" ? mode : "both"}}}});
+        Json identity = {{"generation", opened.at("generation")}, {"context", opened.at("context")}, {"revision", 0}};
         auto frame = emptyFrame();
         char byte;
         while (recv(fd, &byte, 1, MSG_PEEK) > 0) {
             auto message = readMessage(fd);
             messages.push_back(message);
-            if (message.contains("CloseSession")) break;
-            if (message.contains("DisplayAcknowledged")) continue;
-            if (message.contains("Poll")) {
-                assert(message.at("Poll").at("session") == session);
-                if (mode == "rescore" && ++polls == 1) {
-                    frame["candidates"]["items"] = Json::parse(R"([{"text":"你好","translation":{"senses":[{"text":"hello","fresh":true}]}},{"text":"","translation":null},{"text":"","translation":null}])");
-                    frame["highlight"] = 0;
-                    identity["revision"] = identity.at("revision").get<uint64_t>() + 1;
-                }
-                writeMessage(fd, {{"Update", {{"session", session}, {"identity", identity}, {"frame", frame}}}});
-                continue;
-            }
-            const auto &event = message.at("LinuxEvent").at("event");
+            if (message.contains("Close")) break;
+            const auto &event = message.at("Event").at("event");
             Json commit = nullptr;
             std::string outcome = "Passthrough";
-            if (mode == "selection" && event.contains("Key") && !event.at("Key").at("release").get<bool>()) {
-                const auto key = event.at("Key").at("event").at("virtual_key");
-                if (key == 84) {
-                    writeMessage(fd, {{"RequestSelection", {{"session", session}, {"request", uint64_t(1)}}}});
-                    auto selection = readMessage(fd);
-                    assert(selection.at("LinuxEvent").at("event").at("Selection").at("text") == "你好");
-                    messages.push_back(selection);
-                    frame = emptyFrame();
-                    frame["candidates"]["items"] = Json::parse(R"([{"text":"hello","kind":"Cloud","translation":null}])");
-                    outcome = "Consumed";
-                } else if (key == 13) {
-                    commit = "hello";
-                    frame = emptyFrame();
-                    outcome = "Consumed";
-                }
-            }
-            if (event.contains("Key") && !event.at("Key").at("release").get<bool>() && event.at("Key").at("event").at("character") == "n") {
-                frame = Json::parse(R"({"preedit":[{"text":"ni","kind":"Typed"}],"cursor":2,"candidates":{"items":[{"text":"","translation":null},{"text":"","translation":null},{"text":"你好","translation":{"senses":[{"text":"hello","fresh":true}]}}]},"highlight":2,"page":0,"page_count":2,"notice":null})");
+            if (event.contains("Key") && !event.at("Key").at("release").get<bool>()
+                && event.at("Key").at("event").at("character") == "a") {
+                frame = amiFrame();
                 outcome = "Consumed";
-                if (mode == "annotation") {
-                    frame["candidates"]["items"][2]["translation"]["senses"][0] = {
-                        {"text", "開発する"}, {"annotation", "v. 開発(かいはつ)する"}, {"fresh", true}};
-                }
-                if (mode == "cloud") {
-                    frame["candidates"]["items"][2]["kind"] = "Cloud";
-                    frame["sentence"] = "你好世界";
-                }
             }
             if (event.contains("Candidate")) {
-                assert(event.at("Candidate").at("index") == 2);
+                assert(event.at("Candidate").at("index") == 1);
                 assert(event.at("Candidate").at("identity") == identity);
-                commit = "你好";
+                commit = frame.at("candidates").at(1).at("text");
                 frame = emptyFrame();
                 outcome = "Consumed";
             }
             if (event.contains("Capabilities") || event == "Reset") frame = emptyFrame();
             if (event.contains("Deactivate")) {
                 const auto &facts = event.at("Deactivate");
-                if (!facts.at("capability_changed").get<bool>() && !(facts.at("focus_out").get<bool>() && facts.at("client_preedit").get<bool>()) && !frame.at("preedit").empty()) commit = "ni";
+                // Like the real Server: the framework commits client preedit itself on focus out.
+                if (!facts.at("capability_changed").get<bool>() && !(facts.at("focus_out").get<bool>() && facts.at("client_preedit").get<bool>())
+                    && !frame.at("preedit").get<std::string>().empty()) commit = frame.at("preedit");
                 frame = emptyFrame();
             }
             identity["revision"] = identity.at("revision").get<uint64_t>() + 1;
-            writeMessage(fd, {{"KeyResult", {{"session", session}, {"identity", identity}, {"frame", frame}, {"commit", commit}, {"outcome", outcome}}}});
-            if (mode == "failure" && event.contains("Key")) {
-                messages.push_back(readMessage(fd)); // 默认面板反馈。
-                break;
-            }
+            writeMessage(fd, {{"Result", {{"session", session}, {"identity", identity}, {"frame", frame}, {"commit", commit}, {"outcome", outcome}}}});
+            if (mode == "failure" && event.contains("Key")) break;
         }
         close(fd);
     }

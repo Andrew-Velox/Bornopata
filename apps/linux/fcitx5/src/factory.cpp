@@ -1,4 +1,4 @@
-//! Bornopata addon 工厂。
+//! Addon factory.
 #include "bornopata.h"
 namespace fcitx {
 class BornopataFactory final : public AddonFactory {

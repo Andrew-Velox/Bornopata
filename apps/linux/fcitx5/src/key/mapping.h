@@ -1,4 +1,4 @@
-//! Fcitx KeySym 与共享协议键码之间的映射。
+//! Mapping between Fcitx key symbols and the protocol key codes.
 #pragma once
 #include <fcitx-utils/key.h>
 #include <nlohmann/json.hpp>

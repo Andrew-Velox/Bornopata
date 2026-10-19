@@ -337,3 +337,21 @@ fn learned_data_is_saved_when_the_router_goes_away() {
     assert_eq!(frame.candidates[0].source, Source::Learned);
     let _ = std::fs::remove_dir_all(&directory);
 }
+
+#[test]
+fn a_change_of_privacy_drops_the_word_typed_before_it() {
+    let mut rig = Rig::scaffold();
+    rig.type_text("kotha");
+    let reply = rig.event(Event::Capabilities(Capabilities {
+        sensitive: true,
+        ..Capabilities::default()
+    }));
+    assert!(reply.frame.is_empty());
+    // The same facts again are no boundary.
+    rig.type_text("ami");
+    let reply = rig.event(Event::Capabilities(Capabilities {
+        sensitive: true,
+        ..Capabilities::default()
+    }));
+    assert_eq!(reply.frame.roman, "ami");
+}

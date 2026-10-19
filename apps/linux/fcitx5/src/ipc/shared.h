@@ -1,4 +1,4 @@
-//! 插件唯一连接、观察器与安全上下文登记；析构通知延迟到下一事务。
+//! The plugin's single connection, its observer and the registry of live contexts; close notices wait for the next transaction.
 #pragma once
 #include "connection.h"
 #include <fcitx/inputcontext.h>
@@ -34,7 +34,7 @@ public:
         auto pending = std::move(retired);
         retired.clear();
         for (auto id : pending)
-            if (!connection.send({{"CloseSession", {{"session", id}}}})) return false;
+            if (!connection.send({{"Close", {{"session", id}}}})) return false;
         return true;
     }
 };

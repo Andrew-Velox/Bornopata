@@ -1,4 +1,4 @@
-//! 传输错误在有界时间内使整条连接失效，已发送事件不重放。
+//! A transport error invalidates the whole connection within bounded time; events already sent are not replayed.
 #include "bornopata.h"
 #include "support/input.h"
 #include "support/wire.h"
@@ -23,29 +23,27 @@ int main(int argc, char **argv) {
     int keys = 0;
     std::thread mock([&] {
         int connection = accept(listener, nullptr, nullptr);
-        auto opened = readMessage(connection).at("OpenSession");
+        auto opened = readMessage(connection).at("Open");
         const auto session = opened.at("session");
-        assert(opened.at("protocol") == 9);
-        writeMessage(connection, {{"Update", {{"session", session}, {"linux_ui", {{"version", failure == "old-version" ? 2 : 3}}}}}});
+        assert(opened.at("protocol") == 1);
+        writeMessage(connection, {{"Opened", {{"session", session}, {"protocol", failure == "old-version" ? 2 : 1}, {"mode", "Bangla"}}}});
         if (failure != "old-version") {
-            auto identity = readMessage(connection).at("LinuxHello");
-            identity.erase("version"); identity.erase("session"); identity["revision"] = 1;
-            writeMessage(connection, {{"LinuxHello", {{"session", session}, {"version", 3}, {"preedit", "both"}}}});
+            Json identity = {{"generation", opened.at("generation")}, {"context", opened.at("context")}, {"revision", 1}};
             for (const auto *name : {"Capabilities", "Focus"}) {
-                const auto event = readMessage(connection).at("LinuxEvent").at("event");
+                const auto event = readMessage(connection).at("Event").at("event");
                 assert(event.contains(name));
                 identity["revision"] = identity.at("revision").get<uint64_t>() + 1;
-                writeMessage(connection, {{"KeyResult", {{"session", session}, {"identity", identity},
+                writeMessage(connection, {{"Result", {{"session", session}, {"identity", identity},
                     {"frame", emptyFrame()}, {"commit", nullptr}, {"outcome", "Passthrough"}}}});
             }
-            assert(readMessage(connection).at("LinuxEvent").at("event").contains("Key")); ++keys;
+            assert(readMessage(connection).at("Event").at("event").contains("Key")); ++keys;
             if (failure == "timeout") std::this_thread::sleep_for(std::chrono::milliseconds(350));
             else if (failure == "malformed") {
                 const char bad[] = {1, 0, 0, 0, '{'};
                 assert(send(connection, bad, sizeof(bad), MSG_NOSIGNAL) == sizeof(bad));
-            } else writeMessage(connection, {{"KeyResult", {{"session", 999}, {"outcome", "Consumed"}, {"commit", "不可上屏"}, {"identity", identity}, {"frame", Json::object()}}}});
+            } else writeMessage(connection, {{"Result", {{"session", 999}, {"outcome", "Consumed"}, {"commit", "must not be committed"}, {"identity", identity}, {"frame", Json::object()}}}});
         }
-        char byte; assert(recv(connection, &byte, 1, 0) == 0); // 失败后关闭，无键重放。
+        char byte; assert(recv(connection, &byte, 1, 0) == 0); // It closes after the failure and no key is replayed.
         close(connection);
     });
     char program[] = "borno-transport"; char disable[] = "--disable=all"; char *arguments[] = {program, disable, nullptr};
@@ -54,7 +52,7 @@ int main(int argc, char **argv) {
         fcitx::BornopataEngine engine(&instance.addonManager());
         Input context(instance.inputContextManager());
         auto begin = std::chrono::steady_clock::now();
-        assert(!engine.process(&context, fcitx::Key(FcitxKey_n)));
+        assert(!engine.process(&context, fcitx::Key(FcitxKey_a)));
         assert(std::chrono::steady_clock::now() - begin < std::chrono::seconds(1));
         assert(context.committed.empty() && context.inputPanel().empty());
         mock.join();

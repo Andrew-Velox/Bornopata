@@ -1,4 +1,4 @@
-//! 长度前缀显式使用小端；非阻塞 fd 内部同步 poll，共享 200ms 截止时间，耗时需与 UI 分开。
+//! The length prefix is explicitly little-endian. The fd is non-blocking and polled synchronously under one shared 200 ms deadline.
 #include "connection.h"
 #include <array>
 #include <chrono>
@@ -49,7 +49,7 @@ bool Connection::open() {
     socklen_t size = sizeof(credentials);
     if (getsockopt(fd_, SOL_SOCKET, SO_PEERCRED, &credentials, &size) < 0 || credentials.uid != geteuid()) { close(); return false; }
 #else
-    // BSD 没有 SO_PEERCRED；glibc 没有 getpeereid，所以分开写
+    // BSD has no SO_PEERCRED and glibc has no getpeereid, so the two are written separately
     uid_t uid = 0;
     gid_t gid = 0;
     if (getpeereid(fd_, &uid, &gid) < 0 || uid != geteuid()) { close(); return false; }

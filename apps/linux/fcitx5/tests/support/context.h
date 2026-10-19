@@ -1,4 +1,4 @@
-//! 默认面板回归使用的无应用输入上下文。
+//! An input context without an application, for default panel tests.
 #pragma once
 #include <fcitx/inputcontext.h>
 #include <functional>
@@ -22,7 +22,7 @@ protected:
     void deleteSurroundingTextImpl(int, unsigned int) override {}
     void forwardKeyImpl(const fcitx::ForwardKeyEvent &) override {}
     void updatePreeditImpl() override {
-        // 回调只触发一次。不用 std::move：libc++ 不保证移走后的 std::function 变空
+        // The callback fires once. Not std::move: libc++ does not guarantee a moved-from std::function is empty.
         auto callback = std::exchange(onPreedit, nullptr);
         if (callback) callback();
     }

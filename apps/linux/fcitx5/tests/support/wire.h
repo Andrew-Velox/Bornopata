@@ -1,4 +1,4 @@
-//! 测试消息读写；断言只检查协议适配，业务在 Rust 测试覆盖。
+//! Test message reading and writing; assertions only check the protocol adaptation, input logic is covered by the Rust tests.
 #pragma once
 #include <nlohmann/json.hpp>
 #include <array>
@@ -22,5 +22,11 @@ inline void writeMessage(int fd, const Json &message) {
     assert(send(fd, body.data(), size, MSG_NOSIGNAL) == size);
 }
 inline Json emptyFrame() {
-    return Json::parse(R"({"preedit":[],"cursor":0,"candidates":{"items":[]},"highlight":0,"page":0,"page_count":1,"notice":null})");
+    return Json::parse(R"({"roman":"","preedit":"","candidates":[],"highlight":0,"suggesting":false,"mode":"Bangla"})");
+}
+/// The frame the mock shows after the letters "ami": Bangla preedit and three candidates.
+inline Json amiFrame() {
+    return Json::parse(R"({"roman":"ami","preedit":"\u0986\u09ae\u09bf","candidates":[
+        {"text":"\u0986\u09ae\u09bf","source":"Direct"},{"text":"\u0985\u09ae\u09bf","source":"Dictionary"},
+        {"text":"\u0986\u09ae\u09c0","source":"Learned"}],"highlight":0,"suggesting":false,"mode":"Bangla"})");
 }

@@ -1,4 +1,4 @@
-//! Fcitx 上下文只保存会话身份与展示事实，输入状态保存在 Server。
+//! An input context keeps only its session identity and display facts; all input state lives in the Server.
 #pragma once
 #include "ipc/shared.h"
 #include <fcitx/inputcontextproperty.h>
@@ -14,37 +14,33 @@ struct Session final : fcitx::InputContextProperty {
         }
     }
 
-    /// 插件生命周期内递增，永不复用。
+    /// Increases for the life of the plugin and is never reused.
     uint64_t id;
 
-    /// 析构只撤销登记并排队关闭，不阻塞或访问已析构 Engine。
+    /// The destructor only withdraws the registration and queues the close; it must not block or touch an engine
+    /// that is already destroyed.
     std::weak_ptr<SharedConnection> owner;
 
     bool opened = false;
 
     bool focused = false;
 
-    /// 最近提交给客户端的预编辑；框架失焦提交事实依赖此字段。
+    /// Whether the last frame was given to the client as preedit; the framework commits that on focus out.
     bool clientPreedit = false;
 
     uint64_t revision = 0;
 
     uint64_t generation = 0;
 
-    /// 框架边界代次；重入后阻止旧响应继续上屏或重画。
+    /// Counts framework boundaries; after a reentrant call it stops an older reply from committing or redrawing.
     uint64_t lifecycle = 0;
 
     nlohmann::json displayIdentity;
 
-    /// 仅缓存 Server 已确认的能力；尚未成功发送不能视为同步。
+    /// The capabilities the Server has confirmed; a send that has not succeeded does not count as synchronized.
     nlohmann::json capabilities;
 
-    std::string preeditMode = "both";
-
-    std::string selectionText;
-
-    unsigned int selectionCursor = 0;
-
-    unsigned int selectionAnchor = 0;
+    /// "Bangla" or "English", as last reported by the Server; empty before the first reply.
+    std::string mode;
 };
 }

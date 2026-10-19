@@ -1,4 +1,4 @@
-//! 可观测应用上屏与可重入 preedit 回调的真实 Fcitx 上下文。
+//! A real Fcitx input context that records commits and can call back reentrantly from preedit updates.
 #pragma once
 #include <fcitx/inputcontext.h>
 #include <fcitx/inputpanel.h>
@@ -19,7 +19,7 @@ public:
 protected:
     void commitStringImpl(const std::string &text) override {
         committed += text;
-        // 回调只触发一次。不用 std::move：libc++ 不保证移走后的 std::function 变空
+        // The callback fires once. Not std::move: libc++ does not guarantee a moved-from std::function is empty.
         auto callback = std::exchange(commitHook, nullptr);
         if (callback) callback();
     }

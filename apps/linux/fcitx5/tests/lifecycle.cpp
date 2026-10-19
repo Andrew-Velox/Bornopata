@@ -1,4 +1,4 @@
-//! 框架真实事件次序：失焦只交付一次，能力与 Shift 事实完整转发。
+//! Real framework event order: focus out delivers once, and the capabilities and Shift facts are forwarded in full.
 #include "bornopata.h"
 #include "support/context.h"
 #include "support/mock.h"
@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     fcitx::Instance instance(2, arguments);
     instance.initialize();
     fcitx::BornopataEngine engine(&instance.addonManager());
-    fcitx::InputMethodEntry entry("bornopata", "bornopata", "zh_CN", "bornopata");
+    fcitx::InputMethodEntry entry("bornopata", "bornopata", "bn_BD", "bornopata");
     auto context = std::make_unique<Context>(instance.inputContextManager());
     using Flag = fcitx::CapabilityFlag;
     fcitx::CapabilityFlags capabilities = Flag::Preedit;
@@ -21,13 +21,13 @@ int main(int argc, char **argv) {
     if (scenario == "focusout-client-owned") capabilities |= Flag::ClientUnfocusCommit;
     context->setCapabilityFlags(capabilities);
     context->focusIn();
-    assert(engine.process(context.get(), fcitx::Key(FcitxKey_n)));
+    assert(engine.process(context.get(), fcitx::Key(FcitxKey_a)));
     if (scenario.rfind("focusout-", 0) == 0) {
         if (scenario == "focusout-client-owned") context->commitString(context->inputPanel().clientPreedit().toStringForCommit());
         context->focusOut();
         fcitx::FocusOutEvent event(context.get());
         engine.deactivate(entry, event);
-        assert(context->committed == "ni");
+        assert(context->committed == "\u0986\u09ae\u09bf");
     } else if (scenario == "capability-deactivate") {
         fcitx::InputContextSwitchInputMethodEvent event(fcitx::InputMethodSwitchedReason::CapabilityChanged, "bornopata", context.get());
         engine.deactivate(entry, event);
@@ -52,8 +52,8 @@ int main(int argc, char **argv) {
     bool sawShiftPress = false, sawShiftRelease = false, sawCapabilityReason = false;
     Json lastCaps;
     for (const auto &message : mock.messages) {
-        if (!message.contains("LinuxEvent")) continue;
-        const auto &event = message.at("LinuxEvent").at("event");
+        if (!message.contains("Event")) continue;
+        const auto &event = message.at("Event").at("event");
         if (event.contains("Capabilities")) lastCaps = event.at("Capabilities");
         if (event.contains("Key") && event.at("Key").at("event").at("virtual_key") == 16) {
             if (event.at("Key").at("release").get<bool>()) sawShiftRelease = true;

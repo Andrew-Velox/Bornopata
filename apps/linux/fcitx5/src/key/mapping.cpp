@@ -1,4 +1,4 @@
-//! 字符交给 JSON 库转义；功能键转换成共享协议的 VK 值。
+//! Characters are escaped by the JSON library; function keys are converted to the protocol's virtual-key values.
 #include "mapping.h"
 namespace bornopata {
 nlohmann::json mapKey(const fcitx::Key &key) {
@@ -30,10 +30,6 @@ nlohmann::json mapKey(const fcitx::Key &key) {
         if (key.sym() >= FcitxKey_KP_0 && key.sym() <= FcitxKey_KP_9) code = 0x60 + key.sym() - FcitxKey_KP_0;
         break;
     }
-    // Shift+数字的译词/删除快捷键按物理数字行识别，字符仍保留 !@# 等。
-    const std::string shiftedDigits = ")!@#$%^&*(";
-    auto shifted = shiftedDigits.find(static_cast<char>(key.sym()));
-    if (key.sym() < 128 && key.states().test(fcitx::KeyState::Shift) && shifted != std::string::npos) code = 0x30 + shifted;
     auto unicode = fcitx::Key::keySymToUnicode(key.sym());
     nlohmann::json character = nullptr;
     if (unicode >= 0x20 && unicode != 0x7f) character = fcitx::Key::keySymToUTF8(key.sym());
@@ -41,6 +37,6 @@ nlohmann::json mapKey(const fcitx::Key &key) {
     return {{"virtual_key", code}, {"character", character}, {"modifiers", {
         {"ctrl", states.test(fcitx::KeyState::Ctrl)}, {"shift", states.test(fcitx::KeyState::Shift) || key.sym() == FcitxKey_ISO_Left_Tab},
         {"alt", states.test(fcitx::KeyState::Alt)}, {"win", states.test(fcitx::KeyState::Super) || states.test(fcitx::KeyState::Hyper)},
-        {"caps", states.test(fcitx::KeyState::CapsLock)}, {"english_mode", false}}}};
+        {"caps", states.test(fcitx::KeyState::CapsLock)}}}};
 }
 }

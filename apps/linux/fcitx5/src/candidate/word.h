@@ -1,4 +1,4 @@
-//! 候选正文与第一条译词；选词仍回 Server 调 Engine::commit。
+//! A candidate: its text and an annotation. Selecting it goes back to the Server, which commits.
 #pragma once
 #include <fcitx/candidatelist.h>
 #include <functional>
@@ -12,7 +12,7 @@ public:
     }
     void select(fcitx::InputContext *context) const override { if (!isPlaceHolder()) select_(context); }
 private:
-    /// 含帧版本检查的选择操作。
+    /// The selection, guarded by a check that the frame is still the one shown.
     std::function<void(fcitx::InputContext *)> select_;
 };
 }
