@@ -13,6 +13,9 @@ pub enum Source {
     /// A word from the word list.
     Dictionary,
 
+    /// A word the typed letters are only the beginning of.
+    Completion,
+
     /// A next-word suggestion.
     Next,
 }

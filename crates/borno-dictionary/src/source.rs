@@ -63,11 +63,10 @@ mod tests {
     use crate::DictionaryBuilder;
 
     fn source(words: &[(&str, u32)]) -> DictionarySource {
-        let path = std::env::temp_dir().join(format!(
-            "borno-source-{}-{}.bnd",
-            std::process::id(),
-            words.len()
-        ));
+        static NEXT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+        let number = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        let path =
+            std::env::temp_dir().join(format!("borno-source-{}-{number}.bnd", std::process::id()));
         let mut builder = DictionaryBuilder::new();
         for (word, count) in words {
             builder.add(word, *count);

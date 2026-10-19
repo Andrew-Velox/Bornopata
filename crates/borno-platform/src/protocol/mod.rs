@@ -24,7 +24,7 @@ pub use session::SessionId;
 
 /// Bumped whenever a message or a field changes meaning. The Server refuses a shell that sends another number;
 /// there is no compatibility layer, the Server and the plugin are installed together.
-pub const PROTOCOL_VERSION: u32 = 1;
+pub const PROTOCOL_VERSION: u32 = 2;
 
 #[cfg(test)]
 mod tests;

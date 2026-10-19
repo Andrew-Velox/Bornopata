@@ -72,11 +72,19 @@ fn a_picked_candidate_is_learned_across_runs() {
 
     let first = stdout(&["--user-dir", user_dir, "--pick", "2", "kotha"]);
     assert!(first.contains("1. কথা  [direct]"), "{first}");
-    assert!(first.contains("text: কোঁথা"), "{first}");
+    let picked = first
+        .lines()
+        .find_map(|line| line.strip_prefix("text: "))
+        .expect("the committed text is printed")
+        .to_owned();
+    assert_ne!(picked, "কথা");
 
     let later = stdout(&["--user-dir", user_dir, "kotha"]);
-    assert!(later.contains("1. কোঁথা  [learned]"), "{later}");
-    assert!(later.contains("text: কোঁথা"), "{later}");
+    assert!(
+        later.contains(&format!("1. {picked}  [learned]")),
+        "{later}"
+    );
+    assert!(later.contains(&format!("text: {picked}")), "{later}");
     let _ = std::fs::remove_dir_all(&directory);
 }
 

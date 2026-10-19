@@ -113,3 +113,39 @@ impl LanguageModel for FixedModel {
             .collect()
     }
 }
+
+/// A word source with frequencies and completions, answering by exact roman input or by prefix of it.
+pub struct StubSource(pub Vec<(&'static str, &'static str, u32)>);
+
+impl borno_transliteration::WordSource for StubSource {
+    fn suggest(&self, roman: &str) -> Vec<String> {
+        self.0
+            .iter()
+            .filter(|(typed, _, _)| *typed == roman)
+            .map(|(_, word, _)| (*word).to_owned())
+            .collect()
+    }
+
+    fn lookup(&self, roman: &str, limit: usize) -> Vec<borno_transliteration::WordSuggestion> {
+        let mut found: Vec<_> = self
+            .0
+            .iter()
+            .filter(|(typed, _, _)| typed.starts_with(roman))
+            .map(
+                |(typed, word, frequency)| borno_transliteration::WordSuggestion {
+                    text: (*word).to_owned(),
+                    frequency: *frequency,
+                    completion: *typed != roman,
+                },
+            )
+            .collect();
+        found.sort_by_key(|suggestion| std::cmp::Reverse(suggestion.frequency));
+        found.truncate(limit);
+        found
+    }
+}
+
+/// An engine over a [`StubSource`].
+pub fn stub_engine(words: Vec<(&'static str, &'static str, u32)>) -> Engine {
+    Engine::new(Box::new(StubSource(words)))
+}

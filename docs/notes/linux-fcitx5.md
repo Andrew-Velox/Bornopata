@@ -79,7 +79,7 @@ Learned data (`user-words.tsv`, `user-choices.tsv`, `user-ngram.tsv`) is written
 
 ## Protocol
 
-Framing: a 4-byte little-endian length, then a JSON body (`borno_platform::protocol`). Version `PROTOCOL_VERSION = 1`; the Server refuses any other and there is no compatibility layer, the Server and the plugin are installed together. Bump the number whenever a message changes meaning and change the plugin in the same commit.
+Framing: a 4-byte little-endian length, then a JSON body (`borno_platform::protocol`). Version `PROTOCOL_VERSION = 2`; the Server refuses any other and there is no compatibility layer, the Server and the plugin are installed together. Bump the number whenever a message changes meaning and change the plugin in the same commit.
 
 - Plugin to Server: `Open{session, app, protocol, generation, context}`, `Close{session}`, `Event{session, event}` with events `Capabilities`, `Reset`, `Key{event, release}`, `Deactivate`, `Focus`, `Candidate{identity, index}`. The first event of a session must be `Capabilities`.
 - Server to plugin: `Opened`, `Result{session, outcome, commit, identity, frame}`, `Ignored`. `commit` is applied before the frame is drawn. `identity.revision` grows with every reply so a stale reply or a click on a replaced frame is dropped.

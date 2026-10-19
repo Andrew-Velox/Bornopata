@@ -3,12 +3,15 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use super::ranking::Evidence;
+use super::ranking::{Evidence, edit_distance};
 use super::{Engine, Query, Timings};
 use crate::candidate::Candidate;
 
 /// Longer inputs get the direct conversion only: the word source is built for words, not paragraphs.
 const MAX_SUGGEST_LEN: usize = 64;
+
+/// Words asked of the word source for one input; the candidate limit trims the list afterwards.
+const LOOKUP_LIMIT: usize = 32;
 
 impl Engine {
     /// Candidates for `input` as if typed right after `previous`. Does not touch the composition or learning state.
@@ -50,21 +53,26 @@ impl Engine {
         timings.direct = started.elapsed();
         if !direct.is_empty() {
             order.push(direct.clone());
-            evidence.entry(direct).or_default().direct = true;
+            evidence.entry(direct.clone()).or_default().direct = true;
         }
 
         let started = Instant::now();
         let suggested = if input.len() <= MAX_SUGGEST_LEN {
-            self.words.suggest(input)
+            self.words.lookup(input, LOOKUP_LIMIT)
         } else {
             Vec::new()
         };
-        for text in suggested {
-            let entry = evidence.entry(text.clone()).or_insert_with(|| {
-                order.push(text);
+        for suggestion in suggested {
+            let entry = evidence.entry(suggestion.text.clone()).or_insert_with(|| {
+                order.push(suggestion.text.clone());
                 Evidence::default()
             });
-            entry.dictionary = true;
+            if suggestion.completion {
+                entry.completion = true;
+            } else {
+                entry.dictionary = true;
+            }
+            entry.frequency = entry.frequency.max(suggestion.frequency);
         }
         timings.dictionary = started.elapsed();
 
@@ -75,7 +83,7 @@ impl Engine {
                 Evidence::default()
             });
         }
-        let mut ranked: Vec<Candidate> = order
+        let mut ranked: Vec<(bool, Candidate)> = order
             .into_iter()
             .map(|text| {
                 let mut known = evidence.remove(&text).unwrap_or_default();
@@ -84,18 +92,25 @@ impl Engine {
                 known.pair_count =
                     previous.map_or(0, |previous| self.learner.pair_count(previous, &text));
                 known.log_prob = self.language_model.log_prob(previous, &text);
-                Candidate {
+                if known.dictionary && !known.direct {
+                    known.distance = edit_distance(&text, &direct);
+                }
+                let candidate = Candidate {
                     source: known.source(),
                     score: known.score(),
                     text,
-                }
+                };
+                (known.is_completion_only(), candidate)
             })
             .collect();
-        ranked.sort_by(|a, b| {
-            b.score
-                .total_cmp(&a.score)
+        ranked.sort_by(|(a_completion, a), (b_completion, b)| {
+            a_completion
+                .cmp(b_completion)
+                .then_with(|| b.score.total_cmp(&a.score))
                 .then_with(|| a.text.cmp(&b.text))
         });
+        let mut ranked: Vec<Candidate> =
+            ranked.into_iter().map(|(_, candidate)| candidate).collect();
         ranked.truncate(self.candidate_limit);
         timings.ranking = started.elapsed();
         (ranked, timings)

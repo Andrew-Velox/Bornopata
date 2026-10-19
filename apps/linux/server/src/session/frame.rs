@@ -10,6 +10,7 @@ fn source(source: CandidateSource) -> Source {
         CandidateSource::Learned => Source::Learned,
         CandidateSource::Direct => Source::Direct,
         CandidateSource::Dictionary => Source::Dictionary,
+        CandidateSource::Completion => Source::Completion,
     }
 }
 

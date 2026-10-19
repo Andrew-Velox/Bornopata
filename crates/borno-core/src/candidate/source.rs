@@ -11,8 +11,11 @@ pub enum CandidateSource {
     /// The direct Avro conversion of the input.
     Direct,
 
-    /// A word suggested by the word source.
+    /// A word suggested by the word source as a spelling of the input.
     Dictionary,
+
+    /// A word that only starts with what was typed (prefix completion).
+    Completion,
 }
 
 impl fmt::Display for CandidateSource {
@@ -21,6 +24,7 @@ impl fmt::Display for CandidateSource {
             Self::Learned => "learned",
             Self::Direct => "direct",
             Self::Dictionary => "dictionary",
+            Self::Completion => "completion",
         })
     }
 }
