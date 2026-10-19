@@ -153,7 +153,7 @@ impl Worker {
     }
 
     pub(super) fn hide(&mut self, token: u64) {
-        if !self.active.as_ref().is_some_and(|a| a.token == token) {
+        if self.active.as_ref().is_none_or(|a| a.token != token) {
             return;
         }
         self.clear_active();
