@@ -10,6 +10,7 @@ members = [
     "crates/borno-platform",
     "apps/cli",
     "apps/linux/server",
+    "tools/dict-build",
 ]
 
 [workspace.package]

@@ -13,4 +13,4 @@ pub use dictionary::{Dictionary, Match};
 pub use error::DictionaryError;
 pub use key::key;
 pub use normalize::{normalize, tokens};
-pub use source::DictionarySource;
+pub use source::{DictionarySource, word_source};

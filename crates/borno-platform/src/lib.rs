@@ -2,6 +2,7 @@
 
 pub mod config;
 mod error;
+pub mod paths;
 pub mod protocol;
 
 pub use config::{Config, GeneralConfig, KeyCombo, LogLevel, Modifiers, ShortcutConfig};

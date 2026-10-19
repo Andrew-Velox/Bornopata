@@ -8,6 +8,9 @@ pub enum CliError {
     #[error("failed to open user data: {0}")]
     Learning(#[from] borno_learning::LearningError),
 
+    #[error("failed to open the dictionary: {0}")]
+    Dictionary(#[from] borno_dictionary::DictionaryError),
+
     #[error("failed to load language model: {0}")]
     LanguageModel(#[from] borno_lm::LmError),
 

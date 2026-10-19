@@ -4,10 +4,9 @@ use std::path::Path;
 use std::sync::Arc;
 
 use borno_learning::FrequencyLearner;
-use borno_linux_server::{Router, ServerError, Shared, ipc, paths};
+use borno_linux_server::{Router, ServerError, Shared, ipc};
 use borno_lm::BigramModel;
-use borno_platform::Config;
-use borno_transliteration::UpodeshWordSource;
+use borno_platform::{Config, paths};
 
 /// The optional language model, looked up in the user data directory.
 const LANGUAGE_MODEL_FILE: &str = "lm.bnd";
@@ -41,8 +40,13 @@ fn run() -> Result<(), ServerError> {
         None
     };
     let model = load_model(&user_dir)?;
-    // The word source is the upodesh scaffold until we have our own list (docs/design/bangla-reuse-plan.md).
-    let shared = Shared::new(Arc::new(UpodeshWordSource::new()), learner, model);
+    let dictionary = paths::dictionary_path();
+    match &dictionary {
+        Some(path) => tracing::info!(path = %path.display(), "using the dictionary"),
+        None => tracing::warn!("no dictionary file, only the scaffold word list answers"),
+    }
+    let words = borno_dictionary::word_source(dictionary.as_deref())?;
+    let shared = Shared::new(Arc::from(words), learner, model);
     let mut router = Router::new(config, shared);
 
     extern "C" fn stop(_: libc::c_int) {

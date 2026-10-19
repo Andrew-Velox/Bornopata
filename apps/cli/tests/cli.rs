@@ -3,8 +3,12 @@
 use std::path::PathBuf;
 use std::process::{Command, Output};
 
+/// Runs the CLI without any dictionary file from the real user directory, so the result does not depend on the
+/// machine; tests that want a dictionary pass `--dict`.
 fn run(args: &[&str]) -> Output {
+    let hermetic = !args.contains(&"--dict");
     Command::new(env!("CARGO_BIN_EXE_borno-cli"))
+        .args(hermetic.then_some("--no-dict"))
         .args(args)
         .output()
         .expect("the CLI starts")
@@ -96,4 +100,42 @@ fn next_words_follow_what_was_typed_before() {
     let output = stdout(&["--user-dir", user_dir, "ami"]);
     assert!(output.contains("next: ভাত"), "{output}");
     let _ = std::fs::remove_dir_all(&directory);
+}
+
+#[test]
+fn a_dictionary_completes_what_is_typed_and_ranks_by_frequency() {
+    let directory = scratch("dictionary");
+    std::fs::create_dir_all(&directory).unwrap();
+    let path = directory.join("words.bnd");
+    let mut builder = borno_dictionary::DictionaryBuilder::new();
+    for (word, count) in [
+        ("বাংলা", 400),
+        ("বাংলাদেশ", 9_000),
+        ("বাংলাদেশী", 100),
+        ("আমি", 5_000),
+    ] {
+        builder.add(word, count);
+    }
+    builder
+        .write(&path, &borno_format::Metadata::default())
+        .unwrap();
+
+    let output = stdout(&["--dict", path.to_str().unwrap(), "bangl"]);
+    assert!(output.contains("1. বাংল  [direct]"), "{output}");
+    assert!(output.contains("2. বাংলাদেশ  [completion]"), "{output}");
+    assert!(output.contains("3. বাংলা  [completion]"), "{output}");
+    // Space commits what was typed, never a completion.
+    assert!(output.contains("text: বাংল"), "{output}");
+
+    let output = stdout(&["--dict", path.to_str().unwrap(), "bangla"]);
+    assert!(output.contains("1. বাংলা  [direct]"), "{output}");
+    assert!(output.contains("2. বাংলাদেশ  [completion]"), "{output}");
+    let _ = std::fs::remove_dir_all(&directory);
+}
+
+#[test]
+fn a_missing_dictionary_file_is_an_error() {
+    let output = run(&["--dict", "/nonexistent/words.bnd", "ami"]);
+    assert!(!output.status.success());
+    assert!(String::from_utf8_lossy(&output.stderr).contains("dictionary"));
 }

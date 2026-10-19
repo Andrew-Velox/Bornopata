@@ -23,6 +23,15 @@ pub struct Args {
     #[arg(long)]
     pub user_dir: Option<PathBuf>,
 
+    /// Dictionary file. Without it `$BORNOPATA_DICT` or `words.bnd` in the user data directory is used if present,
+    /// else only the built-in scaffold word list answers.
+    #[arg(long)]
+    pub dict: Option<PathBuf>,
+
+    /// Ignore any dictionary file and use only the built-in scaffold word list.
+    #[arg(long, conflicts_with = "dict")]
+    pub no_dict: bool,
+
     /// Language model as a `.bnd` file.
     #[arg(long, conflicts_with_all = ["lm_unigram", "lm_bigram"])]
     pub lm: Option<PathBuf>,

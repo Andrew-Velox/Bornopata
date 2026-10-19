@@ -66,9 +66,11 @@ name = "borno-cli"
 version = "0.1.1"
 dependencies = [
  "borno-core",
+ "borno-dictionary",
+ "borno-format",
  "borno-learning",
  "borno-lm",
- "borno-transliteration",
+ "borno-platform",
  "clap",
  "thiserror",
  "tracing-subscriber",
@@ -80,6 +82,16 @@ version = "0.1.1"
 dependencies = [
  "borno-transliteration",
  "tracing",
+]
+
+[[package]]
+name = "borno-dict-build"
+version = "0.1.0"
+dependencies = [
+ "borno-dictionary",
+ "borno-format",
+ "clap",
+ "thiserror",
 ]
 
 [[package]]
@@ -123,6 +135,7 @@ name = "borno-linux-server"
 version = "0.1.0-dev"
 dependencies = [
  "borno-core",
+ "borno-dictionary",
  "borno-learning",
  "borno-lm",
  "borno-platform",

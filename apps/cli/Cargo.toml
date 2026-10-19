@@ -10,9 +10,14 @@ workspace = true
 
 [dependencies]
 borno-core.workspace = true
+borno-dictionary.workspace = true
 borno-learning.workspace = true
 borno-lm.workspace = true
-borno-transliteration.workspace = true
+borno-platform.workspace = true
 clap.workspace = true
 thiserror.workspace = true
 tracing-subscriber.workspace = true
+
+[dev-dependencies]
+borno-dictionary.workspace = true
+borno-format.workspace = true

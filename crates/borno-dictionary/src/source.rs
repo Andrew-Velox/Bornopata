@@ -2,7 +2,9 @@
 
 use std::path::Path;
 
-use borno_transliteration::{Transliterator, WordSource, WordSuggestion};
+use borno_transliteration::{
+    FallbackWordSource, Transliterator, UpodeshWordSource, WordSource, WordSuggestion,
+};
 
 use crate::dictionary::Dictionary;
 use crate::error::DictionaryError;
@@ -29,6 +31,21 @@ impl DictionarySource {
 
     pub fn dictionary(&self) -> &Dictionary {
         &self.dictionary
+    }
+}
+
+/// The word source the programs use: the dictionary at `path` with the `upodesh` scaffold behind it as a fallback,
+/// or the scaffold alone when there is no dictionary.
+pub fn word_source(
+    path: Option<&Path>,
+) -> Result<Box<dyn WordSource + Send + Sync>, DictionaryError> {
+    let scaffold = Box::new(UpodeshWordSource::new());
+    match path {
+        Some(path) => Ok(Box::new(FallbackWordSource::new(
+            Box::new(DictionarySource::open(path)?),
+            scaffold,
+        ))),
+        None => Ok(scaffold),
     }
 }
 
