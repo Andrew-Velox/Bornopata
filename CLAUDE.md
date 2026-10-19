@@ -18,9 +18,11 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 - `crates/borno-dictionary`: Bengali word normalization, the phonetic `key`, the FST-indexed `.bnd` dictionary with prefix completion (`Dictionary`, `DictionaryBuilder`) and `DictionarySource`, the main `WordSource`.
 - `crates/borno-transliteration`: `Transliterator` (Avro conversion through `okkhor`) and the `WordSource` seam with the `upodesh` scaffold implementation.
 - `crates/borno-learning`: `FrequencyLearner` (word counts, per-input choices, personal bigram, time decay, TSV files in one directory).
+- `crates/borno-gloss`: the English glosses (`gloss-en.bnd`): `Glossary` (mapped, hash lookup, Core's `Annotator`) and `GlossaryBuilder`.
 - `crates/borno-lm`: `BigramModel` language model, from TSV or `.bnd`, with next-word successors.
 - `crates/borno-format`: `.bnd` data container (mmap reader, zero-copy views, writer, hash index).
 - `apps/cli`: `borno-cli <roman>...` types words through the engine and prints candidates, sources, scores and timings; `--dict` picks a dictionary, `--eval FILE` measures ranking. Run it before merging ranking changes.
+- `tools/gloss-build`: `borno-gloss-build` cleans Wiktionary entries into the gloss table (`wiktionary`), optionally fills gaps with a language model (`generate`, key from the environment or `.env` only), writes the review sheet (`sheet`) and the `.bnd` (`export`).
 - `tools/dict-build`: `borno-dict-build` counts Bengali words in corpus text (wiki XML included) and writes the dictionary. Corpora are never committed.
 - `crates/borno-platform`: the config file (`[general]`, `[shortcut]`) and the Server and shell wire protocol (`protocol`).
 - `crates/bamboo-slip`: the self-drawn UI engine (scene tree, layout, text shaping, animation to a bitmap), from Qingjian, GPL side of its dual license.

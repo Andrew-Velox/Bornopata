@@ -84,6 +84,7 @@ Then typing `bangl` offers বাংল first (what you typed) followed by ব�
 [general]
 learning = true          # remember choices (kept in ~/.local/share/bornopata)
 bangla_digits = true
+gloss = true             # English gloss with part of speech beside each candidate ("n. rice"); needs gloss-en.bnd
 log_level = "info"       # logs in ~/.local/state/bornopata/logs
 
 [shortcut]
@@ -99,6 +100,8 @@ layout = "vertical"      # or "horizontal"
 
 Fonts: the window needs a Bengali font (Noto Sans Bengali from `noto-fonts` on Arch); `journalctl --user -u bornopata` or the log says which panel was chosen.
 
+The gloss file `gloss-en.bnd` (installed next to `words.bnd` by `install.sh`, or `$BORNOPATA_GLOSS`) is mapped at Server start when `gloss = true`; the log says how many entries were loaded. See [../design/glosses.md](../design/glosses.md).
+
 Learned data (`user-words.tsv`, `user-choices.tsv`, `user-ngram.tsv`) is written a few seconds after the last commit and when the Server stops. An optional language model goes in `~/.local/share/bornopata/lm.bnd`. Typed text is never written to the logs.
 
 ## Protocol
@@ -108,7 +111,7 @@ Framing: a 4-byte little-endian length, then a JSON body (`borno_platform::proto
 - Plugin to Server: `Open{session, app, protocol, generation, context, popup}` (`popup` is the token of the popup channel when the context can show the popup, else null), `Close{session}`, `Event{session, event}` with events `Capabilities`, `Reset`, `Key{event, release}`, `Deactivate`, `Focus`, `Candidate{identity, index}` and `Cursor{x, y, width, height, surface_relative}` (the text cursor, sent when it changes and before a key). The first event of a session must be `Capabilities`.
 - Server to plugin: `Opened`, `Result{session, outcome, commit, identity, frame}`, `Ignored`. `commit` is applied before the frame is drawn. `identity.revision` grows with every reply so a stale reply or a click on a replaced frame is dropped.
 - **Popup channel**: a second connection starts with `Attach{protocol, token}` (answered `Attached`) and then carries only popup messages. Server to plugin: `Pool{pool, size}` with a `memfd` as `SCM_RIGHTS` ancillary data, `Present{context, pool, buffer, offset, width, height, stride, scale_120, logical_width, logical_height}` (premultiplied ARGB8888, cropped to the card) and `Hide`. Plugin to Server: `Released{buffer}` and `Scale{scale_120}`. The plugin reads it from Fcitx5's event loop without blocking; the Server writes from its render thread, so typing never waits for a render. Details: [../design/popup-surface.md](../design/popup-surface.md).
-- `Frame`: `roman`, `preedit` (Bangla text of the highlighted candidate), `candidates` (at most nine, each with `text` and `source`: `Learned`, `Direct`, `Dictionary`, `Completion` or `Next`), `highlight`, `suggesting`, `mode`, `native` (the Server shows the frame in its own window, so the plugin draws no candidate list).
+- `Frame`: `roman`, `preedit` (Bangla text of the highlighted candidate), `candidates` (at most nine, each with `text`, `source`: `Learned`, `Direct`, `Dictionary`, `Completion` or `Next`, and an optional `gloss {pos, text}`), `highlight`, `suggesting`, `mode`, `native` (the Server shows the frame in its own window, so the plugin draws no candidate list).
 
 ## Tests
 
