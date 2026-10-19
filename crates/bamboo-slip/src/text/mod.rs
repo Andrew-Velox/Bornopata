@@ -131,13 +131,6 @@ impl TextPainter {
         self.measured.clear();
     }
 
-    /// 光学字号（点）：SF 这类带 `opsz` 轴的字体在小字号用文本视觉尺寸，CoreText 对系统字体自动做，这里要显式给。
-    /// 现在是整个画笔一个值（cosmic-text 的字体实例缓存没按它分键），界面里的小字号都在 20 pt 以下，落到同一档。
-    pub fn set_optical_size(&mut self, points: Option<f32>) {
-        self.font_system.set_optical_size(points);
-        self.measured.clear();
-    }
-
     /// 一段文字的宽高（像素），一行到底。高度就是行高。
     pub fn measure(&mut self, text: &str, style: &TextStyle) -> TextSize {
         self.measure_within(text, style, None)
