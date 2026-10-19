@@ -14,8 +14,8 @@ public:
 
     pid_t pid = -1;
 
-    /// `executable` is the built `borno-linux-server`; `config` is appended to the config file.
-    explicit RealServer(const char *executable, const std::string &config = "") {
+    /// `executable` is the built `borno-linux-server`; `config` is appended to the config file. Tests never open a window on a real desktop; `panel` is the `[panel] mode`.
+    explicit RealServer(const char *executable, const std::string &config = "", const char *panel = "fcitx") {
         char pattern[] = "/tmp/borno-real-XXXXXX";
         auto *created = mkdtemp(pattern); assert(created);
         directory = created;
@@ -25,8 +25,7 @@ public:
         setenv("XDG_STATE_HOME", directory.c_str(), 1);
         unsetenv("DBUS_SESSION_BUS_ADDRESS");
         std::filesystem::create_directories(directory / "bornopata");
-        // Tests never open the self-drawn window on a real desktop: Fcitx5's panel is the one under test.
-        std::ofstream(directory / "bornopata/config.toml") << "[panel]\nmode = \"fcitx\"\n\n" << config;
+        std::ofstream(directory / "bornopata/config.toml") << "[panel]\nmode = \"" << panel << "\"\n\n" << config;
         pid = fork(); assert(pid >= 0);
         if (pid == 0) { execl(executable, executable, nullptr); _exit(127); }
         for (int i = 0; i < 500 && !std::filesystem::exists(directory / "server.sock"); ++i)
@@ -45,6 +44,13 @@ public:
     std::string read(const std::string &relative) const {
         std::ifstream input(directory / relative);
         return std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
+    }
+    /// Everything the Server logged so far (the writer is asynchronous, so this may lag a moment behind).
+    std::string log() const {
+        std::string text;
+        std::error_code error;
+        for (const auto &entry : std::filesystem::directory_iterator(directory / "bornopata/logs", error)) text += read(std::filesystem::relative(entry.path(), directory).string());
+        return text;
     }
     ~RealServer() { stop(); std::filesystem::remove_all(directory); }
 };

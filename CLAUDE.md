@@ -26,7 +26,7 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 - `crates/bamboo-slip`: the self-drawn UI engine (scene tree, layout, text shaping, animation to a bitmap), from Qingjian, GPL side of its dual license.
 - `crates/borno-render`: the candidate window renderer: `Frame` + theme to a bitmap. Themes `bornopata` and `sakura` are in `themes/`; `cargo run -p borno-render --example preview` draws them to PNG.
 - `crates/borno-panel`: the Wayland window: a layer-shell surface on its own thread, popup placement, Hyprland geometry. `examples/show.rs` puts it on a real screen.
-- `apps/linux`: `server` (`Router` input logic, Unix socket IPC), `fcitx5` (C++ plugin; draws the Fcitx5 panel only when the Server's own window is not available), `scripts` (user-level install and uninstall), `systemd` (user unit).
+- `apps/linux`: `server` (`Router` input logic, Unix socket IPC), `fcitx5` (C++ plugin; draws the Fcitx5 panel only when the Server's own window is not available, and shows the Server's bitmaps in the input-method popup of Wayland clients), `scripts` (user-level install and uninstall), `systemd` (user unit).
 - `assets/`: sample data. Every directory has a README with source and license. Data without a verified license must not ship.
 
 `docs/` has three kinds of pages (index in `docs/README.md`): `design/` decisions, `plan/` roadmap, `notes/` engineering records.

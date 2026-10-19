@@ -1,6 +1,7 @@
 //! Default candidate panel. When the connection fails the preedit is cleared and input passes through; nothing is replayed.
 #include "bornopata.h"
 #include "candidate/word.h"
+#include "popup/wayland/make.h"
 #include "key/mapping.h"
 #include <fcitx/addonmanager.h>
 #include <fcitx/candidatelist.h>
@@ -37,12 +38,27 @@ std::string annotation(const nlohmann::json &item) {
 }
 
 BornopataEngine::BornopataEngine(AddonManager *manager)
+    : BornopataEngine(manager, bornopata::makeWaylandPresenter(manager)) {}
+
+BornopataEngine::BornopataEngine(AddonManager *manager, std::unique_ptr<bornopata::Presenter> presenter)
     : instance_(manager->instance()), shared_(std::make_shared<bornopata::SharedConnection>()),
       sessions_([this](InputContext &context) {
           const auto id = shared_->nextSession++;
           shared_->contexts.emplace(id, context.watch());
           return new bornopata::Session(shared_, id);
       }) {
+    if (presenter)
+        popup_ = std::make_unique<bornopata::PopupBridge>(instance_->eventLoop(), std::move(presenter),
+            [this](const std::string &identity) -> InputContext * {
+                for (const auto &[id, watched] : shared_->contexts) {
+                    (void)id;
+                    auto *context = watched.get();
+                    if (!context || contextIdentity(context) != identity) continue;
+                    auto *session = context->propertyFor(&sessions_);
+                    return context->hasFocus() && session->opened && session->showing ? context : nullptr;
+                }
+                return nullptr;
+            });
     shared_->deferred = instance_->eventLoop().addDeferEvent([this](EventSource *event) {
         event->setEnabled(false);
         if (shared_->connection.connected() && !shared_->flush()) disconnectAll();
@@ -64,12 +80,15 @@ BornopataEngine::BornopataEngine(AddonManager *manager)
         auto *session = context->propertyFor(&sessions_);
         ++session->lifecycle;
         session->focused = false;
+        session->showing = false;
+        if (popup_) popup_->hide(context);
         if (session->opened) exchange(context, {{"Focus", {{"focused", false}}}}, false);
     });
 }
 
 BornopataEngine::~BornopataEngine() {
     *alive_ = false;
+    popup_.reset();
     capabilityWatcher_.reset(); focusWatcher_.reset(); cursorWatcher_.reset();
     shared_->watcher.reset(); shared_->deferred.reset(); shared_->connection.close();
     const auto contexts = shared_->contexts;
@@ -90,6 +109,8 @@ void BornopataEngine::clear(InputContext *context) {
     const auto revision = ++session->revision;
     session->displayIdentity = nullptr;
     session->clientPreedit = false;
+    session->showing = false;
+    if (popup_) popup_->hide(context);
     context->inputPanel().reset();
     context->updatePreedit();
     if (watched.get() && session->revision == revision)
@@ -99,6 +120,7 @@ void BornopataEngine::clear(InputContext *context) {
 void BornopataEngine::disconnectAll() {
     if (shared_->clearing) return;
     shared_->clearing = true;
+    if (popup_) popup_->reset();
     shared_->watcher.reset();
     shared_->connection.close();
     shared_->retired.clear();
@@ -159,8 +181,11 @@ bool BornopataEngine::connect(InputContext *context) {
         if (!shared_->flush()) throw std::runtime_error("close exchange");
         session->generation = shared_->generation;
         nlohmann::json response;
+        // A context that can show the popup names the channel the Server draws its frames in.
+        const auto popup = popup_ ? popup_->token(context, shared_->generation) : std::nullopt;
         if (!shared_->connection.send({{"Open", {{"session", session->id}, {"app", context->program()}, {"protocol", PROTOCOL},
-                {"generation", session->generation}, {"context", contextIdentity(context)}}}}, &response)
+                {"generation", session->generation}, {"context", contextIdentity(context)},
+                {"popup", popup ? nlohmann::json(*popup) : nlohmann::json(nullptr)}}}}, &response)
             || response.at("Opened").at("session") != session->id
             || response.at("Opened").at("protocol") != PROTOCOL)
             throw std::runtime_error("protocol mismatch");
@@ -333,6 +358,7 @@ void BornopataEngine::render(InputContext *context, const nlohmann::json &frame)
     };
     // When the Server shows the frame in its own window the Fcitx5 panel stays empty; only the inline preedit remains.
     const bool native = frame.value("native", false);
+    session->showing = native && (!items.empty() || !roman.empty());
     auto list = std::make_unique<CommonCandidateList>();
     list->setPageSize(PANEL_CANDIDATES);
     if (suggesting) list->setLabels({"Tab", "", "", "", "", "", "", "", ""});

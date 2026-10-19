@@ -5,18 +5,21 @@ How the pieces fit, how to build and install them on Arch with Hyprland, and wha
 ## Parts
 
 - **`borno-linux-server`** (`apps/linux/server`): holds one `Engine` per input context and all learned data, listens on a Unix socket (`$XDG_RUNTIME_DIR/bornopata.sock`, or `$BORNOPATA_SOCKET`). All input logic is in the `Router`.
-- **`bornopata.so`** (`apps/linux/fcitx5`): a thin Fcitx5 addon. It forwards key and lifecycle events and the text cursor position to the Server and draws the frame it gets back: on Fcitx5's default panel, or, when the Server says the frame is `native`, only the inline preedit.
-- **The self-drawn window** (`crates/borno-panel`, started by the Server): a layer-shell overlay with the Bornopata themes, used on Hyprland and other wlroots compositors; see [../design/candidate-window.md](../design/candidate-window.md). GNOME and KDE keep Fcitx5's panel.
+- **`bornopata.so`** (`apps/linux/fcitx5`): a thin Fcitx5 addon. It forwards key and lifecycle events and the text cursor position to the Server and draws the frame it gets back: on Fcitx5's default panel, or, when the Server says the frame is `native`, only the inline preedit. For Wayland input contexts it also shows the bitmaps the Server draws in the input method's popup surface (`src/popup/`).
+- **The self-drawn window** with the Bornopata themes, in two forms; see [../design/candidate-window.md](../design/candidate-window.md) and [../design/popup-surface.md](../design/popup-surface.md):
+  - the **input-method popup** (`apps/linux/server/src/popup`, shown by the plugin): for Wayland-native clients (Brave, Firefox, GTK, Qt). The compositor places it at the caret and flips it at screen edges. Used when the plugin can create the popup surface (Fcitx5 5.1 with the `waylandim` frontend);
+  - the **layer-shell overlay** (`crates/borno-panel`, started by the Server): for X11 and XWayland clients with a known cursor rectangle on Hyprland and other wlroots compositors.
+  Everything else (GNOME, KDE, any failure) keeps Fcitx5's panel.
 - Socket access is limited to the same user (`SO_PEERCRED`, mode 0600, private directory).
 
 ## Arch packages
 
 ```bash
-sudo pacman -S fcitx5 fcitx5-gtk fcitx5-qt fcitx5-configtool nlohmann-json pkgconf cmake noto-fonts
+sudo pacman -S fcitx5 fcitx5-gtk fcitx5-qt fcitx5-configtool nlohmann-json pkgconf cmake noto-fonts wayland wayland-protocols
 ```
 
-`fcitx5` already ships the development headers on Arch. Rust comes from `rustup` (the toolchain in `rust-toolchain.toml`). `noto-fonts` provides a Bangla font (Noto Sans Bengali).
-Debian and Ubuntu: `cmake g++ pkg-config python3 libfcitx5core-dev libfcitx5utils-dev libfcitx5config-dev nlohmann-json3-dev`. FreeBSD: `pkg install bash cmake pkgconf python3 fcitx5 nlohmann-json rustup-init`.
+`fcitx5` already ships the development headers on Arch. `wayland` (the client library and `wayland-scanner`) and `wayland-protocols` are needed for the popup surface; without any of them, or without the Fcitx5 Wayland module, CMake builds the plugin without it (`-DBORNOPATA_WAYLAND_POPUP=OFF` does the same) and Wayland clients get Fcitx5's panel. Rust comes from `rustup` (the toolchain in `rust-toolchain.toml`). `noto-fonts` provides a Bangla font (Noto Sans Bengali).
+Debian and Ubuntu: `cmake g++ pkg-config python3 libfcitx5core-dev libfcitx5utils-dev libfcitx5config-dev nlohmann-json3-dev` (and `libwayland-dev libwayland-bin wayland-protocols` for the popup surface; `libsystemd-dev` to run the plugin tests). FreeBSD: `pkg install bash cmake pkgconf python3 fcitx5 nlohmann-json rustup-init`.
 
 ## Build and install (user directory, no root)
 
@@ -87,7 +90,8 @@ log_level = "info"       # logs in ~/.local/state/bornopata/logs
 toggle = "ctrl+alt+space"
 
 [panel]
-mode = "auto"            # auto: own window where possible, else Fcitx5's panel; fcitx: always Fcitx5's panel
+mode = "auto"            # auto: popup for Wayland clients, layer-shell window for X11, else Fcitx5's panel;
+                         # popup: only the input-method popup; native: only the layer-shell window; fcitx: always Fcitx5's panel
 theme = "bornopata"      # or "sakura", or the path of a theme directory
 dark = false             # dark variant of themes that have one
 layout = "vertical"      # or "horizontal"
@@ -99,10 +103,11 @@ Learned data (`user-words.tsv`, `user-choices.tsv`, `user-ngram.tsv`) is written
 
 ## Protocol
 
-Framing: a 4-byte little-endian length, then a JSON body (`borno_platform::protocol`). Version `PROTOCOL_VERSION = 3`; the Server refuses any other and there is no compatibility layer, the Server and the plugin are installed together. Bump the number whenever a message changes meaning and change the plugin in the same commit.
+Framing: a 4-byte little-endian length, then a JSON body (`borno_platform::protocol`). Version `PROTOCOL_VERSION = 4`; the Server refuses any other and there is no compatibility layer, the Server and the plugin are installed together. Bump the number whenever a message changes meaning and change the plugin in the same commit.
 
-- Plugin to Server: `Open{session, app, protocol, generation, context}`, `Close{session}`, `Event{session, event}` with events `Capabilities`, `Reset`, `Key{event, release}`, `Deactivate`, `Focus`, `Candidate{identity, index}` and `Cursor{x, y, width, height, surface_relative}` (the text cursor, sent when it changes and before a key). The first event of a session must be `Capabilities`.
+- Plugin to Server: `Open{session, app, protocol, generation, context, popup}` (`popup` is the token of the popup channel when the context can show the popup, else null), `Close{session}`, `Event{session, event}` with events `Capabilities`, `Reset`, `Key{event, release}`, `Deactivate`, `Focus`, `Candidate{identity, index}` and `Cursor{x, y, width, height, surface_relative}` (the text cursor, sent when it changes and before a key). The first event of a session must be `Capabilities`.
 - Server to plugin: `Opened`, `Result{session, outcome, commit, identity, frame}`, `Ignored`. `commit` is applied before the frame is drawn. `identity.revision` grows with every reply so a stale reply or a click on a replaced frame is dropped.
+- **Popup channel**: a second connection starts with `Attach{protocol, token}` (answered `Attached`) and then carries only popup messages. Server to plugin: `Pool{pool, size}` with a `memfd` as `SCM_RIGHTS` ancillary data, `Present{context, pool, buffer, offset, width, height, stride, scale_120, logical_width, logical_height}` (premultiplied ARGB8888, cropped to the card) and `Hide`. Plugin to Server: `Released{buffer}` and `Scale{scale_120}`. The plugin reads it from Fcitx5's event loop without blocking; the Server writes from its render thread, so typing never waits for a render. Details: [../design/popup-surface.md](../design/popup-surface.md).
 - `Frame`: `roman`, `preedit` (Bangla text of the highlighted candidate), `candidates` (at most nine, each with `text` and `source`: `Learned`, `Direct`, `Dictionary`, `Completion` or `Next`), `highlight`, `suggesting`, `mode`, `native` (the Server shows the frame in its own window, so the plugin draws no candidate list).
 
 ## Tests
@@ -114,4 +119,4 @@ cargo build -p borno-linux-server                                # the real-Serv
 env -u DBUS_SESSION_BUS_ADDRESS ctest --test-dir target/fcitx5 --output-on-failure
 ```
 
-The C++ tests cover the panel against a mock Server, the framework event order, transport failures, and typing, privacy and reentrancy against the real Server. The `multiplex` and `reentrant` suites of the pinyin plugin were dropped with the features they tested.
+The C++ tests cover the panel against a mock Server, the framework event order, transport failures, and typing, privacy and reentrancy against the real Server. The popup tests (`popup-*`) run the channel against the mock Server with a fake presenter; `real-popup` runs the real Server's render thread; `proxy-finder` checks the search for the raw proxy in Fcitx5's wrapper object. The `multiplex` and `reentrant` suites of the pinyin plugin were dropped with the features they tested.

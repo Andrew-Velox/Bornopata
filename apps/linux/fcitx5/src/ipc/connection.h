@@ -14,6 +14,8 @@ public:
     /// For the event loop to notice a hang-up; all traffic still goes through send.
     int fd() const { return fd_; }
     void close();
+    /// Hands the descriptor to the caller, who closes it; the connection is closed afterwards.
+    int release() { int fd = fd_; fd_ = -1; return fd; }
 private:
     /// The connection; -1 when not connected.
     int fd_ = -1;

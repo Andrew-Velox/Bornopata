@@ -36,7 +36,7 @@ jobs:
       - name: Install Fcitx5 build and test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ libfcitx5core-dev libfcitx5config-dev libfcitx5utils-dev nlohmann-json3-dev fcitx5 fonts-dejavu-core fonts-noto-core
+          sudo apt-get install -y cmake g++ libfcitx5core-dev libfcitx5config-dev libfcitx5utils-dev nlohmann-json3-dev pkg-config libsystemd-dev libwayland-dev libwayland-bin wayland-protocols fcitx5 fonts-dejavu-core fonts-noto-core
 
       - name: Format
         run: cargo fmt --all --check

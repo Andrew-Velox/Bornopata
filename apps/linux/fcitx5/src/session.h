@@ -28,6 +28,9 @@ struct Session final : fcitx::InputContextProperty {
     /// Whether the last frame was given to the client as preedit; the framework commits that on focus out.
     bool clientPreedit = false;
 
+    /// The last frame was drawn by the Server (its popup or window), not by the Fcitx5 panel.
+    bool showing = false;
+
     uint64_t revision = 0;
 
     uint64_t generation = 0;

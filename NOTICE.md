@@ -12,4 +12,7 @@ Bornopata is distributed under the same license, GPL-3.0-or-later; see `LICENSE`
 commercial license, as their `LICENSE.md` files say. Bornopata uses and distributes them under the GPL side only and cannot offer the
 commercial license. The themes' pictures are new; none of Qingjian's theme artwork is included.
 
+`apps/linux/fcitx5/protocol/input-method-unstable-v2.xml` is the Wayland protocol description of the input-method popup, copied unchanged from the
+`wayland-protocols-misc` crate; its own copyright and permission notice (MIT) is in the file.
+
 Third-party components are listed with their licenses in `docs/design/bangla-reuse-plan.md` and in each `assets/*/README.md`.

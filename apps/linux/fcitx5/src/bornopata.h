@@ -1,5 +1,6 @@
 //! Fcitx5 thin plugin: forwards framework events to the Server and draws the frame it returns on the default panel.
 #pragma once
+#include "popup/bridge.h"
 #include "session.h"
 #include <fcitx/addonfactory.h>
 #include <fcitx/inputcontext.h>
@@ -10,6 +11,8 @@ namespace fcitx {
 class BornopataEngine final : public InputMethodEngineV2 {
 public:
     explicit BornopataEngine(AddonManager *manager);
+    /// With a presenter of the caller's choosing (tests); `nullptr` means no popup.
+    BornopataEngine(AddonManager *manager, std::unique_ptr<bornopata::Presenter> presenter);
     ~BornopataEngine() override;
     void keyEvent(const InputMethodEntry &, KeyEvent &) override;
     void reset(const InputMethodEntry &, InputContextEvent &) override;
@@ -26,6 +29,7 @@ private:
     bool exchange(InputContext *context, const nlohmann::json &event, bool display = true);
     void render(InputContext *context, const nlohmann::json &frame);
     Instance *instance_;
+    std::unique_ptr<bornopata::PopupBridge> popup_;
     std::shared_ptr<bornopata::SharedConnection> shared_;
     std::shared_ptr<bool> alive_ = std::make_shared<bool>(true);
     FactoryFor<bornopata::Session> sessions_;

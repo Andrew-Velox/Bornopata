@@ -21,7 +21,7 @@ Updated 2026-10-20.
 - `borno-platform`: slim config and the new wire protocol (version 1).
 - `borno-linux-server`: `Router` with per-context engines over shared learning, Unix socket IPC, systemd user unit.
 - `borno-dictionary`: normalization, phonetic key, the FST-indexed `.bnd` dictionary, prefix completion; `tools/dict-build` builds it from Wikipedia and Common Voice (413k words, 92% top-1 on the 142-spelling set). The engine ranks by frequency and shows completions after what was typed.
-- Self-drawn candidate window: `bamboo-slip` and `borno-render` (from Qingjian, GPL side) with Bangla frames and two themes (`bornopata`, `sakura`, original artwork), `borno-panel` (layer-shell, Hyprland placement), wired through protocol 3 with automatic fallback; see [design/candidate-window.md](../design/candidate-window.md).
+- Self-drawn candidate window: `bamboo-slip` and `borno-render` (from Qingjian, GPL side) with Bangla frames and two themes (`bornopata`, `sakura`, original artwork), `borno-panel` (layer-shell, Hyprland placement), wired through protocol 4 with automatic fallback; Wayland-native clients (Brave, Firefox, GTK, Qt) show it in the input-method popup surface the compositor places at the caret ([design/popup-surface.md](../design/popup-surface.md)); see [design/candidate-window.md](../design/candidate-window.md). Open: mouse clicks in the popup, a shadow-friendly variant of the card, Sway and KDE checks.
 - Fcitx5 plugin on the default panel, install and uninstall scripts, CI building and testing server and plugin together.
 
 ## Next
