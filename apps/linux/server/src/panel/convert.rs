@@ -2,8 +2,10 @@
 
 use borno_panel::Rect;
 use borno_panel::compositor::CursorRect as WindowCursor;
-use borno_platform::protocol::{CursorRect, Frame, Mode, Source};
-use borno_render::{Frame as RenderFrame, Mode as RenderMode, Preedit, Row, Source as RowSource};
+use borno_platform::protocol::{CursorRect, Frame, FrameGloss, Mode, Source};
+use borno_render::{
+    Frame as RenderFrame, Mode as RenderMode, Preedit, Row, Source as RowSource, Tone,
+};
 
 /// The key that takes a next-word suggestion, shown on the window.
 const NEXT_WORD_HINT: &str = "Tab";
@@ -13,6 +15,19 @@ pub fn render_rect(cursor: CursorRect) -> WindowCursor {
         rect: Rect::new(cursor.x, cursor.y, cursor.width, cursor.height),
         surface_relative: cursor.surface_relative,
     }
+}
+
+/// The gloss as the segments drawn after the word: the part of speech in its own tone, then the meaning.
+fn annotation(gloss: Option<&FrameGloss>) -> Vec<(String, Tone)> {
+    let Some(gloss) = gloss else {
+        return Vec::new();
+    };
+    let mut segments = Vec::new();
+    if !gloss.pos.is_empty() {
+        segments.push((format!("{} ", gloss.pos), Tone::Pos));
+    }
+    segments.push((gloss.text.clone(), Tone::Gloss));
+    segments
 }
 
 /// What the renderer draws for `frame`: the typed letters on top, one row per candidate marked by its source, the
@@ -34,6 +49,7 @@ pub fn render_frame(frame: &Frame) -> RenderFrame {
                 row.index.clear();
             }
             row.source = source;
+            row.annotation = annotation(candidate.gloss.as_ref());
             row
         })
         .collect();
@@ -87,6 +103,35 @@ mod tests {
         assert_eq!(drawn.rows[2].index, "3");
         assert_eq!(drawn.highlighted, Some(1));
         assert_eq!(drawn.hint, None);
+    }
+
+    #[test]
+    fn a_gloss_becomes_a_part_of_speech_segment_and_a_meaning_segment() {
+        let mut rice = candidate("ভাত", Source::Dictionary);
+        rice.gloss = Some(FrameGloss {
+            pos: "n.".into(),
+            text: "rice".into(),
+        });
+        let mut bare = FrameGloss {
+            pos: String::new(),
+            text: "rice".into(),
+        };
+        let frame = Frame {
+            roman: "bhat".into(),
+            candidates: vec![rice, candidate("ভাতে", Source::Completion)],
+            ..Frame::default()
+        };
+        let drawn = render_frame(&frame);
+        assert_eq!(
+            drawn.rows[0].annotation,
+            [
+                ("n. ".to_owned(), Tone::Pos),
+                ("rice".to_owned(), Tone::Gloss)
+            ]
+        );
+        assert!(drawn.rows[1].annotation.is_empty());
+        bare.pos.clear();
+        assert_eq!(annotation(Some(&bare)), [("rice".to_owned(), Tone::Gloss)]);
     }
 
     #[test]
