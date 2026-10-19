@@ -6,6 +6,7 @@ members = [
     "crates/borno-learning",
     "crates/borno-lm",
     "crates/borno-format",
+    "crates/borno-dictionary",
     "crates/borno-platform",
     "apps/cli",
     "apps/linux/server",
@@ -27,6 +28,7 @@ borno-learning = { path = "crates/borno-learning" }
 borno-platform = { path = "crates/borno-platform" }
 borno-lm = { path = "crates/borno-lm" }
 borno-format = { path = "crates/borno-format" }
+borno-dictionary = { path = "crates/borno-dictionary" }
 # External versions are pinned here; member crates use `xxx.workspace = true`
 serde = { version = "1.0.229", features = ["derive"] }
 thiserror = "2.0.20"
@@ -36,6 +38,10 @@ tracing-appender = "0.2.5"
 clap = { version = "4.6.6", features = ["derive", "env"] }
 serde_json = "1.0.151"
 toml = "1.1.5"
+# Finite state transducer for the dictionary key index (MIT / Unlicense)
+fst = "0.4.7"
+# Unicode normalization of corpus text
+unicode-normalization = "0.1.24"
 # Fast string-keyed hash tables for hot lookups (word counts, language model, personal bigram)
 foldhash = "0.2.0"
 # .bnd data container: opened with mmap, structs read without copying

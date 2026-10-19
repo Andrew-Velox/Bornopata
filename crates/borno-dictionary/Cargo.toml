@@ -1,0 +1,18 @@
+[package]
+name = "borno-dictionary"
+description = "Bangla word list with frequencies: normalization, phonetic keys, the .bnd dictionary and prefix completion"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+borno-format.workspace = true
+borno-transliteration.workspace = true
+fst.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+unicode-normalization.workspace = true
+zerocopy.workspace = true
