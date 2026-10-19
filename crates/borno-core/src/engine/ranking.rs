@@ -9,7 +9,8 @@ const DICTIONARY_PRIOR: f64 = 1.5;
 /// The direct conversion that is also a dictionary word.
 const CONFIRMED_PRIOR: f64 = 2.0;
 const CHOICE_WEIGHT: f64 = 3.0;
-const WORD_WEIGHT: f64 = 1.0;
+/// Kept small on purpose: how often a word was committed for some other input must not outvote the letters typed now.
+const WORD_WEIGHT: f64 = 0.2;
 const PAIR_WEIGHT: f64 = 0.5;
 const LM_WEIGHT: f64 = 0.2;
 

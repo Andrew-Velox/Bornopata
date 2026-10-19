@@ -72,3 +72,12 @@ fn next_words_are_empty_without_any_knowledge() {
     let engine = fixed_engine(&[]);
     assert!(engine.next_words(5).is_empty());
 }
+
+#[test]
+fn a_word_committed_for_another_input_does_not_outvote_the_typed_letters() {
+    let mut engine = fixed_engine(&[("ta", &["তা", "টা"]), ("Ta", &["টা", "তা"])])
+        .with_learner(Box::new(MemoryLearner::default()));
+    type_word(&mut engine, "ta ");
+    type_word(&mut engine, "Ta");
+    assert_eq!(engine.candidates()[0].text, "টা");
+}

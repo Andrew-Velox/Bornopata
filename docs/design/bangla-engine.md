@@ -27,16 +27,19 @@ Deduplicated by text. A candidate's source label is learned, then direct, then d
 
 ## Ranking
 
-Score per candidate, highest first, stable on ties:
+Score per candidate, highest first, ties broken on the text so the order is stable:
 
 ```
-score = prior + 3·ln(1 + choice_weight(input, text)) + ln(1 + weight(text))
+score = prior + 3·ln(1 + choice_weight(input, text)) + 0.2·ln(1 + weight(text))
         + 0.5·ln(1 + pair_count(previous, text)) + lm_bonus
-prior:    direct 2.0, dictionary 1.5 − 0.1·position (floor 0), learned-only 0
+prior:    direct and in the dictionary 2.0, dictionary only 1.5, direct only 1.0
 lm_bonus: 0.2 · max(0, log_prob(previous, text) + 10) when the language model knows the pair
 ```
 
-The constants are first guesses to be tuned with the CLI once there is real frequency data. The scaffold list has no frequencies, so for now direct and source order do most of the work and learning does the rest.
+A dictionary word beats an unbacked direct conversion (`ShikkhA` gives শিক্ষা first and ষিক্ষা stays visible). The weight of a word committed for some other input is deliberately small:
+after `ta` was committed, `Ta` must still lead with টা. Only a choice made for exactly this input outweighs the typed letters.
+
+The constants are first guesses to be tuned with the CLI once there is real frequency data. The scaffold list has no frequencies and `upodesh` answers in a different order every run (the adapter sorts its words), so position in the word source is not used yet: direct, dictionary membership and learning do the work.
 
 ## Learning and prediction
 

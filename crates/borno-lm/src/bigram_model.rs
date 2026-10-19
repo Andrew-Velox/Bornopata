@@ -359,6 +359,19 @@ mod tests {
     }
 
     #[test]
+    fn successors_list_the_likeliest_followers_first() {
+        let model = BigramModel::parse(UNIGRAM, BIGRAM).unwrap();
+        let after_ami = model.successors(Some("আমি"), 5);
+        let words: Vec<&str> = after_ami.iter().map(|(word, _)| word.as_str()).collect();
+        assert_eq!(words, ["ভাত", "মহাকাশ"]);
+        assert!(after_ami[0].1 > after_ami[1].1);
+        assert_eq!(model.successors(Some("আমি"), 1).len(), 1);
+        let at_start = model.successors(None, 5);
+        assert_eq!(at_start[0].0, "আমি");
+        assert!(model.successors(Some("মঙ্গল"), 5).is_empty());
+    }
+
+    #[test]
     fn bnd_round_trip_gives_identical_probabilities() {
         let model = BigramModel::parse(UNIGRAM, BIGRAM).unwrap();
         let dir = std::env::temp_dir().join("borno-lm-tests");
