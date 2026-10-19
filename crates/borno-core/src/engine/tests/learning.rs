@@ -81,3 +81,29 @@ fn a_word_committed_for_another_input_does_not_outvote_the_typed_letters() {
     type_word(&mut engine, "Ta");
     assert_eq!(engine.candidates()[0].text, "টা");
 }
+
+#[test]
+fn accepting_a_next_word_teaches_the_pair_and_moves_the_context() {
+    let mut engine =
+        fixed_engine(&[("ami", &["আমি"])]).with_learner(Box::new(MemoryLearner::default()));
+    type_word(&mut engine, "ami ");
+    assert_eq!(engine.accept_next_word("ভাত"), "ভাত");
+    assert_eq!(engine.previous_word(), Some("ভাত"));
+    engine.forget_context();
+    type_word(&mut engine, "ami ");
+    assert_eq!(engine.next_words(3), ["ভাত"]);
+}
+
+#[test]
+fn nothing_is_learned_while_learning_is_off() {
+    let mut engine = learned_engine();
+    engine.set_learning(false);
+    type_word(&mut engine, "kotha");
+    engine.highlight(2);
+    engine.commit();
+    engine.accept_next_word("ভাত");
+    engine.forget_context();
+    type_word(&mut engine, "kotha");
+    assert_eq!(engine.candidates()[0].source, CandidateSource::Direct);
+    assert!(engine.next_words(3).is_empty());
+}

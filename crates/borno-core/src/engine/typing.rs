@@ -53,13 +53,25 @@ impl Engine {
     pub fn commit(&mut self) -> Option<String> {
         let candidate = self.candidates.get(self.highlighted)?;
         let text = candidate.text.clone();
-        self.learner
-            .record(self.composition.as_str(), &text, self.previous.as_deref());
+        if self.learning {
+            self.learner
+                .record(self.composition.as_str(), &text, self.previous.as_deref());
+        }
         self.previous = Some(text.clone());
         self.composition.clear();
         self.candidates.clear();
         self.highlighted = 0;
         Some(text)
+    }
+
+    /// The user took a next-word suggestion: remembers the transition and makes the word the new context.
+    /// Returns the text to commit.
+    pub fn accept_next_word(&mut self, word: &str) -> String {
+        if self.learning {
+            self.learner.record("", word, self.previous.as_deref());
+        }
+        self.previous = Some(word.to_owned());
+        word.to_owned()
     }
 
     /// Drops the composition without committing (Escape).

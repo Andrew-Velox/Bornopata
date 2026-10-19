@@ -43,6 +43,9 @@ pub struct Engine {
 
     /// Timings of the last candidate generation.
     timings: Timings,
+
+    /// Whether commits are remembered. Off for private fields.
+    learning: bool,
 }
 
 impl Engine {
@@ -58,6 +61,7 @@ impl Engine {
             highlighted: 0,
             previous: None,
             timings: Timings::default(),
+            learning: true,
         }
     }
 
@@ -69,6 +73,12 @@ impl Engine {
     pub fn with_language_model(mut self, language_model: Box<dyn LanguageModel>) -> Self {
         self.language_model = language_model;
         self
+    }
+
+    /// Turns remembering on or off. While off, commits still update the sentence context but teach the learner
+    /// nothing; ranking keeps using what was learned before.
+    pub fn set_learning(&mut self, enabled: bool) {
+        self.learning = enabled;
     }
 
     pub fn composition(&self) -> &Composition {
