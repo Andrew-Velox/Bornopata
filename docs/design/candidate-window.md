@@ -12,7 +12,7 @@ what the default panel cannot: where a word came from, next-word hints, soft sha
 
 ## Why a layer-shell window positioned by compositor IPC
 
-A Wayland client knows its text cursor only relative to its own surface. The `input-method-v2` popup surface would be placed by the compositor exactly, but only the process that owns the input-method object (Fcitx5's Wayland frontend) can create it, and Fcitx5 does not expose it to addons. Alternatives and why they lost:
+A Wayland client knows its text cursor only relative to its own surface. The `input-method-v2` popup surface would be placed by the compositor exactly, but only the process that owns the input-method object (Fcitx5's Wayland frontend) can create it. The plugin can reach that object after all, so Wayland-native clients now use it ([popup-surface.md](popup-surface.md)); the layer-shell window stays for X11 and XWayland clients, whose cursor rectangle is known. Alternatives and why they lost:
 
 | Option | Verdict |
 |---|---|
@@ -27,7 +27,7 @@ Cost of the choice: the popup is placed at window origin + cursor rectangle, so 
 
 - `[panel] mode = "auto"` starts the window at Server launch and falls back to Fcitx5's panel, with a log line, when there is no Wayland session or no layer-shell. `fcitx` never starts it. If the window dies later, the Router drops it and the plugin draws again from the next reply on.
 - A frame is shown only once the plugin has reported a cursor; before that the plugin draws.
-- An all-zero rectangle does not count as a cursor. Fcitx5 on Hyprland hands that over for Wayland-native clients such as Chromium, because the compositor only gives the caret position to the input method's own popup surface; a window placed by it would sit in the corner of the app. Those frames are drawn by Fcitx5's panel (themed through `classicui`), which the compositor places correctly. Drawing inside that popup surface from a Fcitx5 UI addon would give the self-drawn look everywhere; it is not built yet.
+- An all-zero rectangle does not count as a cursor. Fcitx5 on Hyprland hands that over for Wayland-native clients such as Chromium, because the compositor only gives the caret position to the input method's own popup surface; a window placed by it would sit in the corner of the app. Those frames are drawn in the compositor-placed popup surface when the plugin can create it ([popup-surface.md](popup-surface.md)), and by Fcitx5's panel otherwise.
 - The surface is on the overlay layer, anchored top-left with margins that place it, takes no keyboard focus, has an empty input region (clicks go to the application) and is destroyed when the frame is empty.
 - Placement: below the cursor by 6 px, flipped above it when there is no room below, pushed in from the monitor's edges. The monitor comes from Hyprland's `monitors`; the surface is created on that output.
 - Scale: rendered at the monitor's scale rounded up to an integer, with `set_buffer_scale`. Fractional scales (`wp_fractional_scale` with `wp_viewporter`) are not done yet, so a 1.25 monitor shows a slightly soft window.
