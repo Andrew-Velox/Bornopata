@@ -1,17 +1,20 @@
-//! Engine 装配错误。
-use borno_dictionary::DictionaryError;
-use borno_lm::LmError;
-use borno_translate::GlossaryError;
+//! Errors while starting the Server.
 
-/// 装配 Engine 时的错误。
+use borno_learning::LearningError;
+use borno_lm::LmError;
+use borno_platform::ConfigError;
+
 #[derive(Debug, thiserror::Error)]
 pub enum ServerError {
-    #[error("load dictionary: {0}")]
-    Dictionary(#[from] DictionaryError),
+    #[error("config: {0}")]
+    Config(#[from] ConfigError),
 
-    #[error("load glossary: {0}")]
-    Glossary(#[from] GlossaryError),
+    #[error("learned data: {0}")]
+    Learning(#[from] LearningError),
 
-    #[error("load language model: {0}")]
+    #[error("language model: {0}")]
     LanguageModel(#[from] LmError),
+
+    #[error("io: {0}")]
+    Io(#[from] std::io::Error),
 }

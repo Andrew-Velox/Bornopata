@@ -80,3 +80,10 @@ fn equal_scores_keep_a_stable_order() {
     let first = texts(&engine, "x");
     assert_eq!(first, texts(&engine, "x"));
 }
+
+#[test]
+fn the_candidate_limit_keeps_the_best_ones() {
+    let engine = fixed_engine(&[("x", &["ক", "খ", "গ", "ঘ"])]).with_candidate_limit(2);
+    let all = texts(&fixed_engine(&[("x", &["ক", "খ", "গ", "ঘ"])]), "x");
+    assert_eq!(texts(&engine, "x"), all[..2]);
+}

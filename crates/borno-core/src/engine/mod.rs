@@ -46,6 +46,9 @@ pub struct Engine {
 
     /// Whether commits are remembered. Off for private fields.
     learning: bool,
+
+    /// Most candidates a query returns; the rest are dropped after ranking.
+    candidate_limit: usize,
 }
 
 impl Engine {
@@ -62,6 +65,7 @@ impl Engine {
             previous: None,
             timings: Timings::default(),
             learning: true,
+            candidate_limit: usize::MAX,
         }
     }
 
@@ -79,6 +83,12 @@ impl Engine {
     /// nothing; ranking keeps using what was learned before.
     pub fn set_learning(&mut self, enabled: bool) {
         self.learning = enabled;
+    }
+
+    /// Caps the candidate list. The shell's panel shows a fixed number, so the highlight must stay inside it.
+    pub fn with_candidate_limit(mut self, limit: usize) -> Self {
+        self.candidate_limit = limit.max(1);
+        self
     }
 
     pub fn composition(&self) -> &Composition {

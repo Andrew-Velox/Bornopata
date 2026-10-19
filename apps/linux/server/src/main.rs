@@ -1,111 +1,87 @@
-//! Linux 本地输入服务；云联想与本地模型按配置加载，之后改配置由热加载应用。
-#[cfg(any(target_os = "linux", target_os = "freebsd"))]
-mod paths;
+//! Starts the Linux Server: config, logging, shared engine parts, then the socket loop.
 
-#[cfg(any(target_os = "linux", target_os = "freebsd"))]
-fn run() -> Result<(), Box<dyn std::error::Error>> {
-    use borno_core::Language;
-    use borno_linux_server::{
-        AssemblySpec, LanguageModelFiles, Router, RouterConfig, assembly, find_model,
-    };
-    use borno_platform::Config;
-    use std::path::PathBuf;
-    if std::env::args().any(|arg| arg == "--version") {
+use std::path::Path;
+use std::sync::Arc;
+
+use borno_learning::FrequencyLearner;
+use borno_linux_server::{Router, ServerError, Shared, ipc, paths};
+use borno_lm::BigramModel;
+use borno_platform::Config;
+use borno_transliteration::UpodeshWordSource;
+
+/// The optional language model, looked up in the user data directory.
+const LANGUAGE_MODEL_FILE: &str = "lm.bnd";
+
+fn main() {
+    if std::env::args().any(|argument| argument == "--version") {
         println!("borno-linux-server {}", env!("CARGO_PKG_VERSION"));
-        return Ok(());
+        return;
     }
+    if let Err(error) = run() {
+        eprintln!("Bornopata could not start: {error}");
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<(), ServerError> {
     let config_path = paths::config_path();
     if let Some(parent) = config_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
     Config::write_template_if_missing(&config_path)?;
     let config = Config::load(&config_path)?;
+
+    // Keep the guard alive: it flushes the log writer on exit.
+    let _guard = start_logging(&config)?;
+
+    let user_dir = paths::user_dir();
+    let learner = if config.general.learning {
+        Some(FrequencyLearner::open(&user_dir)?)
+    } else {
+        None
+    };
+    let model = load_model(&user_dir)?;
+    // The word source is the upodesh scaffold until we have our own list (docs/design/bangla-reuse-plan.md).
+    let shared = Shared::new(Arc::new(UpodeshWordSource::new()), learner, model);
+    let mut router = Router::new(config, shared);
+
+    extern "C" fn stop(_: libc::c_int) {
+        ipc::request_shutdown();
+    }
+    unsafe {
+        libc::signal(libc::SIGTERM, stop as *const () as libc::sighandler_t);
+        libc::signal(libc::SIGINT, stop as *const () as libc::sighandler_t);
+    }
+    let socket = ipc::socket_path();
+    tracing::info!(path = %socket.display(), "Bornopata Linux Server started");
+    ipc::serve(socket, &mut router)?;
+    Ok(())
+}
+
+fn start_logging(
+    config: &Config,
+) -> Result<tracing_appender::non_blocking::WorkerGuard, ServerError> {
     std::fs::create_dir_all(paths::log_dir())?;
     let appender = tracing_appender::rolling::RollingFileAppender::builder()
         .rotation(tracing_appender::rolling::Rotation::DAILY)
         .filename_prefix("server")
         .filename_suffix("log")
         .max_log_files(7)
-        .build(paths::log_dir())?;
-    let (writer, _guard) = tracing_appender::non_blocking(appender);
+        .build(paths::log_dir())
+        .map_err(std::io::Error::other)?;
+    let (writer, guard) = tracing_appender::non_blocking(appender);
     tracing_subscriber::fmt()
-        .with_env_filter("info")
+        .with_env_filter(config.general.log_level.directive())
         .with_ansi(false)
         .with_writer(writer)
         .init();
-    let root =
-        paths::resource_root().ok_or("product resources missing; set BORNOPATA_RESOURCES")?;
-    let dictionary = std::env::var_os("BORNOPATA_DICT")
-        .map(PathBuf::from)
-        .or_else(|| paths::generated(&root, "dict.bnd"))
-        .unwrap_or_else(|| root.join("assets/sample/dict.tsv"));
-    let user_dir = paths::user_dir();
-    let mut spec = AssemblySpec {
-        glossary: assembly::learning_language(&config)
-            .and_then(|lang| assembly::glossary_file(&root, lang).map(|p| (lang, p))),
-        english_glossary: assembly::glossary_file(&root, Language::Chinese),
-        english: paths::generated(&root, "english.tsv")
-            .or_else(|| paths::asset(&root, "sample/english.tsv")),
-        emoji: ["emoji/emoji-zh.tsv", "emoji/emoji-en.tsv"]
-            .into_iter()
-            .filter_map(|n| paths::asset(&root, n))
-            .collect(),
-        language_model: LanguageModelFiles::find(&root.join("data/generated")),
-        bundled_dicts_dir: Some(root.join("data/generated/dicts")),
-        dictionaries: config.dictionaries.clone(),
-        levels_dir: Some(root.join("assets/levels")),
-        user_dir: Some(user_dir.clone()),
-        input_log: config.general.input_log,
-        log_dir: Some(paths::log_dir()),
-        ..AssemblySpec::new(dictionary)
-    };
-    let mut engine = match assembly::assemble(&spec) {
-        Ok(engine) => engine,
-        Err(error) => {
-            tracing::warn!(%error, "主词库不可用，降级样例词库");
-            spec.dict = root.join("assets/sample/dict.tsv");
-            assembly::assemble(&spec)?
-        }
-    };
-    engine.set_fuzzy(config.fuzzy);
-    engine.set_shuangpin(config.general.shuangpin());
-    engine.set_shuangpin_raw_preedit(config.general.shuangpin_raw_preedit);
-    engine.set_zhuyin_mode(config.general.is_zhuyin());
-    engine.set_shift_letter_compose(config.general.shift_letter.compose());
-    engine.set_learning(config.general.learning);
-    engine.set_chinese_first(config.general.chinese_first);
-    engine.set_emoji_limit(usize::from(config.general.emoji.get()));
-    engine.set_kaomoji_limit(usize::from(config.general.kaomoji.get()));
-    engine.set_symbol_limit(usize::from(config.general.symbols.get()));
-    engine.set_traditional(config.general.traditional());
-    engine.set_english_in_chinese(config.general.english_in_chinese);
-    engine.set_mode_keys(config.shortcut.mode);
-    engine
-        .set_custom_phrases(config.custom_phrases.clone())
-        .map_err(std::io::Error::other)?;
-    assembly::attach_cloud(&mut engine, &config.predict);
-    engine.log_session(env!("CARGO_PKG_VERSION"), "linux");
-    let mut router = Router::new(engine, RouterConfig::from(&config));
-    router.configure_local_model(find_model(Some(&user_dir), &root), &config.model);
-    router.watch_config(&config, config_path, root, user_dir);
-    extern "C" fn stop(_: libc::c_int) {
-        borno_linux_server::ipc::request_shutdown();
-    }
-    unsafe {
-        libc::signal(libc::SIGTERM, stop as *const () as libc::sighandler_t);
-        libc::signal(libc::SIGINT, stop as *const () as libc::sighandler_t);
-    }
-    let socket = borno_linux_server::ipc::socket_path();
-    tracing::info!(path = %socket.display(), "Bornopata Linux Server 启动");
-    borno_linux_server::ipc::serve_socket(socket, &mut router)?;
-    Ok(())
+    Ok(guard)
 }
-fn main() {
-    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
-    if let Err(error) = run() {
-        eprintln!("Bornopata启动失败：{error}");
-        std::process::exit(1);
+
+fn load_model(user_dir: &Path) -> Result<Option<BigramModel>, ServerError> {
+    let path = user_dir.join(LANGUAGE_MODEL_FILE);
+    if !path.is_file() {
+        return Ok(None);
     }
-    #[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
-    eprintln!("borno-linux-server 仅支持 Linux 与 FreeBSD");
+    Ok(Some(BigramModel::from_path(&path)?))
 }

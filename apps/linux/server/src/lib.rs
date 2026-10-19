@@ -1,10 +1,15 @@
-//! Linux Server：持有 Core Engine，通过 Unix domain socket 服务多个 Fcitx5 会话。
-pub mod assembly;
-pub mod dispatch;
+//! Linux Server: holds the Bangla engines and serves the Fcitx5 plugin over a Unix socket.
+//!
+//! [`Router`] is the whole input logic and knows nothing about sockets; [`ipc`] only moves messages.
+
 pub mod error;
-#[cfg(any(target_os = "linux", target_os = "freebsd"))]
+#[cfg(unix)]
 pub mod ipc;
-pub mod protocol;
-pub use assembly::{AssemblySpec, LanguageModelFiles};
-pub use dispatch::{Router, RouterConfig, find_model};
+pub mod paths;
+pub mod router;
+pub mod session;
+pub mod shared;
+
 pub use error::ServerError;
+pub use router::Router;
+pub use shared::Shared;

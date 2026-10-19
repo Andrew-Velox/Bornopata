@@ -96,6 +96,7 @@ impl Engine {
                 .total_cmp(&a.score)
                 .then_with(|| a.text.cmp(&b.text))
         });
+        ranked.truncate(self.candidate_limit);
         timings.ranking = started.elapsed();
         (ranked, timings)
     }

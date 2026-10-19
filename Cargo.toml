@@ -8,9 +8,6 @@ members = [
     "crates/borno-format",
     "crates/borno-platform",
     "apps/cli",
-]
-# Pinyin-shaped crates kept on disk until the next phase ports them to the Bangla Engine (docs/plan/roadmap.md).
-exclude = [
     "apps/linux/server",
 ]
 
