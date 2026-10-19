@@ -1,0 +1,30 @@
+[package]
+name = "borno-linux-server"
+description = "Linux Fcitx5 输入法的 Rust Server"
+version = "0.2.2-dev"
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "borno-linux-server"
+path = "src/main.rs"
+
+[dependencies]
+borno-core.workspace = true
+borno-dictionary.workspace = true
+borno-learning.workspace = true
+borno-lm.workspace = true
+borno-neural.workspace = true
+borno-platform.workspace = true
+borno-translate.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tracing-appender.workspace = true
+libc = "0.2.189"
+borno-predict.workspace = true
+
+[lints]
+workspace = true

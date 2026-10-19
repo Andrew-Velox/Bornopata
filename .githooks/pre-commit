@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Enable with: git config core.hooksPath .githooks. Skip with: git commit --no-verify
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+# Decorative divider comments (`// ====`, `// ----`) carry no reason; group with blank lines and ordering instead.
+staged_rs="$(git diff --cached --name-only --diff-filter=ACM -- '*.rs')"
+if [[ -n "$staged_rs" ]]; then
+  matches="$(echo "$staged_rs" | xargs grep -nE '^\s*//[/!]?\s*[=─-]{3,}\s*$' 2>/dev/null || true)"
+  if [[ -n "$matches" ]]; then
+    echo "$matches"
+    echo "no decorative divider comments; group with blank lines and ordering" >&2
+    exit 1
+  fi
+fi
+
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings

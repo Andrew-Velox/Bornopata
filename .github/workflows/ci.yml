@@ -1,0 +1,93 @@
+# One Linux job: fmt, dependency policy, clippy, the whole workspace test suite, and the Fcitx5 shell.
+# Actions are pinned to commits (the tag is in the trailing comment); Dependabot updates them weekly. Cargo runs with --locked.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  core:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
+        with:
+          toolchain: 1.96.0
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+
+      - name: Install Fcitx5 build and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libfcitx5core-dev libfcitx5config-dev libfcitx5utils-dev nlohmann-json3-dev fcitx5
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      # audit.yml covers RustSec advisories; this adds licenses, sources and wildcard versions.
+      # cargo-deny reads Cargo.lock itself and ignores --locked, so lock drift is caught by the --locked steps below.
+      - name: Dependency licenses, sources and wildcards
+        run: |
+          cargo install cargo-deny --version 0.20.2 --locked
+          cargo deny check licenses bans sources
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      - name: Test
+        run: cargo test --workspace --locked
+
+      - name: Build Linux server
+        run: cargo build -p borno-linux-server --locked
+
+      - name: Configure Fcitx5 shell
+        run: cmake -S apps/linux/fcitx5 -B target/fcitx5-stage1 -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+
+      - name: Build Fcitx5 shell
+        run: cmake --build target/fcitx5-stage1 --parallel 2
+
+      # Logs go through tee so the failure upload below can attach them. `shell: bash` is required: the default
+      # `bash -e` has no pipefail, so `| tee` would swallow the test exit code and skip the failure() step.
+      - name: Test Fcitx5 shell
+        shell: bash
+        run: |
+          mkdir -p target/ci-logs
+          env -u DBUS_SESSION_BUS_ADDRESS ctest --test-dir target/fcitx5-stage1 --output-on-failure 2>&1 | tee target/ci-logs/fcitx5-ctest.log
+
+      - name: Validate Linux install scripts
+        run: bash -n apps/linux/scripts/install.sh apps/linux/scripts/uninstall.sh
+
+      - name: Test Linux installation
+        shell: bash
+        run: |
+          mkdir -p target/ci-logs
+          python3 apps/linux/tests/installation.py 2>&1 | tee target/ci-logs/linux-installation.log
+
+      - name: Upload Linux diagnostics
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: linux-ci-diagnostics
+          if-no-files-found: ignore
+          path: |
+            target/ci-logs/**
+            target/fcitx5-stage1/Testing/**
+            target/fcitx5-stage1/CMakeFiles/CMakeOutput.log
+            target/fcitx5-stage1/CMakeFiles/CMakeError.log

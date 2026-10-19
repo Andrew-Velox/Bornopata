@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Commit subjects follow Conventional Commits: `<type>(<scope>): <summary>`, all lowercase type and scope.
+# Enable with: git config core.hooksPath .githooks. Skip with: git commit --no-verify.
+# Merge commits must match too: git merge --no-ff -m "feat: ..."
+set -euo pipefail
+file="$1"
+subject="$(sed -n '1p' "$file")"
+
+# Reverts and rebase-generated fixup / squash subjects are not checked.
+if [[ "$subject" =~ ^(Revert|fixup!|squash!|amend!) ]]; then
+  exit 0
+fi
+
+types='feat|fix|docs|refactor|perf|test|build|ci|chore|style|revert'
+if [[ ! "$subject" =~ ^($types)(\([a-z0-9._/-]+\))?!?:\ [^[:space:]] ]]; then
+  cat >&2 <<MSG
+The first line must be "<type>(<scope>): <summary>", for example: fix(core): handle conjunct after reph
+  types:  $types
+  scope:  lowercase crate or shell name (core, transliteration, platform, linux, fcitx5, cli, docs, ci, deps ...), optional
+  got:    $subject
+See "Commit messages" in docs/contributing.md.
+MSG
+  exit 1
+fi

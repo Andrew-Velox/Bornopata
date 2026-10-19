@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest something new or better
+labels: [feature]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What you want to do
+      description: The task or typing situation, not only the solution you have in mind.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: How you imagine it working, and what you do today instead.

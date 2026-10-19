@@ -1,0 +1,66 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/borno-core",
+    "crates/borno-transliteration",
+    "crates/borno-dictionary",
+    "crates/borno-translate",
+    "crates/borno-learning",
+    "crates/borno-platform",
+    "crates/borno-predict",
+    "crates/borno-lm",
+    "crates/borno-format",
+    "crates/borno-neural",
+    "apps/linux/server", "apps/cli",
+]
+
+[workspace.package]
+version = "0.1.1"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[workspace.lints.clippy]
+all = "warn"
+
+[workspace.dependencies]
+# 内部 crate
+borno-core = { path = "crates/borno-core" }
+borno-dictionary = { path = "crates/borno-dictionary" }
+borno-translate = { path = "crates/borno-translate" }
+borno-learning = { path = "crates/borno-learning" }
+borno-platform = { path = "crates/borno-platform" }
+borno-predict = { path = "crates/borno-predict" }
+borno-lm = { path = "crates/borno-lm" }
+borno-format = { path = "crates/borno-format" }
+borno-neural = { path = "crates/borno-neural" }
+# 外部依赖统一在这里定版本，子 crate 一律 `xxx.workspace = true`
+serde = { version = "1.0.229", features = ["derive"] }
+thiserror = "2.0.20"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+tracing-appender = "0.2.5"
+dotenvy = "0.15.7"
+clap = { version = "4.6.6", features = ["derive", "env"] }
+serde_json = "1.0.151"
+toml = "1.1.5"
+toml_edit = "0.25"
+# 快捷候选的日期 / 时间（本地时区）
+jiff = "0.2.35"
+# 热路径上的字符串键哈希表（词频 / 语言模型 / 个人 n-gram）：SipHash 一次查表几十纳秒，单字母简拼一键要查几万次
+foldhash = "0.2.0"
+# 简繁转换（OpenCC 的纯 Rust 实现，Apache-2.0）：字典在编译期编进产物，运行时不读外部文件。
+# 只要简 → 繁，反向的 t2s 用不上
+ferrous-opencc = { version = "0.4.0", default-features = false, features = ["s2t-conversion"] }
+# .bnd 数据容器：mmap 打开、结构体数组零拷贝读取
+memmap2 = "0.9"
+zerocopy = { version = "0.8", features = ["derive"] }
+# 本地神经语言模型推理（字级 Transformer，权重 safetensors）
+candle-core = "0.11.0"
+candle-nn = "0.11.0"
+# 云联想：OpenAI 兼容接口客户端与它需要的异步运行时
+async-openai = { version = "0.42.0", default-features = false, features = ["chat-completion", "native-tls", "byot", "middleware"] }
+reqwest = { version = "0.13", default-features = false }
+uuid = { version = "1.26", features = ["v4"] }
+tokio = { version = "1.53.1", features = ["rt", "time"] }
+# macOS 平台层
+objc2 = "0.6.4"

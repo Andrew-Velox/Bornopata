@@ -1,0 +1,10 @@
+[advisories]
+ignore = [
+    # paste is unmaintained. Chain: candle-core -> gemm 0.19 -> paste.
+    "RUSTSEC-2024-0436",
+    # zip 8.6 symlink escape and SUID retention when extracting, fixed in 9.0. Chain: candle-core -> zip;
+    # we only read model files with candle and never extract archives. Remove these three once candle moves to zip 9.
+    "RUSTSEC-2026-0367",
+    "RUSTSEC-2026-0368",
+    "RUSTSEC-2026-0369",
+]
