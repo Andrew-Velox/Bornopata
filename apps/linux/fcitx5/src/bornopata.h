@@ -21,6 +21,8 @@ private:
     void disconnectAll();
     bool connect(InputContext *context);
     bool syncPrivacy(InputContext *context);
+    /// Tells the Server where the text cursor is, if it moved since the last time.
+    void syncCursor(InputContext *context);
     bool exchange(InputContext *context, const nlohmann::json &event, bool display = true);
     void render(InputContext *context, const nlohmann::json &frame);
     Instance *instance_;
@@ -29,5 +31,6 @@ private:
     FactoryFor<bornopata::Session> sessions_;
     std::unique_ptr<HandlerTableEntry<EventHandler>> capabilityWatcher_;
     std::unique_ptr<HandlerTableEntry<EventHandler>> focusWatcher_;
+    std::unique_ptr<HandlerTableEntry<EventHandler>> cursorWatcher_;
 };
 }

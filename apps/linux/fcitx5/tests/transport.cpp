@@ -25,11 +25,11 @@ int main(int argc, char **argv) {
         int connection = accept(listener, nullptr, nullptr);
         auto opened = readMessage(connection).at("Open");
         const auto session = opened.at("session");
-        assert(opened.at("protocol") == 2);
-        writeMessage(connection, {{"Opened", {{"session", session}, {"protocol", failure == "old-version" ? 3 : 2}, {"mode", "Bangla"}}}});
+        assert(opened.at("protocol") == 3);
+        writeMessage(connection, {{"Opened", {{"session", session}, {"protocol", failure == "old-version" ? 4 : 3}, {"mode", "Bangla"}}}});
         if (failure != "old-version") {
             Json identity = {{"generation", opened.at("generation")}, {"context", opened.at("context")}, {"revision", 1}};
-            for (const auto *name : {"Capabilities", "Focus"}) {
+            for (const auto *name : {"Capabilities", "Focus", "Cursor"}) {
                 const auto event = readMessage(connection).at("Event").at("event");
                 assert(event.contains(name));
                 identity["revision"] = identity.at("revision").get<uint64_t>() + 1;

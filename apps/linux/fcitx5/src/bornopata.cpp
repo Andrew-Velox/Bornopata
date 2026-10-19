@@ -18,7 +18,7 @@
 namespace fcitx {
 namespace {
 /// The wire protocol version; the Server refuses any other.
-constexpr int PROTOCOL = 2;
+constexpr int PROTOCOL = 3;
 
 /// Candidates the panel shows at once; the Server never sends more.
 constexpr size_t PANEL_CANDIDATES = 9;
@@ -55,6 +55,10 @@ BornopataEngine::BornopataEngine(AddonManager *manager)
         ++context->propertyFor(&sessions_)->lifecycle;
         if (context->propertyFor(&sessions_)->opened) syncPrivacy(context);
     });
+    cursorWatcher_ = instance_->watchEvent(EventType::InputContextCursorRectChanged, EventWatcherPhase::PreInputMethod, [this](Event &event) {
+        auto *context = static_cast<InputContextEvent &>(event).inputContext();
+        if (context->propertyFor(&sessions_)->opened && context->hasFocus()) syncCursor(context);
+    });
     focusWatcher_ = instance_->watchEvent(EventType::InputContextFocusOut, EventWatcherPhase::PreInputMethod, [this](Event &event) {
         auto *context = static_cast<InputContextEvent &>(event).inputContext();
         auto *session = context->propertyFor(&sessions_);
@@ -66,7 +70,7 @@ BornopataEngine::BornopataEngine(AddonManager *manager)
 
 BornopataEngine::~BornopataEngine() {
     *alive_ = false;
-    capabilityWatcher_.reset(); focusWatcher_.reset();
+    capabilityWatcher_.reset(); focusWatcher_.reset(); cursorWatcher_.reset();
     shared_->watcher.reset(); shared_->deferred.reset(); shared_->connection.close();
     const auto contexts = shared_->contexts;
     shared_->contexts.clear();
@@ -196,6 +200,18 @@ bool BornopataEngine::syncPrivacy(InputContext *context) {
     return session->opened;
 }
 
+void BornopataEngine::syncCursor(InputContext *context) {
+    auto *session = context->propertyFor(&sessions_);
+    const auto &rect = context->cursorRect();
+    // X11 clients (also through XWayland) report global coordinates; everything else is relative to the surface.
+    const bool surfaceRelative = context->display().rfind("x11", 0) != 0;
+    nlohmann::json cursor = {{"x", rect.left()}, {"y", rect.top()}, {"width", rect.width()}, {"height", rect.height()},
+        {"surface_relative", surfaceRelative}};
+    if (session->cursor == cursor) return;
+    session->cursor = cursor;
+    exchange(context, {{"Cursor", cursor}}, false);
+}
+
 bool BornopataEngine::exchange(InputContext *context, const nlohmann::json &event, bool display) {
     auto *session = context->propertyFor(&sessions_);
     const auto watched = context->watch();
@@ -284,6 +300,8 @@ bool BornopataEngine::process(InputContext *context, const Key &key, bool releas
         return false;
     }
     if (!connect(context) || !watched.get() || !syncPrivacy(context) || !watched.get()) return false;
+    syncCursor(context);
+    if (!watched.get()) return false;
     return exchange(context, {{"Key", {{"event", bornopata::mapKey(key)}, {"release", release}}}});
 }
 
@@ -313,6 +331,8 @@ void BornopataEngine::render(InputContext *context, const nlohmann::json &frame)
         return watched.get() && session->opened && session->lifecycle == lifecycle
             && session->revision == revision && session->displayIdentity == identity;
     };
+    // When the Server shows the frame in its own window the Fcitx5 panel stays empty; only the inline preedit remains.
+    const bool native = frame.value("native", false);
     auto list = std::make_unique<CommonCandidateList>();
     list->setPageSize(PANEL_CANDIDATES);
     if (suggesting) list->setLabels({"Tab", "", "", "", "", "", "", "", ""});
@@ -332,9 +352,9 @@ void BornopataEngine::render(InputContext *context, const nlohmann::json &frame)
     auto &panel = context->inputPanel();
     panel.reset();
     if (inlinePreedit) panel.setClientPreedit(clientPreedit);
-    panel.setPreedit(panelPreedit);
+    if (!native) panel.setPreedit(panelPreedit);
     session->clientPreedit = inlinePreedit && !clientPreedit.empty();
-    if (!items.empty()) panel.setCandidateList(std::move(list));
+    if (!items.empty() && !native) panel.setCandidateList(std::move(list));
     context->updatePreedit();
     if (!current()) return;
     context->updateUserInterface(UserInterfaceComponent::InputPanel);

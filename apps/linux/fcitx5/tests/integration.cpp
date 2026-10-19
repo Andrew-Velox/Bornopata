@@ -28,6 +28,29 @@ int main(int argc, char **argv) {
         return 0;
     }
     assert(consumed);
+    if (mode == "native") {
+        // The Server shows the candidates in its own window: Fcitx5's panel stays empty, the word stays inline,
+        // and the plugin told the Server where the cursor is before the key.
+        assert(context.inputPanel().clientPreedit().toString() == "\u0986\u09ae\u09bf");
+        assert(!context.inputPanel().candidateList() && context.inputPanel().preedit().empty());
+        owned.reset();
+        {
+            auto timer = instance.eventLoop().addTimeEvent(CLOCK_MONOTONIC, fcitx::now(CLOCK_MONOTONIC) + 30000, 0,
+                [&](fcitx::EventSourceTime *, uint64_t) { instance.eventLoop().exit(); return false; });
+            instance.eventLoop().exec();
+        }
+        mock.join();
+        bool sawCursor = false;
+        for (size_t i = 0; i + 1 < mock.messages.size(); ++i) {
+            const auto &event = mock.messages[i].at("Event").at("event");
+            if (event.contains("Cursor")) {
+                assert(event.at("Cursor").contains("surface_relative"));
+                sawCursor = true;
+            }
+        }
+        assert(sawCursor);
+        return 0;
+    }
     // The Bangla word is the client preedit; the Roman letters are in the panel.
     assert(context.inputPanel().clientPreedit().toString() == "আমি");
     assert(context.inputPanel().preedit().toString() == "ami");

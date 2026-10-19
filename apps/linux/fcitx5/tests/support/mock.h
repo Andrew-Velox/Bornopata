@@ -16,7 +16,7 @@ struct Mock {
 
     std::vector<Json> messages;
 
-    /// Modes: "both" is the normal Server, "mismatch" answers with another protocol version,
+    /// Modes: "both" is the normal Server, "native" marks frames as drawn by the Server's own window, "mismatch" answers with another protocol version,
     /// "failure" hangs up after the first key reply.
     explicit Mock(const std::string &mode) {
         char path[] = "/tmp/borno-plugin-XXXXXX";
@@ -44,8 +44,8 @@ struct Mock {
         int fd = accept(listener, nullptr, nullptr);
         auto opened = readMessage(fd).at("Open");
         const auto session = opened.at("session");
-        assert(opened.at("protocol") == 2);
-        writeMessage(fd, {{"Opened", {{"session", session}, {"protocol", mode == "mismatch" ? 3 : 2}, {"mode", "Bangla"}}}});
+        assert(opened.at("protocol") == 3);
+        writeMessage(fd, {{"Opened", {{"session", session}, {"protocol", mode == "mismatch" ? 4 : 3}, {"mode", "Bangla"}}}});
         if (mode == "mismatch") { close(fd); return; }
         Json identity = {{"generation", opened.at("generation")}, {"context", opened.at("context")}, {"revision", 0}};
         auto frame = emptyFrame();
@@ -60,6 +60,8 @@ struct Mock {
             if (event.contains("Key") && !event.at("Key").at("release").get<bool>()
                 && event.at("Key").at("event").at("character") == "a") {
                 frame = amiFrame();
+                // The Server draws the window itself in this mode and tells the plugin so.
+                if (mode == "native") frame["native"] = true;
                 outcome = "Consumed";
             }
             if (event.contains("Candidate")) {

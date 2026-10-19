@@ -42,5 +42,8 @@ struct Session final : fcitx::InputContextProperty {
 
     /// "Bangla" or "English", as last reported by the Server; empty before the first reply.
     std::string mode;
+
+    /// The text cursor rectangle last sent to the Server, to send it again only when it changes.
+    nlohmann::json cursor;
 };
 }

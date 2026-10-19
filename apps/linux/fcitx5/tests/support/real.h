@@ -25,7 +25,8 @@ public:
         setenv("XDG_STATE_HOME", directory.c_str(), 1);
         unsetenv("DBUS_SESSION_BUS_ADDRESS");
         std::filesystem::create_directories(directory / "bornopata");
-        std::ofstream(directory / "bornopata/config.toml") << config;
+        // Tests never open the self-drawn window on a real desktop: Fcitx5's panel is the one under test.
+        std::ofstream(directory / "bornopata/config.toml") << "[panel]\nmode = \"fcitx\"\n\n" << config;
         pid = fork(); assert(pid >= 0);
         if (pid == 0) { execl(executable, executable, nullptr); _exit(127); }
         for (int i = 0; i < 500 && !std::filesystem::exists(directory / "server.sock"); ++i)
