@@ -80,3 +80,11 @@ fn a_mark_after_a_letter_stays_in_the_word() {
     type_all(&mut engine, "a^");
     assert_eq!(engine.composition().as_str(), "a^");
 }
+
+#[test]
+fn a_non_ascii_character_ends_the_word_and_passes_through() {
+    let mut engine = scaffold_engine();
+    type_all(&mut engine, "ami");
+    assert_eq!(engine.type_char('…'), Typed::Commit("আমি…".to_owned()));
+    assert_eq!(engine.type_char('ক'), Typed::Commit("ক".to_owned()));
+}

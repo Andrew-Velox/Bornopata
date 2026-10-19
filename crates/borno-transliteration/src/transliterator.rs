@@ -16,8 +16,30 @@ impl Transliterator {
     }
 
     /// Converts `roman`. Digits become Bangla digits; punctuation and spaces pass through.
+    ///
+    /// `okkhor` panics on non-ASCII input, so text that is already Bangla, or any other script, is passed through
+    /// untouched and only the ASCII stretches between it are converted.
     pub fn convert(&self, roman: &str) -> String {
-        self.parser.convert(roman)
+        if roman.is_ascii() {
+            return self.parser.convert(roman);
+        }
+        let mut converted = String::with_capacity(roman.len());
+        let mut stretch = String::new();
+        for ch in roman.chars() {
+            if ch.is_ascii() {
+                stretch.push(ch);
+                continue;
+            }
+            if !stretch.is_empty() {
+                converted.push_str(&self.parser.convert(&stretch));
+                stretch.clear();
+            }
+            converted.push(ch);
+        }
+        if !stretch.is_empty() {
+            converted.push_str(&self.parser.convert(&stretch));
+        }
+        converted
     }
 }
 
@@ -70,6 +92,15 @@ mod tests {
         assert_eq!(convert(""), "");
         assert_eq!(convert("123"), "১২৩");
         assert_eq!(convert("ami."), "আমি।");
+    }
+
+    #[test]
+    fn passes_non_ascii_text_through_instead_of_panicking() {
+        assert_eq!(convert("কথা"), "কথা");
+        assert_eq!(convert("…"), "…");
+        assert_eq!(convert("ami—tumi"), "আমি—তুমি");
+        assert_eq!(convert("éa"), "éআ");
+        assert_eq!(convert("ক ami"), "ক আমি");
     }
 
     #[test]

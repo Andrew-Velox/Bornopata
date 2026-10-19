@@ -239,3 +239,14 @@ fn the_toggle_follows_the_config() {
     );
     assert_eq!(rig.key(new).frame.mode, Mode::English);
 }
+
+#[test]
+fn a_character_from_another_layout_does_not_crash_the_server() {
+    let mut rig = Rig::scaffold();
+    rig.type_text("ami");
+    let reply = rig.type_char('…');
+    assert_eq!(reply.commit.as_deref(), Some("আমি…"));
+    let reply = rig.type_char('ক');
+    assert_eq!(reply.outcome, KeyOutcome::Passthrough);
+    assert_eq!(reply.commit, None);
+}
