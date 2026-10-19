@@ -33,15 +33,17 @@ def main():
                 print(f'keeping modified file: {path}')
         manifest.unlink(missing_ok=True)
         return
-    if len(args) != 3:
-        raise SystemExit('install needs: <prefix> <repo root> <server binary> <plugin>')
-    root, server, plugin = map(Path, args)
+    if len(args) != 4:
+        raise SystemExit('install needs: <prefix> <repo root> <server binary> <plugin> <gloss file>')
+    root, server, plugin, gloss = map(Path, args)
     data = Path(os.environ.get('XDG_DATA_HOME', str(Path.home() / '.local/share')))
     if not data.is_absolute():
         raise SystemExit('XDG_DATA_HOME must be an absolute path')
     files = {prefix / 'share/licenses/bornopata/LICENSE': root / 'LICENSE',
              prefix / 'bin/borno-linux-server': server,
              prefix / 'lib/fcitx5/bornopata.so': plugin}
+    files[prefix / 'share/licenses/bornopata/GLOSS-ATTRIBUTION.txt'] = root / 'assets/gloss/ATTRIBUTION.txt'
+    files[data / 'bornopata/gloss-en.bnd'] = gloss
     for kind in ('addon', 'inputmethod'):
         files[data / f'fcitx5/{kind}/bornopata.conf'] = root / f'apps/linux/fcitx5/data/{kind}/bornopata.conf'
     config = Path(os.environ.get('XDG_CONFIG_HOME', str(Path.home() / '.config')))
