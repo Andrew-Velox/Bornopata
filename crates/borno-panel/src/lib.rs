@@ -4,8 +4,14 @@
 //! and [`buffer`] converts what `borno-render` draws for `wl_shm`.
 
 pub mod buffer;
+mod command;
 pub mod compositor;
+mod error;
 mod geometry;
 pub mod placement;
+mod wayland;
 
+pub use command::PanelConfig;
+pub use error::PanelError;
 pub use geometry::Rect;
+pub use wayland::Panel;
