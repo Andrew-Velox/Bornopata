@@ -113,7 +113,11 @@ fn short_prefixes_use_the_precomputed_lists_and_agree_with_a_scan() {
         let fast = dictionary.completions(&key(prefix), 10);
         let scanned = dictionary.scan(&key(prefix), 10);
         assert_eq!(fast, scanned, "{prefix}");
-        assert_eq!(fast.len(), if prefix.chars().count() < 3 { 10 } else { 3 }, "{prefix}");
+        assert_eq!(
+            fast.len(),
+            if prefix.chars().count() < 3 { 10 } else { 3 },
+            "{prefix}"
+        );
         assert!(fast.windows(2).all(|pair| pair[0] < pair[1]));
     }
     // Longer than the precomputed length goes through the scan and still ranks by frequency.

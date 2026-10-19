@@ -11,10 +11,14 @@ use crate::layout::{Group, PRECOMPUTED_PREFIX_CHARS};
 /// Keys looked at for a prefix with no precomputed list; bounds the time of a pathological prefix.
 const MAX_KEYS_SCANNED: usize = 20_000;
 
+/// Most words one lookup returns, whatever the caller asks for.
+const MAX_LIMIT: usize = 256;
+
 impl Dictionary {
     /// Up to `limit` words for the phonetic `key` (see [`crate::key`]): first every word whose key is exactly
     /// `key`, most frequent first, then the most frequent words whose key starts with `key` and goes on.
     pub fn lookup(&self, key: &str, limit: usize) -> Vec<Match<'_>> {
+        let limit = limit.min(MAX_LIMIT);
         if key.is_empty() || limit == 0 {
             return Vec::new();
         }

@@ -3,5 +3,7 @@
 pub mod source;
 mod transliterator;
 
-pub use source::{FixedWordSource, UpodeshWordSource, WordSource};
+pub use source::{
+    FallbackWordSource, FixedWordSource, UpodeshWordSource, WordSource, WordSuggestion,
+};
 pub use transliterator::Transliterator;
