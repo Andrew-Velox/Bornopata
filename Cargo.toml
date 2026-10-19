@@ -7,6 +7,7 @@ members = [
     "crates/borno-lm",
     "crates/borno-format",
     "crates/borno-dictionary",
+    "crates/borno-gloss",
     "crates/bamboo-slip",
     "crates/borno-render",
     "crates/borno-panel",
@@ -33,6 +34,7 @@ borno-platform = { path = "crates/borno-platform" }
 borno-lm = { path = "crates/borno-lm" }
 borno-format = { path = "crates/borno-format" }
 borno-dictionary = { path = "crates/borno-dictionary" }
+borno-gloss = { path = "crates/borno-gloss" }
 bamboo-slip = { path = "crates/bamboo-slip" }
 borno-render = { path = "crates/borno-render" }
 borno-panel = { path = "crates/borno-panel" }

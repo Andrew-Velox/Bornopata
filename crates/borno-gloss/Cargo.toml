@@ -1,0 +1,17 @@
+[package]
+name = "borno-gloss"
+description = "Short English glosses for Bangla words: the .bnd glossary file and its lookup"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+borno-core.workspace = true
+borno-dictionary.workspace = true
+borno-format.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+zerocopy.workspace = true
