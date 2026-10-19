@@ -15,6 +15,7 @@ members = [
     "apps/cli",
     "apps/linux/server",
     "tools/dict-build",
+    "tools/gloss-build",
 ]
 
 [workspace.package]

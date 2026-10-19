@@ -178,6 +178,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "borno-gloss-build"
+version = "0.1.0"
+dependencies = [
+ "borno-dictionary",
+ "borno-format",
+ "borno-gloss",
+ "clap",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "borno-learning"
 version = "0.1.1"
 dependencies = [
