@@ -191,3 +191,30 @@ fn a_horizontal_layout_draws_the_same_frame_wider_and_shorter() {
     assert!(horizontal.content_width > vertical.content_width);
     assert!(horizontal.content_height < vertical.content_height);
 }
+
+#[test]
+fn the_sakura_theme_animates_and_keeps_its_blossom_inside_the_bitmap() {
+    let Some(mut renderer) = renderer() else {
+        return;
+    };
+    let sakura = Theme::builtin("sakura", false).expect("sakura is built in");
+    assert_eq!(sakura.id(), "sakura");
+    let first = renderer
+        .render(&shaping(), Layout::Vertical, &sakura, 2.0)
+        .unwrap();
+    // The looping petals ask for more frames, and the blossom hangs over the corner of the card, so the bitmap is
+    // larger than the content on the top and right.
+    assert!(first.next_frame.is_some());
+    assert!(first.content_y > 0);
+    assert!(first.pixmap.width() > first.content_x + first.content_width);
+    let later = renderer
+        .tick_at(std::time::Instant::now() + std::time::Duration::from_millis(2500))
+        .unwrap();
+    assert!(later.is_some());
+    // The base theme has no animation.
+    renderer.forget();
+    let plain = renderer
+        .render(&shaping(), Layout::Vertical, &Theme::light(), 2.0)
+        .unwrap();
+    assert!(plain.next_frame.is_none());
+}

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-20 -20 40 40">
+  <defs>
+    <linearGradient id="p" x1="0" y1="-16" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe0ee"/>
+      <stop offset="1" stop-color="#ff8fbd"/>
+    </linearGradient>
+    <path id="petal" d="M0,-16 C2,-14 2.6,-13.4 4.2,-14.4 C10.4,-9.6 8.6,-1.6 0,-0.6 C-8.6,-1.6 -10.4,-9.6 -4.2,-14.4 C-2.6,-13.4 -2,-14 0,-16 Z"/>
+  </defs>
+  <g fill="url(#p)">
+    <use href="#petal"/>
+    <use href="#petal" transform="rotate(72)"/>
+    <use href="#petal" transform="rotate(144)"/>
+    <use href="#petal" transform="rotate(216)"/>
+    <use href="#petal" transform="rotate(288)"/>
+  </g>
+  <circle r="3.2" fill="#fff0a6"/>
+  <g stroke="#e9a23b" stroke-width="0.8" stroke-linecap="round">
+    <path d="M0,0 L0,-5.4"/>
+    <path d="M0,0 L5.1,-1.7"/>
+    <path d="M0,0 L3.2,4.4"/>
+    <path d="M0,0 L-3.2,4.4"/>
+    <path d="M0,0 L-5.1,-1.7"/>
+  </g>
+</svg>

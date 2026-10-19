@@ -33,11 +33,27 @@ use file::{ColorRef, FontRef, LockedAppearance, SCHEMA, ThemeFile};
 type EmbeddedFiles = &'static [(&'static str, &'static [u8])];
 
 /// Built-in themes: id, source file and images, in the order a settings list shows them; the first is the default.
-const BUILTINS: [(&str, &str, EmbeddedFiles); 1] = [(
-    "bornopata",
-    include_str!("../../themes/bornopata/theme.json"),
-    &[],
-)];
+const BUILTINS: [(&str, &str, EmbeddedFiles); 2] = [
+    (
+        "bornopata",
+        include_str!("../../themes/bornopata/theme.json"),
+        &[],
+    ),
+    (
+        "sakura",
+        include_str!("../../themes/sakura/theme.json"),
+        &[
+            (
+                "images/blossom.svg",
+                include_bytes!("../../themes/sakura/images/blossom.svg"),
+            ),
+            (
+                "images/petal.svg",
+                include_bytes!("../../themes/sakura/images/petal.svg"),
+            ),
+        ],
+    ),
+];
 
 /// 最底层的主题：没写 `extends` 的主题都以它为底，它自己不再往下找。
 const ROOT_THEME: &str = "bornopata";

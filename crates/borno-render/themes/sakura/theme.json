@@ -1,0 +1,90 @@
+// Sakura: a pink-and-lavender glass card with a blossom on the corner and two petals drifting down.
+// All artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+// The pictures are light, so the theme is locked to the light appearance.
+{
+  "extends": "bornopata",
+  "schema": 1,
+  "meta": { "id": "sakura", "name": "Sakura", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "light" },
+
+  "variables": {
+    "text": "#47344f",
+    "dim": "#47344f99",
+    "gloss": "#47344fa6",
+    "faint": "#8a6f94",
+    "accent": "#d0508f",
+    "star": "#e39a2d",
+    "line": "#d0508f26",
+    "surface_top": "#fffafc",
+    "surface_bottom": "#fbe8f2",
+    "pill_top": "#ffdcec",
+    "pill_bottom": "#ffc6df",
+    "chip": "#d0508f24"
+  },
+
+  "components": {
+    "petals": {
+      "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": [6, "auto", "auto", 54], "width": 11, "height": 11,
+          "fill": { "image": "images/petal.svg" },
+          "animation": { "duration": 5200, "easing": "ease-in-out", "loop": true, "keyframes": [
+            { "at": 0, "x": 0, "y": -4, "rotate": 0, "opacity": 0 },
+            { "at": 0.15, "opacity": 0.95 },
+            { "at": 0.6, "x": 12, "y": 22, "rotate": 140, "opacity": 0.9 },
+            { "at": 1, "x": -4, "y": 46, "rotate": 300, "opacity": 0 }
+          ] } },
+        { "type": "frame", "position": "absolute", "inset": [4, 70, "auto", "auto"], "width": 9, "height": 9,
+          "fill": { "image": "images/petal.svg" },
+          "animation": { "duration": 6400, "easing": "ease-in-out", "loop": true, "keyframes": [
+            { "at": 0, "x": 0, "y": -2, "rotate": 40, "opacity": 0 },
+            { "at": 0.2, "opacity": 0.85 },
+            { "at": 0.65, "x": -14, "y": 26, "rotate": -120, "opacity": 0.8 },
+            { "at": 1, "x": 6, "y": 50, "rotate": -280, "opacity": 0 }
+          ] } }
+      ]
+    },
+    "corner": {
+      "type": "frame", "position": "absolute", "inset": [-16, -14, "auto", "auto"], "width": 40, "height": 40,
+      "fill": { "image": "images/blossom.svg" },
+      "animation": { "duration": 9000, "easing": "ease-in-out", "loop": true, "keyframes": [
+        { "at": 0, "rotate": -6 },
+        { "at": 0.5, "rotate": 6 },
+        { "at": 1, "rotate": -6 }
+      ] }
+    }
+  },
+
+  "windows": {
+    "vertical": {
+      "type": "frame", "direction": "column", "padding": [10, 10, 10, 10], "min_width": 200,
+      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 16,
+      "border": { "width": 1, "color": "@line" },
+      "effects": [
+        { "type": "drop-shadow", "y": 10, "blur": 26, "color": "#b8407a38" },
+        { "type": "drop-shadow", "y": 1, "blur": 3, "color": "#b8407a24" }
+      ],
+      "children": [
+        { "type": "use", "component": "petals" },
+        { "type": "use", "component": "top_line" },
+        { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] },
+        { "type": "use", "component": "corner" }
+      ]
+    },
+    "horizontal": {
+      "type": "frame", "direction": "column", "padding": 10,
+      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 16,
+      "border": { "width": 1, "color": "@line" },
+      "effects": [
+        { "type": "drop-shadow", "y": 10, "blur": 26, "color": "#b8407a38" },
+        { "type": "drop-shadow", "y": 1, "blur": 3, "color": "#b8407a24" }
+      ],
+      "children": [
+        { "type": "use", "component": "top_line" },
+        { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 10,
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "item" }] },
+        { "type": "use", "component": "corner" }
+      ]
+    }
+  }
+}
