@@ -1,14 +1,14 @@
-//! 整句转换用的词级语言模型：实现 Core 的 `LanguageModel` trait。
-//! 从 TSV 加载一元 / 二元计数（`from_paths`），或直接映射 `.bnd`（`from_path`，`dict-convert pack lm` 生成，启动近零耗时）。
+//! Word-level bigram language model implementing Core's `LanguageModel` trait.
+//! Loads unigram and bigram counts from TSV (`from_paths`) or maps a `.bnd` file directly (`from_path`, near-zero startup cost).
 //!
-//! TSV 由 `tools/dict-convert bigram` 从语料统计得到：
+//! The TSV files come from corpus statistics:
 //!
 //! ```text
-//! lm-unigram.tsv    词\t计数        （`<s>` 是句首标记，计数为句子数）
-//! lm-bigram.tsv     前词\t后词\t计数
+//! lm-unigram.tsv    word\tcount        (`<s>` marks a sentence start; its count is the number of sentences)
+//! lm-bigram.tsv     previous\tword\tcount
 //! ```
 //!
-//! 概率是插值平滑：P(w|v) = λ·c(v,w)/c(v) + (1-λ)·c(w)/N。模型里没有的词交回 Core 用词库词频兜底。
+//! Probabilities are interpolated: P(w|v) = λ·c(v,w)/c(v) + (1-λ)·c(w)/N. Words the model lacks return `None`.
 
 mod bigram_model;
 mod error;

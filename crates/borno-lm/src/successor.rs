@@ -1,12 +1,12 @@
 use zerocopy::{FromBytes, Immutable, IntoBytes, KnownLayout};
 
-/// CSR 里的一条后继：后词编号与 (前词, 后词) 计数。8 字节，原样落盘。
+/// One successor in the CSR: the next word's id and the (previous, next) count. 8 bytes, stored as is.
 #[derive(Debug, Clone, Copy, FromBytes, IntoBytes, Immutable, KnownLayout)]
 #[repr(C)]
 pub struct Successor {
-    /// 后词编号。
+    /// Id of the next word.
     pub word: u32,
 
-    /// 二元计数。
+    /// Bigram count.
     pub count: u32,
 }

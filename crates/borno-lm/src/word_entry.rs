@@ -1,18 +1,18 @@
 use zerocopy::{FromBytes, Immutable, IntoBytes, KnownLayout};
 
-/// 词表里的一条：词在 arena 里的位置与一元计数。下标就是词的编号。12 字节、无填充，原样落盘。
+/// One word-table entry: where the word sits in the arena and its unigram count. The index is the word id. 12 bytes, no padding, stored as is.
 #[derive(Debug, Clone, Copy, FromBytes, IntoBytes, Immutable, KnownLayout)]
 #[repr(C)]
 pub struct WordEntry {
-    /// 在 `BigramModel::words` 里的字节偏移。
+    /// Byte offset in `BigramModel::words`.
     pub text_start: u32,
 
-    /// 一元计数。
+    /// Unigram count.
     pub count: u32,
 
-    /// 字节长度。
+    /// Byte length.
     pub text_len: u16,
 
-    /// 对齐用，全零。
+    /// Alignment padding, all zero.
     pub reserved: u16,
 }

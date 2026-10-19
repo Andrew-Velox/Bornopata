@@ -1,53 +1,19 @@
-use borno_dictionary::DictionaryError;
-use borno_learning::LearningError;
-use borno_lm::LmError;
-use borno_neural::NeuralError;
-use borno_platform::ConfigError;
-use borno_predict::PredictError;
-use borno_translate::GlossaryError;
+//! Errors of the CLI.
+
 #[derive(Debug, thiserror::Error)]
 pub enum CliError {
-    #[error(transparent)]
-    Cold(#[from] crate::cold::error::ColdError),
+    #[error("failed to write output: {0}")]
+    Output(#[from] std::io::Error),
 
-    #[error(transparent)]
-    Dictionary(#[from] DictionaryError),
+    #[error("failed to open user data: {0}")]
+    Learning(#[from] borno_learning::LearningError),
 
-    #[error(transparent)]
-    Neural(#[from] NeuralError),
+    #[error("failed to load language model: {0}")]
+    LanguageModel(#[from] borno_lm::LmError),
 
-    #[error(transparent)]
-    Glossary(#[from] GlossaryError),
+    #[error("the language model needs both --lm-unigram and --lm-bigram")]
+    IncompleteLanguageModel,
 
-    #[error(transparent)]
-    Learning(#[from] LearningError),
-
-    /// 学习语言不是 en / ja / es / de。
-    #[error("learning language must be en, ja, es or de, got {0:?}")]
-    Language(String),
-
-    /// 删用户词后读回核实：要删的词仍在 `user-words.tsv` 里，说明没写进磁盘。
-    #[error("用户词删除未落盘：{0} 仍在 user-words.tsv 里")]
-    UserWordsRemain(String),
-
-    #[error(transparent)]
-    Config(#[from] ConfigError),
-
-    #[error(transparent)]
-    Predict(#[from] PredictError),
-
-    #[error(transparent)]
-    LanguageModel(#[from] LmError),
-
-    #[error(transparent)]
-    Io(#[from] std::io::Error),
-
-    #[error(transparent)]
-    Replay(#[from] crate::replay::ReplayError),
-
-    #[error(transparent)]
-    Eval(#[from] crate::eval::EvalError),
-
-    #[error(transparent)]
-    Tune(#[from] crate::tuning::TuneError),
+    #[error("--pick {pick} is out of range: the word has {count} candidates")]
+    PickOutOfRange { pick: usize, count: usize },
 }

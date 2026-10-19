@@ -26,6 +26,11 @@ impl Default for UpodeshWordSource {
 
 impl WordSource for UpodeshWordSource {
     fn suggest(&self, roman: &str) -> Vec<String> {
-        self.suggest.suggest(roman)
+        // upodesh builds its answer from hash maps, so the order changes between runs; sort for a stable answer.
+        // The order therefore carries no ranking information (docs/design/bangla-engine.md).
+        let mut words = self.suggest.suggest(roman);
+        words.sort();
+        words.dedup();
+        words
     }
 }

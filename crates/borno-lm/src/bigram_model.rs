@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::path::Path;
 
-use borno_core::sentence::LanguageModel;
+use borno_core::LanguageModel;
 use borno_format::{Container, Kind, Metadata, Table, Text, Writer, hash};
 
 use crate::error::LmError;
@@ -304,29 +304,58 @@ impl LanguageModel for BigramModel {
         };
         Some(probability.max(f64::MIN_POSITIVE).ln())
     }
+
+    fn successors(&self, previous: Option<&str>, limit: usize) -> Vec<(String, f64)> {
+        let previous_id = match previous {
+            None => self.start,
+            Some(text) => self.word_id(text),
+        };
+        let Some(previous_id) = previous_id else {
+            return Vec::new();
+        };
+        let (Some(&start), Some(&end)) = (
+            self.offsets.get(previous_id as usize),
+            self.offsets.get(previous_id as usize + 1),
+        ) else {
+            return Vec::new();
+        };
+        let mut ranked: Vec<(u32, u32)> = self.successors[start as usize..end as usize]
+            .iter()
+            .map(|successor| (successor.word, successor.count))
+            .collect();
+        ranked.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+        ranked.truncate(limit);
+        ranked
+            .into_iter()
+            .filter_map(|(id, _)| {
+                let text = word_text(&self.words, &self.entries[id as usize]);
+                Some((text.to_owned(), self.log_prob(previous, text)?))
+            })
+            .collect()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const UNIGRAM: &str = "<s>\t100\n我\t50\n想\t30\n去\t20\n翔\t1\n";
-    const BIGRAM: &str = "<s>\t我\t40\n我\t想\t25\n想\t去\t15\n我\t翔\t1\n";
+    const UNIGRAM: &str = "<s>\t100\nআমি\t50\nভাত\t30\nখাই\t20\nমহাকাশ\t1\n";
+    const BIGRAM: &str = "<s>\tআমি\t40\nআমি\tভাত\t25\nভাত\tখাই\t15\nআমি\tমহাকাশ\t1\n";
 
     #[test]
     fn bigram_beats_unigram_and_unknown_words_are_none() {
         let model = BigramModel::parse(UNIGRAM, BIGRAM).unwrap();
         assert_eq!(model.word_count(), 5);
         assert_eq!(model.bigram_count(), 4);
-        let xiang = model.log_prob(Some("我"), "想").unwrap();
-        let qu = model.log_prob(Some("我"), "去").unwrap();
+        let xiang = model.log_prob(Some("আমি"), "ভাত").unwrap();
+        let qu = model.log_prob(Some("আমি"), "খাই").unwrap();
         assert!(xiang > qu);
         // 句首概率
-        assert!(model.log_prob(None, "我").unwrap() > model.log_prob(None, "去").unwrap());
+        assert!(model.log_prob(None, "আমি").unwrap() > model.log_prob(None, "খাই").unwrap());
         // 前词未知只用一元
-        let alone = model.log_prob(Some("火星"), "想").unwrap();
+        let alone = model.log_prob(Some("মঙ্গল"), "ভাত").unwrap();
         assert!((alone - (30.0_f64 / 101.0).ln()).abs() < 1e-9);
-        assert_eq!(model.log_prob(Some("我"), "火星"), None);
+        assert_eq!(model.log_prob(Some("আমি"), "মঙ্গল"), None);
     }
 
     #[test]
@@ -346,12 +375,12 @@ mod tests {
         assert_eq!(mapped.bigram_count(), model.bigram_count());
         assert_eq!(mapped.metadata().unwrap().entries, 4);
         for (previous, word) in [
-            (None, "我"),
-            (Some("我"), "想"),
-            (Some("我"), "去"),
-            (Some("想"), "去"),
-            (Some("火星"), "想"),
-            (Some("我"), "火星"),
+            (None, "আমি"),
+            (Some("আমি"), "ভাত"),
+            (Some("আমি"), "খাই"),
+            (Some("ভাত"), "খাই"),
+            (Some("মঙ্গল"), "ভাত"),
+            (Some("আমি"), "মঙ্গল"),
         ] {
             assert_eq!(
                 mapped.log_prob(previous, word),

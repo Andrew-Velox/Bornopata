@@ -3,15 +3,19 @@ resolver = "3"
 members = [
     "crates/borno-core",
     "crates/borno-transliteration",
-    "crates/borno-dictionary",
-    "crates/borno-translate",
     "crates/borno-learning",
-    "crates/borno-platform",
-    "crates/borno-predict",
     "crates/borno-lm",
     "crates/borno-format",
+    "apps/cli",
+]
+# Pinyin-shaped crates kept on disk until the next phase ports them to the Bangla Engine (docs/plan/roadmap.md).
+exclude = [
+    "crates/borno-dictionary",
+    "crates/borno-translate",
+    "crates/borno-predict",
     "crates/borno-neural",
-    "apps/linux/server", "apps/cli",
+    "crates/borno-platform",
+    "apps/linux/server",
 ]
 
 [workspace.package]
@@ -25,6 +29,7 @@ all = "warn"
 [workspace.dependencies]
 # 内部 crate
 borno-core = { path = "crates/borno-core" }
+borno-transliteration = { path = "crates/borno-transliteration" }
 borno-dictionary = { path = "crates/borno-dictionary" }
 borno-translate = { path = "crates/borno-translate" }
 borno-learning = { path = "crates/borno-learning" }
