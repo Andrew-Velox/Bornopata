@@ -1,4 +1,5 @@
 //! Helpers: a Router over a fixed word list and shorthand for the messages tests send.
+#![allow(dead_code)] // each test crate uses a different part of this shared module
 
 use std::sync::Arc;
 
