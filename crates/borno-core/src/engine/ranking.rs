@@ -7,19 +7,19 @@ const UNCONFIRMED_PRIOR: f64 = 1.0;
 const DICTIONARY_PRIOR: f64 = 1.5;
 
 /// The direct conversion that is also a dictionary word.
-const CONFIRMED_PRIOR: f64 = 2.0;
+const CONFIRMED_PRIOR: f64 = 1.7;
 
 /// A word that only starts with what was typed. These are listed after every spelling of the input.
 const COMPLETION_PRIOR: f64 = 1.0;
-const CHOICE_WEIGHT: f64 = 3.0;
+const CHOICE_WEIGHT: f64 = 4.0;
 
 /// Kept small on purpose: how often a word was committed for some other input must not outvote the letters typed now.
 const WORD_WEIGHT: f64 = 0.2;
 const PAIR_WEIGHT: f64 = 0.5;
 const LM_WEIGHT: f64 = 0.2;
 
-/// Weight of the corpus frequency, on a log10 scale: a word seen a million times adds 1.5.
-const FREQUENCY_WEIGHT: f64 = 0.25;
+/// Weight of the corpus frequency, on a log10 scale: a word seen a million times adds 3.6, one seen ten times 0.6.
+const FREQUENCY_WEIGHT: f64 = 0.6;
 
 /// Cost of each letter by which a dictionary spelling differs from what the Avro rules made of the input.
 const DISTANCE_PENALTY: f64 = 0.1;

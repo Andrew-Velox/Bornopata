@@ -49,10 +49,17 @@ fn a_prefix_that_is_no_word_still_shows_its_conversion_first_then_completions_by
 #[test]
 fn spellings_of_the_input_are_ranked_by_frequency() {
     let found = texts(&engine(), "kotha");
-    // The direct conversion কথা is a dictionary word, so it stays first; the others follow by frequency.
-    assert_eq!(found[0], ("কথা".to_owned(), CandidateSource::Direct));
-    assert_eq!(found[1], ("কোথা".to_owned(), CandidateSource::Dictionary));
+    // কোথা is sixteen times as frequent as the direct conversion কথা, which is worth more than typing it exactly.
+    assert_eq!(found[0], ("কোথা".to_owned(), CandidateSource::Dictionary));
+    assert_eq!(found[1], ("কথা".to_owned(), CandidateSource::Direct));
     assert_eq!(found[2], ("কতা".to_owned(), CandidateSource::Dictionary));
+}
+
+#[test]
+fn the_direct_conversion_stays_first_when_it_is_about_as_frequent() {
+    let engine = stub_engine(vec![("kotha", "কথা", 50_000), ("kotha", "কোথা", 60_000)]);
+    let found = texts(&engine, "kotha");
+    assert_eq!(found[0], ("কথা".to_owned(), CandidateSource::Direct));
 }
 
 #[test]

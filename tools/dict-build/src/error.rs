@@ -11,6 +11,13 @@ pub enum BuildError {
         source: std::io::Error,
     },
 
+    #[error("cannot write {path}: {source}")]
+    Write {
+        path: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
     #[error("{path}:{line}: expected `word<TAB>count`")]
     BadCountLine { path: PathBuf, line: usize },
 

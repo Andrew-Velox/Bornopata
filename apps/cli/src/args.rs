@@ -44,6 +44,11 @@ pub struct Args {
     #[arg(long)]
     pub lm_bigram: Option<PathBuf>,
 
+    /// Measure the candidate lists instead of typing: a file of `roman<TAB>word|word` lines. Prints how often the
+    /// word is first, in the first three and in the first nine, and lists the misses.
+    #[arg(long)]
+    pub eval: Option<PathBuf>,
+
     /// Next-word suggestions to show after the last word.
     #[arg(long, default_value_t = 5)]
     pub next: usize,

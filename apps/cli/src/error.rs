@@ -17,6 +17,13 @@ pub enum CliError {
     #[error("the language model needs both --lm-unigram and --lm-bigram")]
     IncompleteLanguageModel,
 
+    #[error("cannot read the evaluation file {path}: {source}")]
+    Eval {
+        path: std::path::PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
     #[error("--pick {pick} is out of range: the word has {count} candidates")]
     PickOutOfRange { pick: usize, count: usize },
 }

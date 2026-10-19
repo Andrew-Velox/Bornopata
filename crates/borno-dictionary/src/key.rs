@@ -9,7 +9,7 @@ use crate::normalize::canonical;
 /// The key of `text`, which may be any Bengali text, normalized or not.
 ///
 /// Letters people confuse share a class, long and short vowels and independent and dependent vowels share a
-/// class, the o sign is dropped (it is the inherent vowel written out), the hasanta, the y-phala, the joiners and
+/// class, the o sign is dropped (it is the inherent vowel written out), the hasanta, the y-phala and ba-phala, the joiners and
 /// the nasalization mark are dropped, and a run of the same consonant is one consonant.
 pub fn key(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
@@ -17,13 +17,13 @@ pub fn key(text: &str) -> String {
     let mut after_hasanta = false;
     for c in canonical(text).chars() {
         // The hasanta only says "these consonants are joined"; people type joined and unjoined alike, so it is
-        // dropped, and the y-phala after it (ব্যবহার, বিদ্যালয়) is dropped too: it is the doubled sound.
+        // dropped, and so are the y-phala and the ba-phala after it (ব্যবহার, বিদ্যালয়, স্বপ্ন): they are a doubled or a silent sound.
         if c == '\u{09CD}' {
             after_hasanta = true;
             continue;
         }
         let was_after_hasanta = std::mem::take(&mut after_hasanta);
-        if was_after_hasanta && c == 'য' {
+        if was_after_hasanta && matches!(c, 'য' | 'ব') {
             continue;
         }
         let Some(class) = class(c) else {
@@ -137,6 +137,7 @@ mod tests {
         // What okkhor makes of "bishshobiddaloy" meets the dictionary spelling.
         same("বিশ্ববিদ্যালয়", "বিশশবিদ্দালয়");
         same("বিদ্যালয়", "বিদ্দালয়");
+        same("স্বপ্ন", "সপ্ন");
     }
 
     #[test]

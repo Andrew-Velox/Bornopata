@@ -6,13 +6,14 @@ The Bangla word list with frequencies behind prefix completion and ranking (`wor
 
 - `sample-words.tsv`: about 170 common Bangla words with made-up counts, written for this repository. For tests and demos. No third-party data.
 - `sample-corpus.txt`: five sentences written for this repository, to test corpus reading.
+- `eval-spellings.tsv`: 142 common words with the Avro-style spellings people type for them, written for this repository. `borno-cli --eval` measures with it how often the right word is among the first candidates.
 
 ## Sources used for the shipped dictionary
 
 | Source | License | Used for | Retrieved |
 |---|---|---|---|
-| Mozilla Common Voice text corpus, Bengali: `sentence-collector.txt` and `wiki.bn.txt` in [common-voice/common-voice](https://github.com/common-voice/common-voice) `server/data/bn` | CC0 1.0 (Mozilla's statement for the Common Voice sentence data) | word counts | see "Build record" below |
-| Bengali Wikipedia, `bnwiki-latest-pages-articles.xml.bz2` from [dumps.wikimedia.org](https://dumps.wikimedia.org/bnwiki/) | CC BY-SA 4.0 (the text is also under the GFDL) | word counts | see "Build record" below |
+| Mozilla Common Voice text corpus, Bengali: `sentence-collector.txt` and `wiki.bn.txt` in [common-voice/common-voice](https://github.com/common-voice/common-voice) `server/data/bn` | CC0 1.0 (Mozilla's statement for the Common Voice sentence data) | word counts | 2026-10-20 |
+| Bengali Wikipedia, `bnwiki-latest-pages-articles.xml.bz2` from [dumps.wikimedia.org](https://dumps.wikimedia.org/bnwiki/) | CC BY-SA 4.0 (the text is also under the GFDL) | word counts | dump of 2026-10-01, retrieved 2026-10-20 |
 
 Only words and how often they occur are kept. No sentence or running text from either source is stored or shipped.
 
@@ -32,7 +33,7 @@ cargo build --release -p borno-dict-build
 
 # Corpora live outside the repository, for example in ~/corpora.
 bzcat ~/corpora/bnwiki/bnwiki-latest-pages-articles.xml.bz2 | target/release/borno-dict-build \
-    --corpus - --corpus ~/corpora/common-voice-bn \
+    --wikitext --corpus - --corpus ~/corpora/common-voice-bn \
     --min-count 5 --output words.bnd --stats \
     --name "Bornopata word list" --license CC-BY-SA-4.0 \
     --attribution "Word counts derived from Bengali Wikipedia (CC BY-SA 4.0) and the Mozilla Common Voice Bengali sentence corpus (CC0)" \
@@ -42,5 +43,21 @@ install -Dm644 words.bnd ~/.local/share/bornopata/words.bnd
 ```
 
 Raw wiki XML works as input: only runs of Bengali letters are used, and markup, Latin text, digits and the danda separate words. Words are normalized (NFC, ড় ঢ় য় precomposed, zero-width joiners removed except in র‍্য) and malformed spellings are dropped.
+
+## Build record
+
+The dictionary measured below was built on 2026-10-20 with `--wikitext --min-count 5`:
+
+| Input | SHA-256 |
+|---|---|
+| `common-voice-bn/sentence-collector.txt` (432,697 lines) | `478e389b68dce47a968ae8ff45841882d2a83e2baf70963bbea9a42aba17b7dd` |
+| `common-voice-bn/wiki.bn.txt` (129,935 lines) | `e43892b11be9dc1c5a414cd581b32daf6bf273076cfa41421a42a541f85d68df` |
+| `bnwiki-latest-pages-articles.xml.bz2` (dump of 2026-10-01) | `f32f68a13fb486423b4cebea3ac79cbc16c6ee2f2e138045aba6795827b39c14` |
+
+113.2 million Bengali tokens (0.6 million malformed ones dropped), 1.94 million distinct words, **413,184 kept**, a 20.6 MB `words.bnd`. The top 10,000 words cover 82% of the kept occurrences. Building takes about 100 seconds; `--dump-counts` saves the kept counts so a later `--counts` build (to try another phonetic key, say) takes seconds.
+
+Without `--wikitext` the template and parameter names of the dump (`|তারিখ=`, `বিষয়শ্রেণী`, `ইউআরএল`) were among the most frequent words.
+
+`borno-cli --dict words.bnd --eval assets/dictionary/eval-spellings.tsv` on this build: the right word is first for 92.3% of the 142 spellings, among the first three for 96.5%, and among the first nine for 96.5%. The ranking weights were tuned on this very set, so the numbers are optimistic for other spellings. Start-up of the Server with it is about 50 ms; a lookup takes 10-40 µs.
 
 The Server and `borno-cli` use `$BORNOPATA_DICT` or `~/.local/share/bornopata/words.bnd` when present; the `upodesh` scaffold list answers only where the dictionary has no spelling of the input.

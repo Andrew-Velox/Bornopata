@@ -57,6 +57,11 @@ pub struct Args {
     #[arg(long, default_value = "")]
     pub version: String,
 
+    /// Also write the kept words as a `word<TAB>count` file. Building from that file later (`--counts`) takes
+    /// seconds instead of re-reading the corpus, which makes experiments with the key and the ranking cheap.
+    #[arg(long)]
+    pub dump_counts: Option<PathBuf>,
+
     /// Print the most frequent words and rough coverage.
     #[arg(long)]
     pub stats: bool,

@@ -42,6 +42,16 @@ fn run(args: &Args) -> Result<(), BuildError> {
     if args.stats {
         report::print(tokens, rejected, unique, &words);
     }
+    if let Some(path) = &args.dump_counts {
+        let mut text = String::new();
+        for (word, count) in &words {
+            text.push_str(&format!("{word}\t{count}\n"));
+        }
+        std::fs::write(path, text).map_err(|source| BuildError::Write {
+            path: path.clone(),
+            source,
+        })?;
+    }
     let mut builder = DictionaryBuilder::new();
     for (word, count) in &words {
         builder.add(word, *count);

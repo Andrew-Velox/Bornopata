@@ -61,6 +61,17 @@ Configuration, learned data and logs are never touched by install or uninstall.
 | Ctrl / Alt / Super chords | commit the word, then the application gets the chord |
 | `ctrl+alt+space` (configurable) | switch between Bangla and English; English passes every key through |
 
+## The dictionary
+
+Without a dictionary only the `upodesh` scaffold list answers and nothing is completed. Build `words.bnd` once (see [assets/dictionary/README.md](../../assets/dictionary/README.md): about two minutes from the Wikipedia dump and the Common Voice sentences) and put it where the Server looks:
+
+```bash
+install -Dm644 words.bnd ~/.local/share/bornopata/words.bnd     # or point $BORNOPATA_DICT at it
+systemctl --user restart bornopata
+```
+
+Then typing `bangl` offers বাংল first (what you typed) followed by বাংলাদেশ, বাংলা ... (completions, most frequent first). Pick one with its number or the arrow keys; Space still commits what you typed. The Server log says which dictionary it opened.
+
 ## Configuration
 
 `~/.config/bornopata/config.toml` is written with comments on first start. Restart the Server after editing (`systemctl --user restart bornopata`).
@@ -83,7 +94,7 @@ Framing: a 4-byte little-endian length, then a JSON body (`borno_platform::proto
 
 - Plugin to Server: `Open{session, app, protocol, generation, context}`, `Close{session}`, `Event{session, event}` with events `Capabilities`, `Reset`, `Key{event, release}`, `Deactivate`, `Focus`, `Candidate{identity, index}`. The first event of a session must be `Capabilities`.
 - Server to plugin: `Opened`, `Result{session, outcome, commit, identity, frame}`, `Ignored`. `commit` is applied before the frame is drawn. `identity.revision` grows with every reply so a stale reply or a click on a replaced frame is dropped.
-- `Frame`: `roman`, `preedit` (Bangla text of the highlighted candidate), `candidates` (at most nine, each with `text` and `source`), `highlight`, `suggesting`, `mode`.
+- `Frame`: `roman`, `preedit` (Bangla text of the highlighted candidate), `candidates` (at most nine, each with `text` and `source`: `Learned`, `Direct`, `Dictionary`, `Completion` or `Next`), `highlight`, `suggesting`, `mode`.
 
 ## Tests
 

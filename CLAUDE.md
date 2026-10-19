@@ -15,11 +15,13 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 ## Directory map
 
 - `crates/borno-core`: the engine. `Engine` is the only entry point: `type_char`, `backspace`, `highlight`, `commit`, `candidates`, `next_words`, plus stateless `query`. The `Learner` and `LanguageModel` traits live here, implemented by the sibling crates.
+- `crates/borno-dictionary`: Bengali word normalization, the phonetic `key`, the FST-indexed `.bnd` dictionary with prefix completion (`Dictionary`, `DictionaryBuilder`) and `DictionarySource`, the main `WordSource`.
 - `crates/borno-transliteration`: `Transliterator` (Avro conversion through `okkhor`) and the `WordSource` seam with the `upodesh` scaffold implementation.
 - `crates/borno-learning`: `FrequencyLearner` (word counts, per-input choices, personal bigram, time decay, TSV files in one directory).
 - `crates/borno-lm`: `BigramModel` language model, from TSV or `.bnd`, with next-word successors.
 - `crates/borno-format`: `.bnd` data container (mmap reader, zero-copy views, writer, hash index).
-- `apps/cli`: `borno-cli <roman>...` types words through the engine and prints candidates, sources, scores and timings. Run it before merging ranking changes.
+- `apps/cli`: `borno-cli <roman>...` types words through the engine and prints candidates, sources, scores and timings; `--dict` picks a dictionary, `--eval FILE` measures ranking. Run it before merging ranking changes.
+- `tools/dict-build`: `borno-dict-build` counts Bengali words in corpus text (wiki XML included) and writes the dictionary. Corpora are never committed.
 - `crates/borno-platform`: the config file (`[general]`, `[shortcut]`) and the Server and shell wire protocol (`protocol`).
 - `apps/linux`: `server` (`Router` input logic, Unix socket IPC), `fcitx5` (C++ plugin on the default panel), `scripts` (user-level install and uninstall), `systemd` (user unit).
 - `assets/`: sample data. Every directory has a README with source and license. Data without a verified license must not ship.
