@@ -1,21 +1,22 @@
 # CLAUDE.md
 
-自绘 UI 引擎 bamboo-slip。公开 API 只从 `lib.rs` 重新导出，各模块本身私有。代码组织、注释、提交信息照仓库根的 `docs/contributing.md`。
+The self-drawn UI engine `bamboo-slip`. Its public API is re-exported from `lib.rs`; the modules are private. Code layout, comments and commit
+messages follow the repository's `docs/contributing.md`.
 
-## 边界
+## Boundary
 
-- 引擎里不出现任何具体应用的概念（候选、拼音、主题文件格式、帧数据、配置键）。使用方自己的数据格式与建树留在使用方，
-  转成引擎的类型（`Scene` / `Visual` / `Effect` / `Keyframes` / `TextStyle`）再交进来；需要使用方定制的画法走 trait（如 `Icon`）。
-  不依赖任何 `qingjian-*` crate：以后要单独发布，用 `git subtree split --prefix crates/bamboo-slip` 带着历史拆出去。
-- 场景树里一律是像素；点 → 像素的倍数由使用方乘。
-- 改动后除了本 crate 的测试，还要跑 `cargo test -p qingjian-render`（快照测试逐像素比对候选窗截图，是引擎的回归基准）
-  与 `cargo test -p qingjian-settings`（离屏点遍设置程序的控件）。
+- No application concepts inside the engine (candidates, typed letters, theme file formats, frame data, config keys). Users convert their own
+  data into the engine's types (`Scene`, `Visual`, `Effect`, `Keyframes`, `TextStyle`) and pass them in; anything the user must customize goes
+  through a trait such as `Icon`.
+- No dependency on any `borno-*` crate.
+- The scene tree holds pixels only; the user multiplies points by the scale factor.
+- Only the drawing engine is kept from the upstream crate (scene, layout, text, fonts, animation, SVG): the window host, the settings widgets and the
+  macOS and Windows font code were removed.
+- After a change run this crate's tests and `cargo test -p borno-render`, whose rendering tests are the regression check.
 
-## 常用命令
+## Commands
 
 ```bash
 cargo test -p bamboo-slip
-cargo clippy -p bamboo-slip --all-targets --all-features -- -D warnings
-cargo clippy -p bamboo-slip --target x86_64-pc-windows-gnu --all-targets -- -D warnings   # DirectWrite 部分只在 Windows 编
-cargo run -p bamboo-slip --example window --features host                                 # 控件演示窗口
+cargo clippy -p bamboo-slip --all-targets -- -D warnings
 ```

@@ -13,6 +13,7 @@ The README only introduces the project; technical content lives here, in three k
 | File | Contents |
 |---|---|
 | [contributing.md](contributing.md) | Conventions: architecture constraints, code layout, versions, commit messages, doc sync, checks, external PRs (CLAUDE.md loads it) |
+| [design/candidate-window.md](design/candidate-window.md) | The self-drawn candidate window: parts, why a layer-shell overlay, placement, fonts, themes |
 | [design/bangla-reuse-plan.md](design/bangla-reuse-plan.md) | Decision to depend on the MIT OpenBangla crates, not `riti`; license consequences; word list provenance |
 | [design/bangla-engine.md](design/bangla-engine.md) | The Bangla engine: composition, candidates, ranking, learning, next-word suggestions |
 | [design/architecture.md](design/architecture.md) | Inherited from Qingjian (Chinese): Core and platform split, crate structure, the `.bnd` container. Pinyin-specific parts will be rewritten |

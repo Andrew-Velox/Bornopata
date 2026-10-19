@@ -21,6 +21,7 @@ Updated 2026-10-20.
 - `borno-platform`: slim config and the new wire protocol (version 1).
 - `borno-linux-server`: `Router` with per-context engines over shared learning, Unix socket IPC, systemd user unit.
 - `borno-dictionary`: normalization, phonetic key, the FST-indexed `.bnd` dictionary, prefix completion; `tools/dict-build` builds it from Wikipedia and Common Voice (413k words, 92% top-1 on the 142-spelling set). The engine ranks by frequency and shows completions after what was typed.
+- Self-drawn candidate window: `bamboo-slip` and `borno-render` (from Qingjian, GPL side) with Bangla frames and two themes (`bornopata`, `sakura`, original artwork), `borno-panel` (layer-shell, Hyprland placement), wired through protocol 3 with automatic fallback; see [design/candidate-window.md](../design/candidate-window.md).
 - Fcitx5 plugin on the default panel, install and uninstall scripts, CI building and testing server and plugin together.
 
 ## Next
@@ -33,6 +34,8 @@ Updated 2026-10-20.
 6. Windows shell, then macOS.
 
 ## Open
+
+- Candidate window: fractional scale, clicking rows, Sway and KDE placement, hover states; check the placement in GTK apps with client-side shadows and with `scaleFactor()` on HiDPI.
 
 - Whether and how to send the question to the `upodesh` / OpenBangla maintainers (draft in [notes/upodesh-provenance-inquiry.md](../notes/upodesh-provenance-inquiry.md)).
 - The settings program and self-drawn renderer (`bamboo-slip`, `qingjian-render`) were removed; recover them from `upstream` if a candidate window or settings UI is needed beyond Fcitx5's default panel.

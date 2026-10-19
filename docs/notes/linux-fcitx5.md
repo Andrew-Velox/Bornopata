@@ -5,7 +5,8 @@ How the pieces fit, how to build and install them on Arch with Hyprland, and wha
 ## Parts
 
 - **`borno-linux-server`** (`apps/linux/server`): holds one `Engine` per input context and all learned data, listens on a Unix socket (`$XDG_RUNTIME_DIR/bornopata.sock`, or `$BORNOPATA_SOCKET`). All input logic is in the `Router`.
-- **`bornopata.so`** (`apps/linux/fcitx5`): a thin Fcitx5 addon. It forwards key and lifecycle events to the Server and draws the frame it gets back on Fcitx5's default panel. No custom rendering.
+- **`bornopata.so`** (`apps/linux/fcitx5`): a thin Fcitx5 addon. It forwards key and lifecycle events and the text cursor position to the Server and draws the frame it gets back: on Fcitx5's default panel, or, when the Server says the frame is `native`, only the inline preedit.
+- **The self-drawn window** (`crates/borno-panel`, started by the Server): a layer-shell overlay with the Bornopata themes, used on Hyprland and other wlroots compositors; see [../design/candidate-window.md](../design/candidate-window.md). GNOME and KDE keep Fcitx5's panel.
 - Socket access is limited to the same user (`SO_PEERCRED`, mode 0600, private directory).
 
 ## Arch packages
@@ -84,17 +85,25 @@ log_level = "info"       # logs in ~/.local/state/bornopata/logs
 
 [shortcut]
 toggle = "ctrl+alt+space"
+
+[panel]
+mode = "auto"            # auto: own window where possible, else Fcitx5's panel; fcitx: always Fcitx5's panel
+theme = "bornopata"      # or "sakura", or the path of a theme directory
+dark = false             # dark variant of themes that have one
+layout = "vertical"      # or "horizontal"
 ```
+
+Fonts: the window needs a Bengali font (Noto Sans Bengali from `noto-fonts` on Arch); `journalctl --user -u bornopata` or the log says which panel was chosen.
 
 Learned data (`user-words.tsv`, `user-choices.tsv`, `user-ngram.tsv`) is written a few seconds after the last commit and when the Server stops. An optional language model goes in `~/.local/share/bornopata/lm.bnd`. Typed text is never written to the logs.
 
 ## Protocol
 
-Framing: a 4-byte little-endian length, then a JSON body (`borno_platform::protocol`). Version `PROTOCOL_VERSION = 2`; the Server refuses any other and there is no compatibility layer, the Server and the plugin are installed together. Bump the number whenever a message changes meaning and change the plugin in the same commit.
+Framing: a 4-byte little-endian length, then a JSON body (`borno_platform::protocol`). Version `PROTOCOL_VERSION = 3`; the Server refuses any other and there is no compatibility layer, the Server and the plugin are installed together. Bump the number whenever a message changes meaning and change the plugin in the same commit.
 
-- Plugin to Server: `Open{session, app, protocol, generation, context}`, `Close{session}`, `Event{session, event}` with events `Capabilities`, `Reset`, `Key{event, release}`, `Deactivate`, `Focus`, `Candidate{identity, index}`. The first event of a session must be `Capabilities`.
+- Plugin to Server: `Open{session, app, protocol, generation, context}`, `Close{session}`, `Event{session, event}` with events `Capabilities`, `Reset`, `Key{event, release}`, `Deactivate`, `Focus`, `Candidate{identity, index}` and `Cursor{x, y, width, height, surface_relative}` (the text cursor, sent when it changes and before a key). The first event of a session must be `Capabilities`.
 - Server to plugin: `Opened`, `Result{session, outcome, commit, identity, frame}`, `Ignored`. `commit` is applied before the frame is drawn. `identity.revision` grows with every reply so a stale reply or a click on a replaced frame is dropped.
-- `Frame`: `roman`, `preedit` (Bangla text of the highlighted candidate), `candidates` (at most nine, each with `text` and `source`: `Learned`, `Direct`, `Dictionary`, `Completion` or `Next`), `highlight`, `suggesting`, `mode`.
+- `Frame`: `roman`, `preedit` (Bangla text of the highlighted candidate), `candidates` (at most nine, each with `text` and `source`: `Learned`, `Direct`, `Dictionary`, `Completion` or `Next`), `highlight`, `suggesting`, `mode`, `native` (the Server shows the frame in its own window, so the plugin draws no candidate list).
 
 ## Tests
 

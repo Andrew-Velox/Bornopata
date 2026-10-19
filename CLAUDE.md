@@ -23,7 +23,10 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 - `apps/cli`: `borno-cli <roman>...` types words through the engine and prints candidates, sources, scores and timings; `--dict` picks a dictionary, `--eval FILE` measures ranking. Run it before merging ranking changes.
 - `tools/dict-build`: `borno-dict-build` counts Bengali words in corpus text (wiki XML included) and writes the dictionary. Corpora are never committed.
 - `crates/borno-platform`: the config file (`[general]`, `[shortcut]`) and the Server and shell wire protocol (`protocol`).
-- `apps/linux`: `server` (`Router` input logic, Unix socket IPC), `fcitx5` (C++ plugin on the default panel), `scripts` (user-level install and uninstall), `systemd` (user unit).
+- `crates/bamboo-slip`: the self-drawn UI engine (scene tree, layout, text shaping, animation to a bitmap), from Qingjian, GPL side of its dual license.
+- `crates/borno-render`: the candidate window renderer: `Frame` + theme to a bitmap. Themes `bornopata` and `sakura` are in `themes/`; `cargo run -p borno-render --example preview` draws them to PNG.
+- `crates/borno-panel`: the Wayland window: a layer-shell surface on its own thread, popup placement, Hyprland geometry. `examples/show.rs` puts it on a real screen.
+- `apps/linux`: `server` (`Router` input logic, Unix socket IPC), `fcitx5` (C++ plugin; draws the Fcitx5 panel only when the Server's own window is not available), `scripts` (user-level install and uninstall), `systemd` (user unit).
 - `assets/`: sample data. Every directory has a README with source and license. Data without a verified license must not ship.
 
 `docs/` has three kinds of pages (index in `docs/README.md`): `design/` decisions, `plan/` roadmap, `notes/` engineering records.

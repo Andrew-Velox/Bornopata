@@ -8,4 +8,8 @@ Copyright remains with the Qingjian contributors, whose names are in the history
 This repository starts from a fresh history, so the upstream repository is the record of who wrote what.
 Bornopata is distributed under the same license, GPL-3.0-or-later; see `LICENSE`.
 
+`crates/bamboo-slip` and `crates/borno-render` (from Qingjian's `qingjian-render`) were dual-licensed upstream under the GPL or a
+commercial license, as their `LICENSE.md` files say. Bornopata uses and distributes them under the GPL side only and cannot offer the
+commercial license. The themes' pictures are new; none of Qingjian's theme artwork is included.
+
 Third-party components are listed with their licenses in `docs/design/bangla-reuse-plan.md` and in each `assets/*/README.md`.
