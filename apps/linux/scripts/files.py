@@ -44,10 +44,11 @@ def main():
              prefix / 'lib/fcitx5/bornopata.so': plugin}
     for kind in ('addon', 'inputmethod'):
         files[data / f'fcitx5/{kind}/bornopata.conf'] = root / f'apps/linux/fcitx5/data/{kind}/bornopata.conf'
-    resources = prefix / 'share/bornopata/resources'
-    for source in (root / 'assets/sample').rglob('*'):
-        if source.is_file():
-            files[resources / source.relative_to(root)] = source
+    config = Path(os.environ.get('XDG_CONFIG_HOME', str(Path.home() / '.config')))
+    if not config.is_absolute():
+        raise SystemExit('XDG_CONFIG_HOME must be an absolute path')
+    unit = config / 'systemd/user/bornopata.service'
+    files[unit] = root / 'apps/linux/systemd/bornopata.service'
     # Check every target first so files from another source are never overwritten.
     for target in files:
         if target.is_symlink() or (target.exists() and (str(target) not in old or digest(target) != old[str(target)])):
@@ -59,6 +60,8 @@ def main():
         shutil.copy2(source, temporary)
         if target == data / 'fcitx5/addon/bornopata.conf':
             temporary.write_text(temporary.read_text().replace('Library=bornopata\n', f'Library={prefix}/lib/fcitx5/bornopata\n'))
+        if target == unit:
+            temporary.write_text(temporary.read_text().replace('@PREFIX@', str(prefix)))
         temporary.replace(target)
         installed[str(target)] = digest(target)
     for filename, checksum in old.items():

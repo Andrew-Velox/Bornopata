@@ -71,7 +71,8 @@ impl Session {
     pub fn set_capabilities(&mut self, capabilities: Capabilities, learning: bool) {
         let changed = self.capabilities != capabilities;
         self.capabilities = capabilities;
-        self.engine.set_learning(learning && !capabilities.sensitive);
+        self.engine
+            .set_learning(learning && !capabilities.sensitive);
         // A change of the field's privacy is a boundary: a word typed under the old facts must not leak into the new.
         if changed {
             self.drop_word();

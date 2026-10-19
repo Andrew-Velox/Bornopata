@@ -50,7 +50,7 @@ Design background is in [design/architecture.md](design/architecture.md) (inheri
 
 - [Conventional Commits](https://www.conventionalcommits.org/): first line `<type>(<scope>): <summary>`, type and scope lower-case, summary in English, for example `feat(transliteration): map reph before consonants`.
   - Types: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `style`, `revert`.
-  - Scopes: a crate or shell name (`core`, `transliteration`, `platform`, `dictionary`, `learning`, `lm`, `neural`, `format`, `predict`, `translate`, `cli`, `linux`, `fcitx5`, `docs`, `ci`, `deps`, `release`); omit when a change spans many. Add `!` after the scope for incompatible changes.
+  - Scopes: a crate or shell name (`core`, `transliteration`, `platform`, `learning`, `lm`, `format`, `cli`, `linux`, `fcitx5`, `docs`, `ci`, `deps`, `release`); omit when a change spans many. Add `!` after the scope for incompatible changes.
   - The body explains why and the trade-offs, one point per line. `.githooks/commit-msg` rejects subjects that do not match, merge commits included.
 - History before the rename (tag `qingjian-import-base`) uses Qingjian's Chinese formats and is not rewritten.
 
@@ -67,7 +67,7 @@ Design background is in [design/architecture.md](design/architecture.md) (inheri
 
 ## CI and releases
 
-- One CI job on Linux: fmt, cargo-deny, clippy, tests, then the Fcitx5 shell build and tests. Everything runs with `--locked`. A weekly `cargo audit` runs separately and Dependabot updates actions and crates.
+- One CI job on Linux: fmt, cargo-deny, clippy, tests, then the Fcitx5 plugin build and tests against the real Server. Everything runs with `--locked`. A weekly `cargo audit` runs separately and Dependabot updates actions and crates.
 - The release workflow does not exist yet. It returns with the first release; until then nothing is published.
 
 ## External PRs

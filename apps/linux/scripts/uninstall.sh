@@ -10,4 +10,4 @@ while (($#)); do
   esac
 done
 python3 "$(dirname -- "${BASH_SOURCE[0]}")/files.py" uninstall "$install_prefix"
-echo 'Uninstalled. Stop the Server by hand and restart Fcitx5; user data is kept.'
+echo 'Uninstalled. Run: systemctl --user disable --now bornopata (if you enabled it), then restart Fcitx5. User data is kept.'

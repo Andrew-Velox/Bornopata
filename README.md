@@ -2,7 +2,7 @@
 
 A Bangla input method for Bangladesh, built around a platform-independent Core with thin shells per platform. Phonetic (Avro-style) typing comes first.
 
-**Status: early development, nothing is released.** The repository was started from the Qingjian pinyin input method (see [NOTICE.md](NOTICE.md)). The Bangla Core works end to end in the CLI; the Linux Server and Fcitx5 plugin are not ported to it yet. See [docs/plan/roadmap.md](docs/plan/roadmap.md).
+**Status: early development, nothing is released.** The repository was started from the Qingjian pinyin input method (see [NOTICE.md](NOTICE.md)). Bangla typing works end to end on Linux with Fcitx5 (build it yourself, see [docs/notes/linux-fcitx5.md](docs/notes/linux-fcitx5.md)). See [docs/plan/roadmap.md](docs/plan/roadmap.md) for what is next.
 
 ## Goals
 
@@ -20,7 +20,7 @@ cargo run -p borno-cli -- ami bangla kotha
 
 The CLI prints each word's candidates with their source (direct, dictionary or learned), score and timings, then the committed text and next-word suggestions. `--user-dir DIR` keeps what you choose between runs; `--pick N` commits the Nth candidate.
 
-Typing into real applications needs the Fcitx5 plugin and the Linux Server, which return once they are ported (roadmap).
+To type into real applications, build and install the Linux Server and the Fcitx5 plugin with `apps/linux/scripts/install.sh`; Arch packages, Hyprland setup and keys are in [docs/notes/linux-fcitx5.md](docs/notes/linux-fcitx5.md).
 
 ## Documentation
 

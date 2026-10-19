@@ -1,0 +1,12 @@
+[Unit]
+Description=Bornopata Bangla input method server
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=@PREFIX@/bin/borno-linux-server
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

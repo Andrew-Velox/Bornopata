@@ -19,7 +19,5 @@ The README only introduces the project; technical content lives here, in three k
 | [plan/roadmap.md](plan/roadmap.md) | Phases and open decisions |
 | [plan/word-list-sources.md](plan/word-list-sources.md) | Candidate corpora for our own word list and their licenses |
 | [notes/crate-notes.md](notes/crate-notes.md) | Inherited (Chinese): per-crate implementation facts |
-| [notes/linux-fcitx5.md](notes/linux-fcitx5.md) | Inherited (Chinese): Linux panel build, protocol, install and troubleshooting |
-| [notes/performance.md](notes/performance.md) | Inherited (Chinese): past performance work |
-| [notes/neural-rescoring.md](notes/neural-rescoring.md) | Inherited (Chinese): local neural rescoring |
+| [notes/linux-fcitx5.md](notes/linux-fcitx5.md) | Linux Server and Fcitx5 plugin: Arch packages, build, install, enabling on Hyprland, keys, config, protocol, tests |
 | [notes/upodesh-provenance-inquiry.md](notes/upodesh-provenance-inquiry.md) | Draft question to the upodesh maintainers, not sent |

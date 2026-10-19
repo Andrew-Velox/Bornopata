@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
-# Installs the Server and the Fcitx5 plugin into a user directory. The Server is started by hand.
+# Installs the Server, the Fcitx5 plugin and a systemd user unit into a user directory.
 set -euo pipefail
-# The Server is outside the workspace while the Core is rewritten (docs/plan/roadmap.md), so there is nothing to build yet.
-echo 'install.sh is disabled until the Linux Server is ported to the Bangla Engine; see docs/plan/roadmap.md.' >&2
-exit 1
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd)
 install_prefix="$HOME/.local"
 build_profile=release
@@ -22,14 +19,14 @@ for tool in cargo cmake c++ pkg-config python3; do
   command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
 done
 if command -v pkg-config >/dev/null 2>&1; then
-  for module in openssl nlohmann_json Fcitx5Core Fcitx5Utils Fcitx5Config; do
+  for module in nlohmann_json Fcitx5Core Fcitx5Utils Fcitx5Config; do
     pkg-config --exists "$module" || missing+=("$module")
   done
 fi
 if ((${#missing[@]})); then
   echo "missing dependencies: ${missing[*]}" >&2
-  echo 'Arch: sudo pacman -S fcitx5 cmake pkgconf openssl nlohmann-json' >&2
-  echo 'Debian / Ubuntu: sudo apt install cmake g++ pkg-config python3 libssl-dev libfcitx5core-dev libfcitx5utils-dev libfcitx5config-dev nlohmann-json3-dev; Rust: https://rustup.rs' >&2
+  echo 'Arch: sudo pacman -S fcitx5 cmake pkgconf nlohmann-json' >&2
+  echo 'Debian / Ubuntu: sudo apt install cmake g++ pkg-config python3 libfcitx5core-dev libfcitx5utils-dev libfcitx5config-dev nlohmann-json3-dev; Rust: https://rustup.rs' >&2
   exit 1
 fi
 install_prefix=$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$install_prefix")
@@ -41,4 +38,4 @@ cmake_output="$repo_root/target/fcitx5-install-$build_profile"
 cmake -S "$repo_root/apps/linux/fcitx5" -B "$cmake_output" "-DCMAKE_BUILD_TYPE=$cmake_type" -DBUILD_TESTING=OFF
 cmake --build "$cmake_output" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
 python3 "$repo_root/apps/linux/scripts/files.py" install "$install_prefix" "$repo_root" "$cargo_output/$build_profile/borno-linux-server" "$cmake_output/bornopata.so"
-printf 'Installed. Start the Server by hand: %s/bin/borno-linux-server\nRestart Fcitx5, then add "Bornopata" in the configuration tool (untick "Only show current language").\n' "$install_prefix"
+printf 'Installed.\nStart the Server: systemctl --user daemon-reload && systemctl --user enable --now bornopata   (or run %s/bin/borno-linux-server yourself)\nRestart Fcitx5, then add "Bornopata" in the configuration tool (untick "Only show current language").\n' "$install_prefix"

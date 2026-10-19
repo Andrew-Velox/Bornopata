@@ -53,4 +53,4 @@ Candidate generation is synchronous, in memory and reads only local tables. Noth
 
 ## Out of scope for this phase
 
-Cloud prediction, glosses, neural rescoring, emoji, fixed layouts, config files and the Server protocol. Their crates are excluded from the workspace until the next phase ports them.
+Cloud prediction, glosses, neural rescoring, emoji and fixed layouts. The crates for the first three were dropped; the Server, config and protocol are described in [../notes/linux-fcitx5.md](../notes/linux-fcitx5.md).
