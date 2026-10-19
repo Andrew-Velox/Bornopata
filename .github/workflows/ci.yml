@@ -1,4 +1,4 @@
-# One Linux job: fmt, dependency policy, clippy, the whole workspace test suite, and the Fcitx5 shell.
+# One Linux job: fmt, dependency policy, clippy, the whole workspace test suite and the install script test.
 # Actions are pinned to commits (the tag is in the trailing comment); Dependabot updates them weekly. Cargo runs with --locked.
 name: ci
 
@@ -33,11 +33,6 @@ jobs:
 
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
 
-      - name: Install Fcitx5 build and test dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake g++ libfcitx5core-dev libfcitx5config-dev libfcitx5utils-dev nlohmann-json3-dev fcitx5
-
       - name: Format
         run: cargo fmt --all --check
 
@@ -54,22 +49,8 @@ jobs:
       - name: Test
         run: cargo test --workspace --locked
 
-      - name: Build Linux server
-        run: cargo build -p borno-linux-server --locked
-
-      - name: Configure Fcitx5 shell
-        run: cmake -S apps/linux/fcitx5 -B target/fcitx5-stage1 -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
-
-      - name: Build Fcitx5 shell
-        run: cmake --build target/fcitx5-stage1 --parallel 2
-
-      # Logs go through tee so the failure upload below can attach them. `shell: bash` is required: the default
-      # `bash -e` has no pipefail, so `| tee` would swallow the test exit code and skip the failure() step.
-      - name: Test Fcitx5 shell
-        shell: bash
-        run: |
-          mkdir -p target/ci-logs
-          env -u DBUS_SESSION_BUS_ADDRESS ctest --test-dir target/fcitx5-stage1 --output-on-failure 2>&1 | tee target/ci-logs/fcitx5-ctest.log
+      # The Linux Server and the Fcitx5 shell tests return when the Server is ported to the Bangla Engine
+      # (docs/plan/roadmap.md). Until then the Server is outside the workspace and these steps are off.
 
       - name: Validate Linux install scripts
         run: bash -n apps/linux/scripts/install.sh apps/linux/scripts/uninstall.sh
@@ -79,15 +60,3 @@ jobs:
         run: |
           mkdir -p target/ci-logs
           python3 apps/linux/tests/installation.py 2>&1 | tee target/ci-logs/linux-installation.log
-
-      - name: Upload Linux diagnostics
-        if: failure()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: linux-ci-diagnostics
-          if-no-files-found: ignore
-          path: |
-            target/ci-logs/**
-            target/fcitx5-stage1/Testing/**
-            target/fcitx5-stage1/CMakeFiles/CMakeOutput.log
-            target/fcitx5-stage1/CMakeFiles/CMakeError.log

@@ -14,8 +14,8 @@ The README only introduces the project; technical content lives here, in three k
 |---|---|
 | [contributing.md](contributing.md) | Conventions: architecture constraints, code layout, versions, commit messages, doc sync, checks, external PRs (CLAUDE.md loads it) |
 | [design/bangla-reuse-plan.md](design/bangla-reuse-plan.md) | Decision to depend on the MIT OpenBangla crates, not `riti`; license consequences; word list provenance |
+| [design/bangla-engine.md](design/bangla-engine.md) | The Bangla engine: composition, candidates, ranking, learning, next-word suggestions |
 | [design/architecture.md](design/architecture.md) | Inherited from Qingjian (Chinese): Core and platform split, crate structure, the `.bnd` container. Pinyin-specific parts will be rewritten |
-| [design/core-internals.md](design/core-internals.md) | Inherited (Chinese): `Engine` fields, key data flow, async side paths, caches |
 | [plan/roadmap.md](plan/roadmap.md) | Phases and open decisions |
 | [plan/word-list-sources.md](plan/word-list-sources.md) | Candidate corpora for our own word list and their licenses |
 | [notes/crate-notes.md](notes/crate-notes.md) | Inherited (Chinese): per-crate implementation facts |

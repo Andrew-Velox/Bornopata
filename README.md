@@ -2,7 +2,7 @@
 
 A Bangla input method for Bangladesh, built around a platform-independent Core with thin shells per platform. Phonetic (Avro-style) typing comes first.
 
-**Status: early development, nothing is released.** The repository was started from the Qingjian pinyin input method; the Bangla Core is not written yet and the engine in `borno-core` is still the inherited pinyin one. See [docs/plan/roadmap.md](docs/plan/roadmap.md).
+**Status: early development, nothing is released.** The repository was started from the Qingjian pinyin input method (see [NOTICE.md](NOTICE.md)). The Bangla Core works end to end in the CLI; the Linux Server and Fcitx5 plugin are not ported to it yet. See [docs/plan/roadmap.md](docs/plan/roadmap.md).
 
 ## Goals
 
@@ -10,15 +10,17 @@ A Bangla input method for Bangladesh, built around a platform-independent Core w
 - Learning from what you type, on your own machine.
 - Linux (Fcitx5) first, then Windows, then macOS.
 
-## Try the inherited tooling
+## Try it
 
 ```bash
 cargo build
 cargo test
-cargo run -p borno-cli -- <input>
+cargo run -p borno-cli -- ami bangla kotha
 ```
 
-Install the Server and the Fcitx5 plugin into your home directory with `apps/linux/scripts/install.sh`; details in [docs/notes/linux-fcitx5.md](docs/notes/linux-fcitx5.md).
+The CLI prints each word's candidates with their source (direct, dictionary or learned), score and timings, then the committed text and next-word suggestions. `--user-dir DIR` keeps what you choose between runs; `--pick N` commits the Nth candidate.
+
+Typing into real applications needs the Fcitx5 plugin and the Linux Server, which return once they are ported (roadmap).
 
 ## Documentation
 

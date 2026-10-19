@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Installs the Server and the Fcitx5 plugin into a user directory. The Server is started by hand.
 set -euo pipefail
+# The Server is outside the workspace while the Core is rewritten (docs/plan/roadmap.md), so there is nothing to build yet.
+echo 'install.sh is disabled until the Linux Server is ported to the Bangla Engine; see docs/plan/roadmap.md.' >&2
+exit 1
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd)
 install_prefix="$HOME/.local"
 build_profile=release
