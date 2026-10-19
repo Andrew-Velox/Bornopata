@@ -144,7 +144,7 @@ mod tests {
         let path = dir.join(name);
         std::fs::create_dir_all(&path).unwrap();
         let json = format!(
-            r##"{{ "extends": "qingjian", "meta": {{ "id": "{id}", "name": "{id} 主题" }},
+            r##"{{ "extends": "bornopata", "meta": {{ "id": "{id}", "name": "{id} theme" }},
                 "variables": {{ "accent": "#ff0000" }} }}"##
         );
         std::fs::write(path.join(THEME_FILE), json).unwrap();
@@ -152,11 +152,11 @@ mod tests {
 
     #[test]
     fn loads_user_themes_after_builtins_and_skips_bad_ones() {
-        let dir = std::env::temp_dir().join("qingjian-theme-library-test");
+        let dir = std::env::temp_dir().join("borno-theme-library-test");
         let _ = std::fs::remove_dir_all(&dir);
         write_theme(&dir, "peach", "peach");
         write_theme(&dir, "mismatch", "other");
-        write_theme(&dir, "wechat", "wechat");
+        write_theme(&dir, "same-as-builtin", "bornopata");
         write_theme(&dir, "dark", "dark");
         std::fs::create_dir_all(dir.join("broken")).unwrap();
         std::fs::write(dir.join("broken").join(THEME_FILE), "{").unwrap();
@@ -167,7 +167,7 @@ mod tests {
         assert_eq!(ids.len(), builtin + 1);
         assert_eq!(ids[builtin], "peach");
         assert_eq!(library.resolve("peach", true).id(), "peach");
-        assert_eq!(library.resolve("nope", false).id(), "qingjian");
+        assert_eq!(library.resolve("nope", false).id(), "bornopata");
         assert!(!library.refresh());
 
         write_theme(&dir, "maple", "maple");

@@ -1,4 +1,4 @@
-//! 候选窗口顶部的拼音行：若干段 + 渲染器自己画的光标。
+//! The typed letters on the top line: segments plus a caret the renderer draws.
 
 mod segment;
 mod style;
@@ -8,15 +8,15 @@ pub use style::PreeditStyle;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Preedit {
-    /// 按顺序画的片段。
+    /// Segments drawn in order.
     pub segments: Vec<PreeditSegment>,
 
-    /// 光标在拼接文本里的字符位置。
+    /// Caret position in characters of the joined text.
     pub cursor: usize,
 }
 
 impl Preedit {
-    /// 单段普通文本。
+    /// A single plain segment.
     pub fn plain(text: &str, cursor: usize) -> Self {
         Self {
             segments: vec![PreeditSegment {
@@ -27,12 +27,12 @@ impl Preedit {
         }
     }
 
-    /// 拼接后的全文。
+    /// The joined text.
     pub fn text(&self) -> String {
         self.segments.iter().map(|s| s.text.as_str()).collect()
     }
 
-    /// 光标前的文字（用来量光标的 x）。
+    /// The text before the caret, for measuring where the caret goes.
     pub fn before_cursor(&self) -> String {
         self.text().chars().take(self.cursor).collect()
     }

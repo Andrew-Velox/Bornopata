@@ -6,7 +6,6 @@
 mod build;
 mod hit;
 mod rendered;
-mod status;
 
 use std::path::PathBuf;
 use std::time::Instant;
@@ -24,10 +23,6 @@ use build::Builder;
 
 pub use hit::{HitRegion, HitTarget};
 pub use rendered::Rendered;
-pub use status::{RenderedStatus, StatusCell};
-
-/// 光学字号（点）：20 pt 以下 CoreText 给系统字体用的就是这一档。
-const OPTICAL_SIZE: f32 = 17.0;
 
 /// 候选词的文字样式名：状态条之外只有核对字体回退时直接用到。
 const CANDIDATE_FONT: &str = "candidate";
@@ -42,8 +37,7 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(library: FontLibrary) -> Self {
-        let mut stage = Stage::new(library);
-        stage.text().set_optical_size(Some(OPTICAL_SIZE));
+        let stage = Stage::new(library);
         Self {
             stage,
             hits: Vec::new(),
@@ -98,7 +92,6 @@ impl Renderer {
             theme,
             scale,
             text: self.stage.text(),
-            cell_nodes: Vec::new(),
             candidate_nodes: Vec::new(),
             sense_nodes: Vec::new(),
         };

@@ -1,10 +1,11 @@
 [package]
-name = "qingjian-render"
-description = "候选窗与状态条：帧数据 + 主题 → 场景树，画在 bamboo-slip 上，各平台只负责贴图"
+name = "borno-render"
+description = "Candidate window renderer: a frame and a theme to a scene tree, drawn on bamboo-slip"
 version.workspace = true
 edition.workspace = true
-license = "GPL-3.0-or-later OR LicenseRef-Qingjian-Commercial"
-repository.workspace = true
+# Dual-licensed upstream (GPL-3.0-or-later or a commercial license, see LICENSE.md). Bornopata uses and
+# distributes it under the GPL side only.
+license = "GPL-3.0-or-later"
 
 [dependencies]
 bamboo-slip.workspace = true
@@ -14,12 +15,7 @@ serde.workspace = true
 serde_json.workspace = true
 
 [dev-dependencies]
-clap.workspace = true
-# 预览工具列字体文件用
-cosmic-text.workspace = true
-# 快照测试画差异图用
 tiny-skia.workspace = true
-tracing-subscriber.workspace = true
 
 [lints]
 workspace = true

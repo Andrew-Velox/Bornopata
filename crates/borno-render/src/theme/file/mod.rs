@@ -5,7 +5,6 @@ mod color;
 mod font;
 mod meta;
 pub(crate) mod node;
-mod status;
 mod text;
 mod windows;
 
@@ -17,7 +16,6 @@ pub(crate) use adaptive::Adaptive;
 pub(crate) use color::{ColorRef, ColorSpec, ColorValue};
 pub(crate) use font::{BundledFont, FontRef, FontStyle};
 pub(crate) use meta::{LockedAppearance, Meta};
-pub(crate) use status::StatusSpec;
 pub(crate) use text::TextSettings;
 pub(crate) use windows::Windows;
 
@@ -48,6 +46,4 @@ pub(crate) struct ThemeFile {
     pub(crate) components: HashMap<String, NodeSpec>,
 
     pub(crate) windows: Windows,
-
-    pub(crate) status: StatusSpec,
 }

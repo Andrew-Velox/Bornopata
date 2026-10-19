@@ -61,7 +61,7 @@ mod tests {
 
     fn theme(text: &str) -> Theme {
         let json = format!(
-            r#"{{ "extends": "qingjian", "schema": 1, "meta": {{ "id": "t", "name": "t" }}, "text": {text} }}"#
+            r#"{{ "extends": "bornopata", "schema": 1, "meta": {{ "id": "t", "name": "t" }}, "text": {text} }}"#
         );
         Theme::from_json(&json, false).unwrap()
     }
@@ -95,7 +95,10 @@ mod tests {
         assert_eq!(candidate.family, annotation.family);
         assert_ne!(candidate.family, index.family);
         assert!(index.italic && !candidate.italic);
-        assert_eq!(theme.font_families(), ["Songti SC", "Georgia"]);
+        assert_eq!(
+            theme.font_families(),
+            ["Noto Sans Bengali", "Songti SC", "Georgia"]
+        );
     }
 
     #[test]
@@ -117,14 +120,8 @@ mod tests {
         for theme in Theme::builtins() {
             let families = theme.font_families();
             match theme.id() {
-                // 候选宋体（mac / Windows 各一个名字），标语 Georgia 斜体
-                "sakura" => assert_eq!(families, ["Songti SC", "SimSun", "Georgia"]),
-                "dafeiyu" | "bocchi" => assert_eq!(families, ["PingFang SC", "Microsoft YaHei"]),
-                // 「01」用 Avenir Next（mac）/ Segoe UI（Windows）
-                "miku" => assert_eq!(
-                    families,
-                    ["PingFang SC", "Microsoft YaHei", "Avenir Next", "Segoe UI"]
-                ),
+                // The Bengali font goes first; `system` is the UI font and needs no lookup.
+                "bornopata" => assert_eq!(families, ["Noto Sans Bengali"]),
                 id => assert!(families.is_empty(), "{id}"),
             }
         }

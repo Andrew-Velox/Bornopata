@@ -67,9 +67,6 @@ pub(crate) enum NodeKind {
         /// 光标后未确认的拼音。
         rest: ColorSpec,
 
-        /// 纠错改掉的字母，带删除线。
-        struck: ColorSpec,
-
         caret: CaretSpec,
 
         /// 拼音的描边。

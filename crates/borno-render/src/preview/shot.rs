@@ -1,4 +1,4 @@
-//! 一张预览图的结果。
+//! The result of one preview picture.
 
 use std::path::PathBuf;
 
@@ -6,9 +6,9 @@ use super::ShotError;
 
 #[derive(Debug)]
 pub struct Shot {
-    /// 文件名：`vertical.png` / `horizontal.png` / `vertical-dark.png`。
+    /// File name: `vertical.png`, `next-words.png` or `vertical-dark.png`.
     pub file: &'static str,
 
-    /// 写出的路径，或这张为什么没画出来。
+    /// The written path, or why this picture failed.
     pub result: Result<PathBuf, ShotError>,
 }

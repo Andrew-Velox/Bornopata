@@ -8,6 +8,7 @@ members = [
     "crates/borno-format",
     "crates/borno-dictionary",
     "crates/bamboo-slip",
+    "crates/borno-render",
     "crates/borno-platform",
     "apps/cli",
     "apps/linux/server",
@@ -32,6 +33,7 @@ borno-lm = { path = "crates/borno-lm" }
 borno-format = { path = "crates/borno-format" }
 borno-dictionary = { path = "crates/borno-dictionary" }
 bamboo-slip = { path = "crates/bamboo-slip" }
+borno-render = { path = "crates/borno-render" }
 # External versions are pinned here; member crates use `xxx.workspace = true`
 serde = { version = "1.0.229", features = ["derive"] }
 thiserror = "2.0.20"

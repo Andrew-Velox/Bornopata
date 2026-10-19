@@ -104,8 +104,8 @@ mod tests {
 
     #[test]
     fn strings_are_left_alone() {
-        let value = parse(r#"{ "url": "https://qingjian.app/a,]", "q": "say \"//hi\",}" }"#);
-        assert_eq!(value["url"], "https://qingjian.app/a,]");
+        let value = parse(r#"{ "url": "https://example.invalid/a,]", "q": "say \"//hi\",}" }"#);
+        assert_eq!(value["url"], "https://example.invalid/a,]");
         assert_eq!(value["q"], "say \"//hi\",}");
     }
 

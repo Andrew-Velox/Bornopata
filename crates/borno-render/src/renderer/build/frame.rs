@@ -73,10 +73,7 @@ impl Builder<'_> {
             None => {
                 let mut nodes = Vec::with_capacity(children.len());
                 for child in children {
-                    match self.matrix(child, layout.gap, ctx)? {
-                        Some(grid) => nodes.push(grid),
-                        None => self.node(child, ctx, &BoxSpec::default(), &mut nodes)?,
-                    }
+                    self.node(child, ctx, &BoxSpec::default(), &mut nodes)?;
                 }
                 self.scene
                     .node(layout_style::flex(base, *direction), visual, &nodes)?

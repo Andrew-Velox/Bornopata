@@ -1,74 +1,60 @@
-//! 样例帧：主题预览图（[`crate::preview`]）、离线预览（`examples/preview.rs`）与快照测试共用。
-//! 与真机上敲同样拼音看到的候选窗对照，内容要和引擎当时给的一致（人工从截图抄）。
+//! Sample frames, shared by the theme preview and the snapshot tests.
 
-use crate::{Frame, Mode, Preedit, Row, Tone};
+use crate::{Frame, Mode, Preedit, Row, Source, Tone};
 
-/// 真机敲「nihao」看到的第一页（2026-09-13 从截图抄），拼音行带光标、译文、生词橙色、页码。
-pub fn nihao() -> Frame {
+/// What typing `bangl` looks like with a dictionary: the typed spelling first, then completions.
+pub fn bangl() -> Frame {
     Frame {
-        preedit: Some(Preedit::plain("ni'hao", 6)),
+        preedit: Some(Preedit::plain("bangl", 5)),
         rows: vec![
-            annotated(
-                0,
-                "你好",
-                &[
-                    ("int. ", Tone::Pos),
-                    ("hello", Tone::Gloss),
-                    (" · ", Tone::Separator),
-                    ("int. ", Tone::Pos),
-                    ("hi", Tone::Gloss),
-                ],
-                false,
-            ),
-            annotated(1, "👋", &[("你好", Tone::Gloss)], false),
-            annotated(2, "你好好", &[], false),
-            annotated(
-                3,
-                "你好像",
-                &[("phr. ", Tone::Pos), ("you seem", Tone::Fresh)],
-                false,
-            ),
-            annotated(4, "你好久", &[], false),
-            annotated(5, "你好看", &[], false),
-            annotated(6, "你哈", &[], false),
-            annotated(
-                7,
-                "你换",
-                &[
-                    ("phr. ", Tone::Pos),
-                    ("you change", Tone::Fresh),
-                    (" · ", Tone::Separator),
-                    ("phr. ", Tone::Pos),
-                    ("you swap", Tone::Fresh),
-                ],
-                false,
-            ),
-            annotated(
-                8,
-                "你会",
-                &[("phr. ", Tone::Pos), ("you will", Tone::Fresh)],
-                false,
-            ),
+            row(0, "বাংল", Source::Typed, &[]),
+            row(1, "বাংলাদেশ", Source::Completion, &[]),
+            row(2, "বাংলা", Source::Completion, &[]),
+            row(3, "বাংলাদেশের", Source::Completion, &[]),
+            row(4, "বাংলাদেশী", Source::Completion, &[]),
         ],
         highlighted: Some(0),
-        footer: Some("1/6".to_owned()),
-        sentence: None,
-        status: None,
+        hint: None,
         mode: Mode::default(),
-        columns: 0,
-        column_ems: Vec::new(),
     }
 }
 
-/// 横排真机截图那一次云端整句到了：拼音行右侧带云朵的整句补全。
-pub fn nihao_with_sentence() -> Frame {
-    let mut frame = nihao();
-    frame.sentence = Some("你好，很高兴认识你！".to_owned());
-    frame
+/// A word with a learned choice, conjuncts and a spelling variant, to check shaping.
+pub fn shaping() -> Frame {
+    Frame {
+        preedit: Some(Preedit::plain("bishshobiddaloy", 15)),
+        rows: vec![
+            row(0, "বিশ্ববিদ্যালয়", Source::Learned, &[]),
+            row(1, "বিশ্বিদ্যালয়", Source::Typed, &[]),
+            row(2, "ক্ষমা", Source::Typed, &[]),
+            row(3, "শিক্ষা", Source::Typed, &[("direct", Tone::Faint)]),
+            row(4, "কোথায়", Source::Typed, &[]),
+            row(5, "দুঃখ", Source::Typed, &[]),
+            row(6, "চাঁদ", Source::Typed, &[]),
+        ],
+        highlighted: Some(0),
+        hint: None,
+        mode: Mode::default(),
+    }
 }
 
-/// 一行候选：序号从 0 数，`annotation` 是译文各段与色调。
-pub fn annotated(index: usize, text: &str, annotation: &[(&str, Tone)], cloud: bool) -> Row {
+/// After a space: next-word suggestions and the key hint.
+pub fn next_words() -> Frame {
+    Frame {
+        preedit: None,
+        rows: vec![
+            row(0, "ভাত", Source::Next, &[]),
+            row(1, "যাই", Source::Next, &[]),
+            row(2, "ভালো", Source::Next, &[]),
+        ],
+        highlighted: Some(0),
+        hint: Some("Tab".to_owned()),
+        mode: Mode::default(),
+    }
+}
+
+/// A row with a source and annotation segments; the index counts from 0.
+pub fn row(index: usize, text: &str, source: Source, annotation: &[(&str, Tone)]) -> Row {
     Row {
         index: (index + 1).to_string(),
         text: text.to_owned(),
@@ -76,7 +62,6 @@ pub fn annotated(index: usize, text: &str, annotation: &[(&str, Tone)], cloud: b
             .iter()
             .map(|(s, tone)| ((*s).to_owned(), *tone))
             .collect(),
-        cloud,
-        code: None,
+        source,
     }
 }

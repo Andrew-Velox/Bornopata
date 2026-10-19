@@ -189,9 +189,6 @@ pub(super) fn image_paths(file: &ThemeFile) -> Vec<String> {
     }
     collect(&file.windows.vertical, &mut paths);
     collect(&file.windows.horizontal, &mut paths);
-    if let Some(root) = &file.status.root {
-        collect(root, &mut paths);
-    }
     paths
 }
 
@@ -217,9 +214,9 @@ mod tests {
     #[test]
     fn embedded_files_are_found_by_theme_path() {
         let theme = Theme::from_json(
-            r#"{ "extends": "qingjian", "schema": 1, "meta": { "id": "e", "name": "e" },
-                 "windows": { "vertical": { "fill": { "image": "images/a.svg" } },
-                              "horizontal": { "fill": { "image": "images/missing.png" } } } }"#,
+            r#"{ "extends": "bornopata", "schema": 1, "meta": { "id": "e", "name": "e" },
+                 "components": { "a": { "type": "frame", "fill": { "image": "images/a.svg" } },
+                                 "b": { "type": "frame", "fill": { "image": "images/missing.png" } } } }"#,
             false,
         )
         .unwrap();

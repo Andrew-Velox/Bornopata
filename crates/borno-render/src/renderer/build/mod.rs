@@ -2,19 +2,16 @@
 //!
 //! 一个模板节点可能产出零个（条件不成立、绑定为空）或多个（`repeat`）场景节点，所以都往 `out` 里推。
 
-mod cell;
 mod context;
 mod frame;
 mod layout_style;
 mod leaf;
-mod matrix;
 mod row;
 
 use bamboo_slip::taffy::NodeId;
 
 use crate::frame::Frame;
 use crate::layout::Layout;
-use crate::renderer::StatusCell;
 use crate::theme::Theme;
 use crate::theme::file::node::{BorderSpec, BoxSpec, EffectSpec, NodeKind, NodeSpec};
 use crate::theme::file::{ColorSpec, FontRef};
@@ -35,9 +32,6 @@ pub(super) struct Builder<'a> {
     /// 量光标位置用。
     pub(super) text: &'a mut TextPainter,
 
-    /// 状态条各格的盒子，按格的顺序；条件不成立没画出来的格为 `None`。
-    pub(super) cell_nodes: Vec<Option<NodeId>>,
-
     /// 候选窗口里各候选产出的节点（第几个候选，节点）：点击区域取它们的外接矩形。
     pub(super) candidate_nodes: Vec<(usize, NodeId)>,
 
@@ -54,16 +48,6 @@ impl Builder<'_> {
             Layout::Horizontal => &windows.horizontal,
         };
         self.root(spec, Context::new(frame))
-    }
-
-    /// 状态条的根节点（主题写了 `status.root`）：格子按 `cells` 展开，各格的盒子记在 [`Self::cell_nodes`]。
-    pub(super) fn status(
-        &mut self,
-        spec: &NodeSpec,
-        frame: &Frame,
-        cells: &[StatusCell],
-    ) -> Result<NodeId, RenderError> {
-        self.root(spec, Context::status(frame, cells))
     }
 
     /// 实例化根模板；什么都没产出（条件不成立）时给一个空节点。
@@ -102,19 +86,6 @@ impl Builder<'_> {
                 Some(component) => self.node(component, ctx, &layout, out),
                 None => Ok(()),
             },
-            NodeKind::Repeat { bind, component } if bind == "cells" => {
-                let Some(component) = theme.file().components.get(component) else {
-                    return Ok(());
-                };
-                let cells = ctx.cells;
-                for (i, cell) in cells.iter().enumerate() {
-                    let before = out.len();
-                    self.node(component, ctx.with_cell(cell, i, cells.len()), &layout, out)?;
-                    // 每格第一个产出的节点就是这一格的盒子，点击按它的右边界分格
-                    self.cell_nodes.push(out.get(before).copied());
-                }
-                Ok(())
-            }
             NodeKind::Repeat { bind, component } => {
                 let (Some(rows), Some(component)) =
                     (ctx.list(bind), theme.file().components.get(component))

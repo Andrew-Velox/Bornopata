@@ -32,267 +32,15 @@ use file::{ColorRef, FontRef, LockedAppearance, SCHEMA, ThemeFile};
 /// 内置主题编进程序的图片：主题里写的路径与文件内容。
 type EmbeddedFiles = &'static [(&'static str, &'static [u8])];
 
-/// 内置主题：id、源文件与图片，按设置界面列出的顺序；第一个是缺省主题。
-const BUILTINS: [(&str, &str, EmbeddedFiles); 7] = [
-    (
-        "qingjian",
-        include_str!("../../themes/qingjian/theme.json"),
-        &[],
-    ),
-    (
-        "system-blue",
-        include_str!("../../themes/system-blue/theme.json"),
-        &[],
-    ),
-    (
-        "wechat",
-        include_str!("../../themes/wechat/theme.json"),
-        &[],
-    ),
-    (
-        "sakura",
-        include_str!("../../themes/sakura/theme.json"),
-        &[
-            (
-                "images/character.png",
-                include_bytes!("../../themes/sakura/images/character.png"),
-            ),
-            (
-                "images/charm.png",
-                include_bytes!("../../themes/sakura/images/charm.png"),
-            ),
-            (
-                "images/cat.png",
-                include_bytes!("../../themes/sakura/images/cat.png"),
-            ),
-            (
-                "images/blossom.png",
-                include_bytes!("../../themes/sakura/images/blossom.png"),
-            ),
-            (
-                "images/bow.svg",
-                include_bytes!("../../themes/sakura/images/bow.svg"),
-            ),
-            (
-                "images/crown.svg",
-                include_bytes!("../../themes/sakura/images/crown.svg"),
-            ),
-            (
-                "images/heart.svg",
-                include_bytes!("../../themes/sakura/images/heart.svg"),
-            ),
-            (
-                "images/sparkle.svg",
-                include_bytes!("../../themes/sakura/images/sparkle.svg"),
-            ),
-            (
-                "images/petal.svg",
-                include_bytes!("../../themes/sakura/images/petal.svg"),
-            ),
-            (
-                "images/moon.svg",
-                include_bytes!("../../themes/sakura/images/moon.svg"),
-            ),
-            (
-                "images/chevron-left.svg",
-                include_bytes!("../../themes/sakura/images/chevron-left.svg"),
-            ),
-            (
-                "images/chevron-right.svg",
-                include_bytes!("../../themes/sakura/images/chevron-right.svg"),
-            ),
-        ],
-    ),
-    (
-        "dafeiyu",
-        include_str!("../../themes/dafeiyu/theme.json"),
-        &[
-            (
-                "images/girl-side.png",
-                include_bytes!("../../themes/dafeiyu/images/girl-side.png"),
-            ),
-            (
-                "images/girl-sleep.png",
-                include_bytes!("../../themes/dafeiyu/images/girl-sleep.png"),
-            ),
-            (
-                "images/girl-top.png",
-                include_bytes!("../../themes/dafeiyu/images/girl-top.png"),
-            ),
-            (
-                "images/bubble.svg",
-                include_bytes!("../../themes/dafeiyu/images/bubble.svg"),
-            ),
-            (
-                "images/chevron-down.svg",
-                include_bytes!("../../themes/dafeiyu/images/chevron-down.svg"),
-            ),
-            (
-                "images/chevron-left.svg",
-                include_bytes!("../../themes/dafeiyu/images/chevron-left.svg"),
-            ),
-            (
-                "images/chevron-right.svg",
-                include_bytes!("../../themes/dafeiyu/images/chevron-right.svg"),
-            ),
-            (
-                "images/heart.svg",
-                include_bytes!("../../themes/dafeiyu/images/heart.svg"),
-            ),
-            (
-                "images/keyboard.svg",
-                include_bytes!("../../themes/dafeiyu/images/keyboard.svg"),
-            ),
-            (
-                "images/moon.svg",
-                include_bytes!("../../themes/dafeiyu/images/moon.svg"),
-            ),
-            (
-                "images/settings.svg",
-                include_bytes!("../../themes/dafeiyu/images/settings.svg"),
-            ),
-            (
-                "images/speech-bubble.svg",
-                include_bytes!("../../themes/dafeiyu/images/speech-bubble.svg"),
-            ),
-            (
-                "images/waves.svg",
-                include_bytes!("../../themes/dafeiyu/images/waves.svg"),
-            ),
-            (
-                "images/whale.svg",
-                include_bytes!("../../themes/dafeiyu/images/whale.svg"),
-            ),
-        ],
-    ),
-    (
-        "miku",
-        include_str!("../../themes/miku/theme.json"),
-        &[
-            (
-                "images/miku-side.png",
-                include_bytes!("../../themes/miku/images/miku-side.png"),
-            ),
-            (
-                "images/miku-sleep.png",
-                include_bytes!("../../themes/miku/images/miku-sleep.png"),
-            ),
-            (
-                "images/miku-top.png",
-                include_bytes!("../../themes/miku/images/miku-top.png"),
-            ),
-            (
-                "images/chevron-left.svg",
-                include_bytes!("../../themes/miku/images/chevron-left.svg"),
-            ),
-            (
-                "images/chevron-right.svg",
-                include_bytes!("../../themes/miku/images/chevron-right.svg"),
-            ),
-            (
-                "images/corner-accent.svg",
-                include_bytes!("../../themes/miku/images/corner-accent.svg"),
-            ),
-            (
-                "images/equalizer.svg",
-                include_bytes!("../../themes/miku/images/equalizer.svg"),
-            ),
-            (
-                "images/keyboard.svg",
-                include_bytes!("../../themes/miku/images/keyboard.svg"),
-            ),
-            (
-                "images/moon.svg",
-                include_bytes!("../../themes/miku/images/moon.svg"),
-            ),
-            (
-                "images/music-note.svg",
-                include_bytes!("../../themes/miku/images/music-note.svg"),
-            ),
-            (
-                "images/panel-horizontal.svg",
-                include_bytes!("../../themes/miku/images/panel-horizontal.svg"),
-            ),
-            (
-                "images/panel-status.svg",
-                include_bytes!("../../themes/miku/images/panel-status.svg"),
-            ),
-            (
-                "images/panel-vertical.svg",
-                include_bytes!("../../themes/miku/images/panel-vertical.svg"),
-            ),
-            (
-                "images/settings.svg",
-                include_bytes!("../../themes/miku/images/settings.svg"),
-            ),
-        ],
-    ),
-    (
-        "bocchi",
-        include_str!("../../themes/bocchi/theme.json"),
-        &[
-            (
-                "images/amp.png",
-                include_bytes!("../../themes/bocchi/images/amp.png"),
-            ),
-            (
-                "images/girl-box.png",
-                include_bytes!("../../themes/bocchi/images/girl-box.png"),
-            ),
-            (
-                "images/girl-side.png",
-                include_bytes!("../../themes/bocchi/images/girl-side.png"),
-            ),
-            (
-                "images/girl-top.png",
-                include_bytes!("../../themes/bocchi/images/girl-top.png"),
-            ),
-            (
-                "images/audio-cable.svg",
-                include_bytes!("../../themes/bocchi/images/audio-cable.svg"),
-            ),
-            (
-                "images/chevron-left.svg",
-                include_bytes!("../../themes/bocchi/images/chevron-left.svg"),
-            ),
-            (
-                "images/chevron-right.svg",
-                include_bytes!("../../themes/bocchi/images/chevron-right.svg"),
-            ),
-            (
-                "images/keyboard.svg",
-                include_bytes!("../../themes/bocchi/images/keyboard.svg"),
-            ),
-            (
-                "images/note-gold.svg",
-                include_bytes!("../../themes/bocchi/images/note-gold.svg"),
-            ),
-            (
-                "images/note.svg",
-                include_bytes!("../../themes/bocchi/images/note.svg"),
-            ),
-            (
-                "images/pick.svg",
-                include_bytes!("../../themes/bocchi/images/pick.svg"),
-            ),
-            (
-                "images/settings.svg",
-                include_bytes!("../../themes/bocchi/images/settings.svg"),
-            ),
-            (
-                "images/star-pink.svg",
-                include_bytes!("../../themes/bocchi/images/star-pink.svg"),
-            ),
-            (
-                "images/star.svg",
-                include_bytes!("../../themes/bocchi/images/star.svg"),
-            ),
-        ],
-    ),
-];
+/// Built-in themes: id, source file and images, in the order a settings list shows them; the first is the default.
+const BUILTINS: [(&str, &str, EmbeddedFiles); 1] = [(
+    "bornopata",
+    include_str!("../../themes/bornopata/theme.json"),
+    &[],
+)];
 
 /// 最底层的主题：没写 `extends` 的主题都以它为底，它自己不再往下找。
-const ROOT_THEME: &str = "qingjian";
+const ROOT_THEME: &str = "bornopata";
 
 /// 引用不到的文字样式退回这个（点）。
 const FALLBACK_FONT: FontSpec = FontSpec::new(16.0, 19.0);
@@ -558,16 +306,16 @@ mod tests {
         }
         assert_eq!(Theme::builtins().len(), BUILTINS.len());
         let theme = Theme::light();
-        assert_eq!(theme.id(), "qingjian");
-        assert!(Theme::builtin("wechat", true).is_some());
+        assert_eq!(theme.id(), "bornopata");
+        assert!(Theme::builtin("bornopata", true).is_some());
         assert!(Theme::builtin("nope", false).is_none());
         assert_eq!(
             theme.color(&ColorRef::Variable("accent".to_owned())),
-            Color::rgba(148, 190, 82, 127)
+            Color::rgb(0x1f, 0x8a, 0x6e)
         );
         assert_eq!(
             Theme::dark().color(&ColorRef::Variable("accent".to_owned())),
-            Color::rgb(51, 111, 51)
+            Color::rgb(0x4f, 0xcf, 0xa8)
         );
     }
 
@@ -575,11 +323,11 @@ mod tests {
     fn theme_file_accepts_comments_trailing_commas_and_schema_key() {
         let theme = Theme::from_json(
             r##"{
-                "$schema": "https://qingjian.app/schema/theme-1.json",
-                "extends": "qingjian", // 以青简绿为底
+                "$schema": "https://example.invalid/schema/theme-1.json",
+                "extends": "bornopata", // based on the built-in theme
                 "schema": 1,
-                "meta": { "id": "jsonc", "name": "注释", },
-                /* 只改高亮色 */
+                "meta": { "id": "jsonc", "name": "comments", },
+                /* only the accent changes */
                 "variables": { "accent": "#ffb7d5", },
             }"##,
             false,
@@ -598,7 +346,7 @@ mod tests {
             for path in assets::image_paths(theme.file()) {
                 assert!(
                     theme.image(&path).is_some() || theme.svg(&path).is_some(),
-                    "内置主题 {} 用到的 {path} 没有编进程序",
+                    "built-in theme {} uses {path}, which is not embedded",
                     theme.id()
                 );
             }
@@ -606,26 +354,9 @@ mod tests {
     }
 
     #[test]
-    fn user_theme_inherits_builtin_images() {
-        let dir = std::env::temp_dir().join("qingjian-theme-inherits-sakura");
-        let _ = std::fs::remove_dir_all(&dir);
-        std::fs::create_dir_all(&dir).unwrap();
-        std::fs::write(
-            dir.join("theme.json"),
-            r##"{ "extends": "sakura", "schema": 1, "meta": { "id": "my-sakura", "name": "我的樱花" },
-                 "variables": { "text": "#000000" } }"##,
-        )
-        .unwrap();
-        let theme = Theme::from_dir(&dir, false).unwrap();
-        assert!(theme.image("images/character.png").is_some());
-        assert!(theme.svg("images/heart.svg").is_some());
-        let _ = std::fs::remove_dir_all(&dir);
-    }
-
-    #[test]
-    fn user_theme_without_extends_builds_on_qingjian() {
+    fn user_theme_without_extends_builds_on_the_base_theme() {
         let theme = Theme::from_json(
-            r##"{ "schema": 1, "meta": { "id": "red", "name": "红" }, "variables": { "accent": "#ff0000" } }"##,
+            r##"{ "schema": 1, "meta": { "id": "red", "name": "red" }, "variables": { "accent": "#ff0000" } }"##,
             false,
         )
         .unwrap();

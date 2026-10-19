@@ -216,6 +216,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "borno-render"
+version = "0.1.1"
+dependencies = [
+ "bamboo-slip",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tiny-skia",
+ "tracing",
+]
+
+[[package]]
 name = "borno-transliteration"
 version = "0.1.1"
 dependencies = [

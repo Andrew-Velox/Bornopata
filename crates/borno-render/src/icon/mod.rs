@@ -1,35 +1,27 @@
-//! 主题里能写的矢量小图标（`"icon": "cloud"`），各自实现引擎的 [`bamboo_slip::Icon`]。
+//! Small vector icons a theme can use (`"icon": "star"`), each implementing the engine's [`bamboo_slip::Icon`].
 
-mod cloud;
-mod gear;
+mod star;
 
 use std::sync::{Arc, LazyLock};
 
 use serde::Deserialize;
 
-use cloud::Cloud;
-use gear::Gear;
+use star::Star;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum Icon {
-    /// 云联想的云朵。
-    Cloud,
-
-    /// 状态条打开设置的齿轮。
-    Gear,
+    /// Marks a word chosen before.
+    Star,
 }
 
-static CLOUD: LazyLock<Arc<dyn bamboo_slip::Icon>> = LazyLock::new(|| Arc::new(Cloud));
-
-static GEAR: LazyLock<Arc<dyn bamboo_slip::Icon>> = LazyLock::new(|| Arc::new(Gear));
+static STAR: LazyLock<Arc<dyn bamboo_slip::Icon>> = LazyLock::new(|| Arc::new(Star));
 
 impl Icon {
-    /// 交给场景树画的那一个。
+    /// The painter handed to the scene tree.
     pub(crate) fn painter(self) -> Arc<dyn bamboo_slip::Icon> {
         match self {
-            Self::Cloud => Arc::clone(&CLOUD),
-            Self::Gear => Arc::clone(&GEAR),
+            Self::Star => Arc::clone(&STAR),
         }
     }
 }

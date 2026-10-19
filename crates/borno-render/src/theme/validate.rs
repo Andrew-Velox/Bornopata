@@ -15,20 +15,6 @@ pub(super) fn problems(file: &ThemeFile) -> Vec<String> {
     }
     check.node(&file.windows.vertical, "windows.vertical");
     check.node(&file.windows.horizontal, "windows.horizontal");
-    let status = &file.status;
-    if let Some(root) = &status.root {
-        check.node(root, "status.root");
-    }
-    check.font(&status.font, "status");
-    for color in [
-        &status.background,
-        &status.separator,
-        &status.normal,
-        &status.emphasized,
-        &status.gear,
-    ] {
-        check.color(color, "status");
-    }
     found
 }
 
@@ -72,13 +58,12 @@ impl Checker<'_> {
                 font,
                 typed,
                 rest,
-                struck,
                 caret,
                 stroke,
             } => {
                 self.font(font, path);
                 self.stroke(stroke.as_ref(), path);
-                for color in [typed, rest, struck, &caret.color] {
+                for color in [typed, rest, &caret.color] {
                     self.spec(color, path);
                 }
             }

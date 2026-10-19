@@ -7,7 +7,7 @@ use super::{Builder, Context};
 use crate::frame::{Preedit, PreeditStyle, Tone};
 use crate::theme::file::node::{BoxSpec, Direction, NodeKind, NodeSpec, ToneFilter};
 use bamboo_slip::RenderError;
-use bamboo_slip::{Decoration, Visual};
+use bamboo_slip::Visual;
 
 impl Builder<'_> {
     pub(super) fn leaf(
@@ -137,7 +137,6 @@ impl Builder<'_> {
             font,
             typed,
             rest,
-            struck,
             caret,
             stroke,
         } = &spec.kind
@@ -153,15 +152,6 @@ impl Builder<'_> {
             let text_style = match segment.style {
                 PreeditStyle::Typed => typed_style,
                 PreeditStyle::Rest => self.text_style(font, self.color(rest, ctx)).stroked(stroke),
-                // 辅码码段：与剩余拼音同色，再压一道下划线区分
-                PreeditStyle::AuxCode => self
-                    .text_style(font, self.color(rest, ctx))
-                    .stroked(stroke)
-                    .decorated(Decoration::Underline),
-                PreeditStyle::Struck => self
-                    .text_style(font, self.color(struck, ctx))
-                    .stroked(stroke)
-                    .decorated(Decoration::Strikethrough),
             };
             let visual = Visual::Text {
                 text: segment.text.clone(),

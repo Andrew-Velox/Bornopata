@@ -23,9 +23,9 @@ pub use fonts::{FontLibrary, UiFont};
 pub use scene::{BoxPaint, Effect, EffectKind, Fill, Icon, Scene, Visual};
 pub use stage::{Painted, Stage};
 pub use svg_image::SvgImage;
-pub use text::font::{FamilyId, FamilyList, FamilyTable, FontSpec, FontWeight};
-pub use text::{Decoration, TextPainter, TextSize, TextStyle};
 /// 使用方建树用的布局类型、自己画图标用的路径与混合模式，与这里是同一个 taffy、tiny-skia。
 pub use taffy;
+pub use text::font::{FamilyId, FamilyList, FamilyTable, FontSpec, FontWeight};
+pub use text::{Decoration, TextPainter, TextSize, TextStyle};
 pub use tiny_skia;
 pub use tiny_skia::Pixmap;

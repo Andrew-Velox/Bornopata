@@ -1,4 +1,4 @@
-//! 主题继承：`"extends": "qingjian"` 以那个内置主题为底，本文件写的覆盖上去。在 JSON 层合并：
+//! 主题继承：`"extends": "bornopata"` 以那个内置主题为底，本文件写的覆盖上去。在 JSON 层合并：
 //! 对象逐键合并（`variables` 只写要改的几个颜色即可），数组与标量整个替换（`children` 写了就是整组换掉）。
 
 use serde_json::{Map, Value};

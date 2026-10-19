@@ -1,85 +1,83 @@
+// Bornopata: a soft rounded card with a leaf-green accent. Rows are marked by where the word came from:
+// a star for a word chosen before, a trailing dots mark for completions, an arrow for next-word suggestions.
 {
   "schema": 1,
-  "meta": { "id": "qingjian", "name": "青简绿", "author": "青简", "license": "GPL-3.0-or-later" },
+  "meta": { "id": "bornopata", "name": "Bornopata", "author": "Bornopata contributors", "license": "GPL-3.0-or-later" },
 
   "variables": {
-    "text": { "light": "#000000d8", "dark": "#ffffffd8" },
-    "gloss": { "light": "#000000a6", "dark": "#ffffffb3" },
-    "faint": { "light": "#00000073", "dark": "#ffffff73" },
-    "fresh": { "light": "#ff8d28", "dark": "#ff9230" },
-    "cloud": { "light": "#00c3d0", "dark": "#00d2e0" },
-    "surface": { "light": "#ffffff", "dark": "#1e1e1e" },
-    "accent": { "light": "#94be527f", "dark": "#336f33" },
-
-    "hl_text": { "light": "#000000d8", "dark": "#ffffffd8" },
-    "hl_gloss": { "light": "#000000a6", "dark": "#ffffffb3" },
-    "hl_faint": { "light": "#00000073", "dark": "#ffffff73" },
-    "hl_fresh": { "light": "#ff8d28", "dark": "#ff9230" },
-    "hl_cloud": { "light": "#00c3d0", "dark": "#00d2e0" }
+    "text": { "light": "#1b2a26", "dark": "#eef5f2" },
+    "dim": { "light": "#1b2a2699", "dark": "#eef5f299" },
+    "gloss": { "light": "#1b2a26a6", "dark": "#eef5f2b3" },
+    "faint": { "light": "#1b2a2673", "dark": "#eef5f273" },
+    "accent": { "light": "#1f8a6e", "dark": "#4fcfa8" },
+    "star": { "light": "#e09a00", "dark": "#ffc233" },
+    "line": { "light": "#1b2a2614", "dark": "#ffffff1f" },
+    "surface_top": { "light": "#ffffff", "dark": "#26302d" },
+    "surface_bottom": { "light": "#f1f8f5", "dark": "#1c2421" },
+    "pill_top": { "light": "#d8f0e6", "dark": "#2c5a4a" },
+    "pill_bottom": { "light": "#c4e6d7", "dark": "#244a3c" },
+    "chip": { "light": "#1f8a6e1f", "dark": "#4fcfa826" }
   },
 
   "text": {
     "gamma": { "light": 0.85, "dark": 0.75 },
+    "family": ["Noto Sans Bengali", "system"],
     "styles": {
-      "candidate": { "size": 16, "line_height": 19 },
-      "annotation": { "size": 12, "line_height": 15 },
-      "index": { "size": 11, "line_height": 14 }
+      "candidate": { "size": 17, "line_height": 24 },
+      "annotation": { "size": 12, "line_height": 16 },
+      "index": { "size": 11, "line_height": 16 }
     }
   },
 
   "components": {
     "top_line": {
-      "type": "frame", "when": "preedit|trailing", "padding": [4, 0, 4, 0], "gap": 16,
+      "type": "frame", "when": "preedit|hint", "padding": [2, 4, 6, 4], "gap": 12, "align_self": "stretch",
       "children": [
         { "type": "preedit", "when": "preedit", "font": "annotation",
-          "typed": "@gloss", "rest": "@faint", "struck": "@faint",
-          "caret": { "width": 1.5, "color": "@text" } },
-        { "type": "frame", "when": "trailing", "children": [
-          { "type": "icon", "icon": "cloud", "when": "trailing.cloud", "size": 13, "height": 15,
-            "color": "@cloud", "margin": [0, 4, 0, 0] },
-          { "type": "text", "bind": "trailing.text", "when": "trailing.cloud", "font": "annotation", "color": "@cloud" },
-          { "type": "text", "bind": "trailing.text", "when": "!trailing.cloud", "font": "annotation", "color": "@gloss" }
-        ] }
+          "typed": "@gloss", "rest": "@faint",
+          "caret": { "width": 1.5, "color": "@accent" } },
+        { "type": "frame", "when": "hint", "margin": [0, 0, 0, "auto"], "padding": [1, 7, 1, 7],
+          "fill": "@chip", "radius": 6, "children": [
+            { "type": "text", "bind": "hint", "font": "annotation", "color": "@accent" }
+          ] }
       ]
     },
 
     "word": {
       "type": "frame",
       "children": [
-        { "type": "icon", "icon": "cloud", "when": "cloud", "size": 13, "height": 19,
-          "color": { "if": "highlighted", "then": "@hl_cloud", "else": "@cloud" }, "margin": [0, 4, 0, 0] },
-        { "type": "text", "bind": "text", "when": "cloud", "font": "candidate",
-          "color": { "if": "highlighted", "then": "@hl_cloud", "else": "@cloud" } },
-        { "type": "text", "bind": "text", "when": "!cloud", "font": "candidate",
-          "color": { "if": "highlighted", "then": "@hl_text", "else": "@text" } },
-        { "type": "text", "bind": "code", "when": "code", "font": "annotation",
-          "color": { "if": "highlighted", "then": "@hl_gloss", "else": "@gloss" }, "margin": [2, 5, 0, 0] }
+        { "type": "icon", "icon": "star", "when": "learned", "size": 11, "height": 24,
+          "color": "@star", "margin": [0, 5, 0, 0] },
+        { "type": "text", "text": "→", "when": "next", "font": "candidate", "color": "@accent", "margin": [0, 6, 0, 0] },
+        { "type": "text", "bind": "text", "when": "completion", "font": "candidate",
+          "color": { "if": "highlighted", "then": "@text", "else": "@dim" } },
+        { "type": "text", "bind": "text", "when": "!completion", "font": "candidate", "color": "@text" },
+        { "type": "text", "text": "…", "when": "completion", "font": "annotation", "color": "@faint", "margin": [4, 0, 0, 3] }
       ]
     },
 
     "row": {
       "type": "frame",
       "children": [
-        { "type": "frame", "id": "highlight", "transition": { "duration": 100, "easing": "ease-out" },
-          "when": "highlighted", "span": "row", "margin": [0, -4, 0, -4], "fill": "@accent", "radius": 4 },
-        { "type": "text", "bind": "index", "font": "index", "margin": [8, 0, 0, 0],
-          "color": { "if": "highlighted", "then": "@hl_faint", "else": "@faint" } },
-        { "type": "use", "component": "word", "margin": [4, 0, 0, 8] },
+        { "type": "frame", "id": "highlight", "transition": { "duration": 110, "easing": "ease-out" },
+          "when": "highlighted", "span": "row", "margin": [0, -4, 0, -4],
+          "fill": { "linear": 180, "stops": ["@pill_top", "@pill_bottom"] }, "radius": 9 },
+        { "type": "text", "bind": "index", "font": "index", "margin": [9, 0, 0, 0],
+          "color": { "if": "highlighted", "then": "@accent", "else": "@faint" } },
+        { "type": "use", "component": "word", "margin": [4, 0, 0, 9] },
         { "type": "annotation", "bind": "annotation", "when": "annotations", "font": "annotation",
-          "gloss": { "if": "highlighted", "then": "@hl_gloss", "else": "@gloss" },
-          "fresh": { "if": "highlighted", "then": "@hl_fresh", "else": "@fresh" },
-          "faint": { "if": "highlighted", "then": "@hl_faint", "else": "@faint" },
-          "margin": [8, 0, 0, 8] }
+          "gloss": "@gloss", "fresh": "@star", "faint": "@faint", "margin": [9, 0, 0, 9] }
       ]
     },
 
     "item": {
       "type": "frame", "padding": [0, 0, 4, 0],
       "children": [
-        { "type": "frame", "id": "highlight", "transition": { "duration": 100, "easing": "ease-out" },
-          "when": "highlighted", "position": "absolute", "inset": [0, -5, 0, -5], "fill": "@accent", "radius": 4 },
-        { "type": "text", "bind": "index", "font": "index", "margin": [8, 3, 0, 0],
-          "color": { "if": "highlighted", "then": "@hl_faint", "else": "@faint" } },
+        { "type": "frame", "id": "highlight", "transition": { "duration": 110, "easing": "ease-out" },
+          "when": "highlighted", "position": "absolute", "inset": [0, -5, 0, -5],
+          "fill": { "linear": 180, "stops": ["@pill_top", "@pill_bottom"] }, "radius": 9 },
+        { "type": "text", "bind": "index", "font": "index", "margin": [9, 3, 0, 0],
+          "color": { "if": "highlighted", "then": "@accent", "else": "@faint" } },
         { "type": "use", "component": "word", "margin": [4, 0, 0, 0] }
       ]
     }
@@ -87,40 +85,32 @@
 
   "windows": {
     "vertical": {
-      "type": "frame", "direction": "column", "padding": 8, "min_width": 180,
-      "fill": "@surface", "radius": 8,
-      "effects": [{ "type": "drop-shadow", "y": 6, "blur": 12, "color": "#0000005a" }],
+      "type": "frame", "direction": "column", "padding": 10, "min_width": 190,
+      "fill": { "linear": 180, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 14,
+      "border": { "width": 1, "color": "@line" },
+      "effects": [
+        { "type": "drop-shadow", "y": 10, "blur": 24, "color": "#0000002e" },
+        { "type": "drop-shadow", "y": 1, "blur": 3, "color": "#00000020" }
+      ],
       "children": [
         { "type": "use", "component": "top_line" },
-        { "type": "frame", "when": "candidates", "table": { "row_height": 27 }, "align_self": "stretch",
-          "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] },
-        { "type": "text", "bind": "page", "font": "index", "color": "@faint",
-          "align_self": "end", "margin": [4, 0, 0, 0] }
+        { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] }
       ]
     },
     "horizontal": {
-      "type": "frame", "direction": "column", "padding": 8, "fill": "@surface", "radius": 8,
-      "effects": [{ "type": "drop-shadow", "y": 6, "blur": 12, "color": "#0000005a" }],
+      "type": "frame", "direction": "column", "padding": 10,
+      "fill": { "linear": 180, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 14,
+      "border": { "width": 1, "color": "@line" },
+      "effects": [
+        { "type": "drop-shadow", "y": 10, "blur": 24, "color": "#0000002e" },
+        { "type": "drop-shadow", "y": 1, "blur": 3, "color": "#00000020" }
+      ],
       "children": [
         { "type": "use", "component": "top_line" },
-        { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 8,
-          "children": [
-            { "type": "repeat", "bind": "candidates", "component": "item" },
-            { "type": "frame", "when": "page", "margin": [0, -5, 0, "auto"], "padding": [0, 0, 0, 5], "children": [
-              { "type": "text", "bind": "page", "font": "index", "color": "@faint", "margin": [8, 0, 0, 0] }
-            ] }
-          ] },
-        { "type": "annotation", "bind": "highlighted.annotation", "when": "highlighted.annotation",
-          "font": "annotation", "gloss": "@gloss", "fresh": "@fresh", "faint": "@faint",
-          "margin": [2, -5, 0, 5], "padding": [0, 0, 2, 0] }
+        { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 10,
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "item" }] }
       ]
     }
-  },
-
-  "status": {
-    "font": "candidate", "padding": 8, "radius": 8,
-    "background": "@surface", "separator": "@faint", "separator_width": 1,
-    "normal": "@gloss", "emphasized": "@cloud", "gear": "@gloss", "gear_size": 15,
-    "effects": [{ "type": "drop-shadow", "y": 6, "blur": 12, "color": "#0000005a" }]
   }
 }
