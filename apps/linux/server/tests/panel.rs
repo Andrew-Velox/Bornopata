@@ -165,3 +165,24 @@ fn next_word_suggestions_show_without_numbers_and_with_the_key_hint() {
     };
     assert_eq!(texts, &["ভাত".to_owned()]);
 }
+
+#[test]
+fn an_all_zero_cursor_is_not_a_position_so_the_shell_draws() {
+    let panel = FakePanel::default();
+    let mut rig = rig(&panel);
+    rig.event(Event::Cursor(CursorRect {
+        surface_relative: true,
+        ..CursorRect::default()
+    }));
+    rig.type_text("kotha");
+    let reply = rig.function(DOWN);
+    assert!(!frame_of(&reply).native);
+    assert!(
+        !panel
+            .log
+            .lock()
+            .unwrap()
+            .iter()
+            .any(|action| matches!(action, Action::Show(..)))
+    );
+}

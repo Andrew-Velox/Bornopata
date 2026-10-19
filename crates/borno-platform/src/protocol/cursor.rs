@@ -14,3 +14,11 @@ pub struct CursorRect {
     /// coordinates (X11).
     pub surface_relative: bool,
 }
+
+impl CursorRect {
+    /// `false` for the all-zero rectangle some Wayland compositors hand over when the client never reported a caret
+    /// position (Fcitx5 on Hyprland with Chromium): a window placed by it would sit in the corner of the app.
+    pub fn is_known(&self) -> bool {
+        self.x != 0.0 || self.y != 0.0 || self.width != 0.0 || self.height != 0.0
+    }
+}

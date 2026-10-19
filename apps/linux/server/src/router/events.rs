@@ -48,6 +48,7 @@ impl Router {
                 }
             }
             Event::Cursor(rect) => {
+                tracing::debug!(?rect, "cursor");
                 session.cursor = Some(rect);
                 Reply::idle()
             }
@@ -97,7 +98,11 @@ impl Router {
             }
             return false;
         }
-        let Some(cursor) = cursor else {
+        let Some(cursor) = cursor.filter(CursorRect::is_known) else {
+            if self.visible == Some(id) {
+                self.visible = None;
+                panel.hide();
+            }
             return false;
         };
         if panel.show(render_frame(frame), cursor) {
