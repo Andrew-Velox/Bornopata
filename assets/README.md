@@ -5,6 +5,7 @@ Bundled data sources and samples. Every subdirectory has a README that states wh
 ## Directories
 
 - `dictionary/`: the sample, the evaluation spellings and the build and license record of the word list (the corpora and the built `words.bnd` are not committed).
+- `gloss/`: the English glosses beside the candidates: the table, the license and attribution record, and how it is built (from Wiktionary; the built `.bnd` is not committed).
 - `sample/`: tiny hand-written files from the inherited pinyin tooling, still used by a few tests.
 
 ## Data of unverified provenance
