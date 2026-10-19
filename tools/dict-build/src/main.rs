@@ -4,6 +4,7 @@ mod args;
 mod counter;
 mod error;
 mod report;
+mod wikitext;
 
 use borno_dictionary::DictionaryBuilder;
 use borno_format::Metadata;
@@ -24,7 +25,7 @@ fn run(args: &Args) -> Result<(), BuildError> {
     if args.corpus.is_empty() && args.counts.is_empty() {
         return Err(BuildError::NoInput);
     }
-    let mut counter = Counter::default();
+    let mut counter = Counter::new(args.wikitext);
     for path in &args.corpus {
         counter.add_path(path)?;
     }

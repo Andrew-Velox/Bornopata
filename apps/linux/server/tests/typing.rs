@@ -250,3 +250,70 @@ fn a_character_from_another_layout_does_not_crash_the_server() {
     assert_eq!(reply.outcome, KeyOutcome::Passthrough);
     assert_eq!(reply.commit, None);
 }
+
+/// A Router over a small real dictionary file, the way the Server runs with `words.bnd`.
+fn dictionary_rig() -> Rig {
+    static NEXT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+    let number = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let path = std::env::temp_dir().join(format!(
+        "borno-server-dict-{}-{number}.bnd",
+        std::process::id()
+    ));
+    let mut builder = borno_dictionary::DictionaryBuilder::new();
+    for (word, count) in [
+        ("বাংলা", 4_000),
+        ("বাংলাদেশ", 90_000),
+        ("বাংলাদেশী", 800),
+        ("আমি", 50_000),
+    ] {
+        builder.add(word, count);
+    }
+    builder
+        .write(&path, &borno_format::Metadata::default())
+        .unwrap();
+    let words = borno_dictionary::word_source(Some(&path)).unwrap();
+    std::fs::remove_file(&path).unwrap();
+    Rig::with(
+        borno_platform::Config::default(),
+        borno_linux_server::Shared::new(std::sync::Arc::from(words), None, None),
+    )
+}
+
+#[test]
+fn the_panel_completes_a_prefix_with_the_most_frequent_words() {
+    let mut rig = dictionary_rig();
+    let mut frame = rig.type_char('b').frame;
+    for ch in "angl".chars() {
+        frame = rig.type_char(ch).frame;
+    }
+    // What was typed first, then the completions, most frequent first, marked as completions.
+    assert_eq!(frame.candidates[0].source, Source::Direct);
+    let completions: Vec<_> = frame.candidates[1..]
+        .iter()
+        .map(|c| c.text.as_str())
+        .collect();
+    assert_eq!(completions, ["বাংলাদেশ", "বাংলা", "বাংলাদেশী"]);
+    assert!(
+        frame.candidates[1..]
+            .iter()
+            .all(|c| c.source == Source::Completion)
+    );
+    assert_eq!(frame.highlight, 0);
+}
+
+#[test]
+fn space_commits_what_was_typed_not_the_first_completion() {
+    let mut rig = dictionary_rig();
+    rig.type_text("bangl");
+    let reply = rig.type_char(' ');
+    assert_eq!(reply.commit.as_deref(), Some("বাংল "));
+}
+
+#[test]
+fn a_completion_can_be_picked_with_its_number() {
+    let mut rig = dictionary_rig();
+    rig.type_text("bangl");
+    let reply = rig.type_char('2');
+    assert_eq!(reply.outcome, KeyOutcome::Consumed);
+    assert_eq!(reply.commit.as_deref(), Some("বাংলাদেশ"));
+}

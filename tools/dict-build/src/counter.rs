@@ -8,6 +8,7 @@ use std::path::{Path, PathBuf};
 use borno_dictionary::{normalize, tokens};
 
 use crate::error::BuildError;
+use crate::wikitext;
 
 /// Word counts gathered from any number of inputs.
 #[derive(Debug, Default)]
@@ -19,11 +20,30 @@ pub struct Counter {
 
     /// Tokens dropped as malformed.
     pub rejected: u64,
+
+    /// Strip wiki markup from each line before counting.
+    pub wikitext: bool,
 }
 
 impl Counter {
+    /// A counter that strips wiki markup first when `wikitext` is set.
+    pub fn new(wikitext: bool) -> Self {
+        Self {
+            wikitext,
+            ..Self::default()
+        }
+    }
+
     /// Counts the Bengali words of one line of text.
     pub fn add_text(&mut self, text: &str) {
+        if self.wikitext {
+            let cleaned = wikitext::strip(text);
+            return self.add_cleaned(&cleaned);
+        }
+        self.add_cleaned(text);
+    }
+
+    fn add_cleaned(&mut self, text: &str) {
         for token in tokens(text) {
             self.tokens += 1;
             match normalize(token) {

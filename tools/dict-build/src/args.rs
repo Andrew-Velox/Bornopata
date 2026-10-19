@@ -20,6 +20,11 @@ pub struct Args {
     #[arg(long)]
     pub corpus: Vec<PathBuf>,
 
+    /// Strip wiki markup (templates, parameter names, category and file links, tags) from the corpus lines before
+    /// counting. Use it for Wikipedia dumps; without it names like `|তারিখ=` count as words millions of times.
+    #[arg(long)]
+    pub wikitext: bool,
+
     /// A `word<TAB>count` file added to the counts. Repeatable.
     #[arg(long)]
     pub counts: Vec<PathBuf>,

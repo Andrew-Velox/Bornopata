@@ -136,6 +136,7 @@ version = "0.1.0-dev"
 dependencies = [
  "borno-core",
  "borno-dictionary",
+ "borno-format",
  "borno-learning",
  "borno-lm",
  "borno-platform",
