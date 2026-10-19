@@ -1,5 +1,6 @@
 //! The engine facade: composition buffer, candidates, commit and next-word suggestions.
 
+mod annotations;
 mod candidates;
 mod next_words;
 mod query;
@@ -17,6 +18,7 @@ pub use typed::Typed;
 
 use borno_transliteration::{Transliterator, WordSource};
 
+use crate::annotator::{Annotator, NoAnnotator};
 use crate::candidate::Candidate;
 use crate::composition::Composition;
 use crate::learner::{Learner, NoLearner};
@@ -28,6 +30,7 @@ pub struct Engine {
     words: Box<dyn WordSource + Send>,
     learner: Box<dyn Learner>,
     language_model: Box<dyn LanguageModel>,
+    annotator: Box<dyn Annotator>,
 
     /// The word being typed.
     composition: Composition,
@@ -59,6 +62,7 @@ impl Engine {
             words,
             learner: Box::new(NoLearner),
             language_model: Box::new(NoLanguageModel),
+            annotator: Box::new(NoAnnotator),
             composition: Composition::default(),
             candidates: Vec::new(),
             highlighted: 0,
@@ -76,6 +80,12 @@ impl Engine {
 
     pub fn with_language_model(mut self, language_model: Box<dyn LanguageModel>) -> Self {
         self.language_model = language_model;
+        self
+    }
+
+    /// Sets the source of the annotation shown beside each candidate; see [`Engine::annotations`].
+    pub fn with_annotator(mut self, annotator: Box<dyn Annotator>) -> Self {
+        self.annotator = annotator;
         self
     }
 
