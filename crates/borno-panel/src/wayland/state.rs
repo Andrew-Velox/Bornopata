@@ -27,6 +27,7 @@ use crate::compositor::{self, Compositor, CursorRect, Located};
 use crate::error::PanelError;
 use crate::geometry::Rect;
 use crate::placement::place;
+use crate::theme::load_theme;
 
 /// What the next draw needs once the surface is configured.
 pub(super) struct Pending {
@@ -136,14 +137,6 @@ fn setup(config: PanelConfig) -> Result<(State, EventLoop<'static, State>), Pane
         quit: false,
     };
     Ok((state, event_loop))
-}
-
-fn load_theme(config: &PanelConfig) -> Result<Theme, PanelError> {
-    if let Some(theme) = Theme::builtin(&config.theme, config.dark) {
-        return Ok(theme);
-    }
-    Theme::from_dir(std::path::Path::new(&config.theme), config.dark)
-        .map_err(|error| PanelError::Render(format!("theme {}: {error}", config.theme)))
 }
 
 impl State {
