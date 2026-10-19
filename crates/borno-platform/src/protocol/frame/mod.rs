@@ -28,6 +28,11 @@ pub struct Frame {
     pub suggesting: bool,
 
     pub mode: Mode,
+
+    /// The Server shows this frame in its own window, so the shell must not draw a candidate list or panel
+    /// preedit (the inline preedit in the application is still the shell's).
+    #[serde(default)]
+    pub native: bool,
 }
 
 impl Frame {

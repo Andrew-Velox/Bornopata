@@ -4,7 +4,7 @@ mod frame;
 mod keys;
 
 use borno_core::Engine;
-use borno_platform::protocol::{Capabilities, Identity, Mode};
+use borno_platform::protocol::{Capabilities, CursorRect, Identity, Mode};
 
 /// The state of one Fcitx5 input context.
 pub struct Session {
@@ -26,6 +26,9 @@ pub struct Session {
     /// Virtual key of the last consumed press. Its release is consumed too, so the application never sees a
     /// release without a press.
     pub(crate) consumed_press: Option<u32>,
+
+    /// Where the text cursor is, as the shell last reported it; the self-drawn window needs it to know where to go.
+    pub(crate) cursor: Option<CursorRect>,
 }
 
 impl Session {
@@ -40,6 +43,7 @@ impl Session {
             suggestions: Vec::new(),
             suggestion_highlight: 0,
             consumed_press: None,
+            cursor: None,
         }
     }
 

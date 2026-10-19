@@ -8,6 +8,7 @@ use std::time::{Duration, Instant};
 use borno_platform::Config;
 use borno_platform::protocol::{ClientMessage, PROTOCOL_VERSION, ServerMessage, SessionId};
 
+use crate::panel::PanelSink;
 use crate::session::Session;
 use crate::shared::Shared;
 
@@ -24,6 +25,12 @@ pub struct Router {
 
     /// When learned data last changed and has not been written yet.
     unsaved_since: Option<Instant>,
+
+    /// The self-drawn candidate window, when there is one. Without it the shell draws the candidates.
+    panel: Option<Box<dyn PanelSink>>,
+
+    /// The session whose frame the window shows.
+    visible: Option<SessionId>,
 }
 
 impl Router {
@@ -33,7 +40,15 @@ impl Router {
             shared,
             sessions: HashMap::new(),
             unsaved_since: None,
+            panel: None,
+            visible: None,
         }
+    }
+
+    /// Gives the Router a candidate window to draw frames in.
+    pub fn with_panel(mut self, panel: Option<Box<dyn PanelSink>>) -> Self {
+        self.panel = panel;
+        self
     }
 
     /// Handles one message from a shell. `None` means there is nothing to answer.
@@ -61,6 +76,12 @@ impl Router {
             }
             ClientMessage::Close { session } => {
                 self.sessions.remove(&session);
+                if self.visible == Some(session) {
+                    self.visible = None;
+                    if let Some(panel) = self.panel.as_mut() {
+                        panel.hide();
+                    }
+                }
                 None
             }
             ClientMessage::Event { session, event } => Some(self.event(session, event)),

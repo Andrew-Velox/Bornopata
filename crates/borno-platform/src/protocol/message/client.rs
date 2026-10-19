@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use super::Event;
 use crate::protocol::SessionId;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ClientMessage {
     /// Starts a session. Answered with [`super::ServerMessage::Opened`].
     Open {

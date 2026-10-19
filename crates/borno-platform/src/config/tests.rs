@@ -57,3 +57,27 @@ fn the_template_is_written_once() {
     assert!(!Config::write_template_if_missing(&path).unwrap());
     assert!(!Config::load(&path).unwrap().general.learning);
 }
+
+#[test]
+fn the_panel_defaults_and_overrides() {
+    let defaults = Config::default();
+    assert_eq!(defaults.panel.mode, PanelMode::Auto);
+    assert_eq!(defaults.panel.theme, "bornopata");
+    assert!(!defaults.panel.dark);
+    assert_eq!(defaults.panel.layout, PanelLayout::Vertical);
+
+    let path = scratch("panel");
+    std::fs::write(
+        &path,
+        "[panel]\nmode = \"fcitx\"\ntheme = \"sakura\"\ndark = true\nlayout = \"horizontal\"\n",
+    )
+    .unwrap();
+    let config = Config::load(&path).unwrap();
+    assert_eq!(config.panel.mode, PanelMode::Fcitx);
+    assert_eq!(config.panel.theme, "sakura");
+    assert!(config.panel.dark);
+    assert_eq!(config.panel.layout, PanelLayout::Horizontal);
+
+    std::fs::write(&path, "[panel]\nmode = \"sideways\"\n").unwrap();
+    assert!(Config::load(&path).is_err());
+}

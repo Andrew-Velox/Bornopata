@@ -5,6 +5,7 @@
 pub mod error;
 #[cfg(unix)]
 pub mod ipc;
+pub mod panel;
 pub mod router;
 pub mod session;
 pub mod shared;

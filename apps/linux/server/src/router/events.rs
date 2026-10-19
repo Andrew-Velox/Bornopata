@@ -1,8 +1,11 @@
 //! What each event of a session does.
 
-use borno_platform::protocol::{Event, Identity, KeyEvent, KeyOutcome, ServerMessage, SessionId};
+use borno_platform::protocol::{
+    CursorRect, Event, Frame, Identity, KeyEvent, KeyOutcome, ServerMessage, SessionId,
+};
 
 use super::Router;
+use crate::panel::render_frame;
 use crate::session::Session;
 
 impl Router {
@@ -44,6 +47,10 @@ impl Router {
                     ..Reply::idle()
                 }
             }
+            Event::Cursor(rect) => {
+                session.cursor = Some(rect);
+                Reply::idle()
+            }
             Event::Key { event, release } => key(session, event, release, &self.config),
             Event::Candidate { identity, index } => {
                 if !current(session, &identity) {
@@ -64,12 +71,43 @@ impl Router {
                 .get_or_insert_with(std::time::Instant::now);
         }
         let identity = session.next_identity();
+        let mut frame = session.frame();
+        let cursor = session.cursor;
+        frame.native = self.present(id, &frame, cursor);
         ServerMessage::Result {
             session: id,
             outcome: reply.outcome,
             commit: reply.commit,
             identity,
-            frame: session.frame(),
+            frame,
+        }
+    }
+
+    /// Draws `frame` in the self-drawn window next to `cursor`, or hides the window when there is nothing to show.
+    /// Returns whether the window shows the frame; when it does not (no window, the cursor is not known yet, the
+    /// window died) the shell has to draw the candidates itself.
+    fn present(&mut self, id: SessionId, frame: &Frame, cursor: Option<CursorRect>) -> bool {
+        let Some(panel) = self.panel.as_mut() else {
+            return false;
+        };
+        if frame.is_empty() {
+            if self.visible == Some(id) {
+                self.visible = None;
+                panel.hide();
+            }
+            return false;
+        }
+        let Some(cursor) = cursor else {
+            return false;
+        };
+        if panel.show(render_frame(frame), cursor) {
+            self.visible = Some(id);
+            true
+        } else {
+            tracing::warn!("the self-drawn candidate window stopped, the Fcitx5 panel takes over");
+            self.panel = None;
+            self.visible = None;
+            false
         }
     }
 }

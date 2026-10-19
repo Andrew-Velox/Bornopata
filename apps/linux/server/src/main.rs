@@ -47,7 +47,8 @@ fn run() -> Result<(), ServerError> {
     }
     let words = borno_dictionary::word_source(dictionary.as_deref())?;
     let shared = Shared::new(Arc::from(words), learner, model);
-    let mut router = Router::new(config, shared);
+    let panel = borno_linux_server::panel::start(&config.panel);
+    let mut router = Router::new(config, shared).with_panel(panel);
 
     extern "C" fn stop(_: libc::c_int) {
         ipc::request_shutdown();

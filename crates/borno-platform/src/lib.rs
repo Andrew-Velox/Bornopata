@@ -5,5 +5,8 @@ mod error;
 pub mod paths;
 pub mod protocol;
 
-pub use config::{Config, GeneralConfig, KeyCombo, LogLevel, Modifiers, ShortcutConfig};
+pub use config::{
+    Config, GeneralConfig, KeyCombo, LogLevel, Modifiers, PanelConfig, PanelLayout, PanelMode,
+    ShortcutConfig,
+};
 pub use error::ConfigError;

@@ -50,14 +50,19 @@ impl Compositor for Hyprland {
     fn locate(&mut self, cursor: CursorRect) -> Option<Located> {
         let global = if cursor.surface_relative {
             let window = self.request("j/activewindow")?;
-            let at = window.get("at")?.as_array()?;
-            let (x, y) = (at.first()?.as_f64()? as f32, at.get(1)?.as_f64()? as f32);
-            Rect::new(
-                x + cursor.rect.x,
-                y + cursor.rect.y,
-                cursor.rect.width,
-                cursor.rect.height,
-            )
+            // X11 clients run through XWayland report global coordinates whatever the frontend says.
+            if window.get("xwayland").and_then(Value::as_bool) == Some(true) {
+                cursor.rect
+            } else {
+                let at = window.get("at")?.as_array()?;
+                let (x, y) = (at.first()?.as_f64()? as f32, at.get(1)?.as_f64()? as f32);
+                Rect::new(
+                    x + cursor.rect.x,
+                    y + cursor.rect.y,
+                    cursor.rect.width,
+                    cursor.rect.height,
+                )
+            }
         } else {
             cursor.rect
         };
@@ -153,6 +158,22 @@ mod tests {
         assert_eq!(located.monitor_name, "DP-1");
         assert_eq!(located.scale, 1.25);
         assert_eq!(located.monitor, Rect::new(0.0, 0.0, 2048.0, 1152.0));
+        let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    fn an_xwayland_window_reports_global_coordinates_already() {
+        let path = serve(
+            "xwayland",
+            r#"{"at":[100,200],"size":[800,600],"xwayland":true}"#,
+        );
+        let located = Hyprland::at(&path)
+            .locate(CursorRect {
+                rect: Rect::new(530.0, 640.0, 2.0, 18.0),
+                surface_relative: true,
+            })
+            .unwrap();
+        assert_eq!(located.cursor, Rect::new(530.0, 640.0, 2.0, 18.0));
         let _ = std::fs::remove_file(path);
     }
 

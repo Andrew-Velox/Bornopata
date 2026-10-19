@@ -42,6 +42,7 @@ impl Session {
                 highlight,
                 suggesting: false,
                 mode: self.mode,
+                native: false,
             };
         }
         if !self.suggestions.is_empty() {

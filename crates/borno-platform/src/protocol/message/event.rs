@@ -2,9 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::protocol::{Capabilities, Identity, KeyEvent};
+use crate::protocol::{Capabilities, CursorRect, Identity, KeyEvent};
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Event {
     /// The framework's facts about the field. Sent before any other event of the session.
     Capabilities(Capabilities),
@@ -32,6 +32,10 @@ pub enum Event {
     Focus {
         focused: bool,
     },
+
+    /// The text cursor moved (or the first position of a focused context). Sent before the key that follows it, so
+    /// the Server can put its candidate window next to the cursor.
+    Cursor(CursorRect),
 
     /// The user clicked candidate `index` of the frame identified by `identity`.
     Candidate {

@@ -106,3 +106,33 @@ fn an_empty_frame_hides_the_panel() {
     };
     assert!(!typing.is_empty());
 }
+
+#[test]
+fn a_cursor_event_carries_the_rectangle_and_its_frame_of_reference() {
+    let message: ClientMessage =
+        serde_json::from_value(json!({"Event": {"session": 1, "event": {"Cursor": {
+        "x": 30.0, "y": 40.0, "width": 2.0, "height": 18.0, "surface_relative": true}}}}))
+        .unwrap();
+    assert_eq!(
+        message,
+        ClientMessage::Event {
+            session: SessionId(1),
+            event: Event::Cursor(CursorRect {
+                x: 30.0,
+                y: 40.0,
+                width: 2.0,
+                height: 18.0,
+                surface_relative: true
+            })
+        }
+    );
+}
+
+#[test]
+fn a_frame_from_an_older_server_is_not_native() {
+    let frame: Frame = serde_json::from_value(json!({"roman": "", "preedit": "", "candidates": [],
+        "highlight": 0, "suggesting": false, "mode": "Bangla"}))
+    .unwrap();
+    assert!(!frame.native);
+    assert_eq!(PROTOCOL_VERSION, 3);
+}

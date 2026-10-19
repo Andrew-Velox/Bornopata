@@ -62,8 +62,16 @@ impl Rig {
     }
 
     pub fn with(config: Config, shared: Shared) -> Self {
+        Self::with_panel(config, shared, None)
+    }
+
+    pub fn with_panel(
+        config: Config,
+        shared: Shared,
+        panel: Option<Box<dyn borno_linux_server::panel::PanelSink>>,
+    ) -> Self {
         let mut rig = Self {
-            router: Router::new(config, shared),
+            router: Router::new(config, shared).with_panel(panel),
         };
         let opened = rig.router.handle(ClientMessage::Open {
             session: SESSION,

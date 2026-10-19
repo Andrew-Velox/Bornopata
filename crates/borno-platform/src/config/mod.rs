@@ -4,6 +4,7 @@ mod general;
 mod key_combo;
 mod log_level;
 mod modifiers;
+mod panel;
 mod shortcut;
 
 #[cfg(test)]
@@ -17,6 +18,7 @@ pub use general::GeneralConfig;
 pub use key_combo::{ComboKey, KeyCombo};
 pub use log_level::LogLevel;
 pub use modifiers::Modifiers;
+pub use panel::{PanelConfig, PanelLayout, PanelMode};
 pub use shortcut::ShortcutConfig;
 
 use crate::error::ConfigError;
@@ -37,6 +39,20 @@ log_level = "info"
 [shortcut]
 # Switch between Bangla and English typing. Modifiers (ctrl, alt, shift, super) plus space, a letter or a digit.
 toggle = "ctrl+alt+space"
+
+[panel]
+# "auto": Bornopata's own candidate window where the compositor allows it (Wayland with layer-shell: Hyprland, Sway),
+# otherwise Fcitx5's panel. "fcitx": always Fcitx5's panel.
+mode = "auto"
+
+# "bornopata" or "sakura", or the path of a theme directory.
+theme = "bornopata"
+
+# The dark variant of themes that have one (sakura is always light).
+dark = false
+
+# "vertical" or "horizontal".
+layout = "vertical"
 "#;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -44,6 +60,7 @@ toggle = "ctrl+alt+space"
 pub struct Config {
     pub general: GeneralConfig,
     pub shortcut: ShortcutConfig,
+    pub panel: PanelConfig,
 }
 
 impl Config {

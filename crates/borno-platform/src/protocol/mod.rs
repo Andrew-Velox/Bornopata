@@ -6,6 +6,7 @@
 
 mod capabilities;
 mod codec;
+mod cursor;
 pub mod frame;
 mod identity;
 pub mod key;
@@ -15,6 +16,7 @@ mod session;
 
 pub use capabilities::Capabilities;
 pub use codec::{CodecError, read_message, write_message};
+pub use cursor::CursorRect;
 pub use frame::{Frame, FrameCandidate, Source};
 pub use identity::Identity;
 pub use key::{KeyEvent, KeyModifiers, KeyOutcome};
@@ -24,7 +26,7 @@ pub use session::SessionId;
 
 /// Bumped whenever a message or a field changes meaning. The Server refuses a shell that sends another number;
 /// there is no compatibility layer, the Server and the plugin are installed together.
-pub const PROTOCOL_VERSION: u32 = 2;
+pub const PROTOCOL_VERSION: u32 = 3;
 
 #[cfg(test)]
 mod tests;
