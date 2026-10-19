@@ -5,11 +5,15 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum PanelMode {
-    /// The self-drawn window where the compositor allows it, Fcitx5's own panel otherwise.
+    /// The self-drawn window where the compositor allows it (the input-method popup for Wayland-native clients, the
+    /// layer-shell window for X11 and XWayland ones), Fcitx5's own panel otherwise.
     #[default]
     Auto,
 
-    /// Like `auto`, but a failure to start the window is logged as a warning, not as a normal fallback.
+    /// Only the input-method popup; Fcitx5's own panel wherever it is not available.
+    Popup,
+
+    /// Only the layer-shell window, and a failure to start it is logged as a warning, not as a normal fallback.
     Native,
 
     /// Always Fcitx5's own panel.

@@ -266,6 +266,7 @@ fn a_wrong_protocol_version_is_not_opened() {
         protocol: PROTOCOL_VERSION + 1,
         generation: 1,
         context: "other".into(),
+        popup: None,
     });
     assert_eq!(reply, None);
     assert_eq!(rig.router.session_count(), 1);
@@ -280,6 +281,7 @@ fn sessions_type_separately_but_learn_together() {
         protocol: PROTOCOL_VERSION,
         generation: 1,
         context: "other".into(),
+        popup: None,
     });
     let caps = |router: &mut Router| {
         router.handle(ClientMessage::Event {

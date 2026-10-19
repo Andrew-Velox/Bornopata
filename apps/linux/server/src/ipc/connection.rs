@@ -10,10 +10,12 @@ use std::sync::mpsc::SyncSender;
 use std::time::Duration;
 
 use borno_platform::protocol::{
-    ClientMessage, Event, PROTOCOL_VERSION, ServerMessage, SessionId, read_message, write_message,
+    ClientMessage, Event, PROTOCOL_VERSION, PopupClientMessage, ServerMessage, SessionId,
+    read_message, write_message,
 };
 
 use super::{Request, ask};
+use crate::popup::PopupHub;
 
 /// Longest context identifier accepted.
 const MAX_CONTEXT: usize = 64;
@@ -29,7 +31,11 @@ struct Mapped {
     capabilities_seen: bool,
 }
 
-pub(super) fn serve_connection(mut stream: UnixStream, sender: &SyncSender<Request>) {
+pub(super) fn serve_connection(
+    mut stream: UnixStream,
+    sender: &SyncSender<Request>,
+    popup: Option<&PopupHub>,
+) {
     if !peer_is_owner(&stream) {
         return;
     }
@@ -43,6 +49,7 @@ pub(super) fn serve_connection(mut stream: UnixStream, sender: &SyncSender<Reque
                 protocol,
                 generation,
                 context,
+                popup: token,
             } => {
                 if protocol != PROTOCOL_VERSION
                     || generation == 0
@@ -68,9 +75,19 @@ pub(super) fn serve_connection(mut stream: UnixStream, sender: &SyncSender<Reque
                         protocol,
                         generation,
                         context,
+                        popup: token,
                     },
                 )
                 .map(|reply| reply.with_session(local))
+            }
+            ClientMessage::Attach { protocol, token } => {
+                if protocol != PROTOCOL_VERSION || !sessions.is_empty() {
+                    break;
+                }
+                if let Some(hub) = popup {
+                    serve_popup_channel(stream, hub, token);
+                }
+                return;
             }
             ClientMessage::Close { session: local } => {
                 if let Some(mapped) = sessions.remove(&local) {
@@ -124,6 +141,33 @@ pub(super) fn serve_connection(mut stream: UnixStream, sender: &SyncSender<Reque
             },
         );
     }
+}
+
+/// A connection that attached as a popup channel: the render thread writes to it, this thread reads what the shell
+/// reports until the shell goes away.
+fn serve_popup_channel(mut stream: UnixStream, hub: &PopupHub, token: u64) {
+    let Ok(writer) = stream.try_clone() else {
+        return;
+    };
+    // The shell must have the reply before any bitmap, so the render thread gets the stream only after it.
+    if write_message(
+        &mut stream,
+        &ServerMessage::Attached {
+            protocol: PROTOCOL_VERSION,
+        },
+    )
+    .is_err()
+    {
+        return;
+    }
+    hub.attach(token, writer);
+    while let Ok(Some(message)) = read_message::<_, PopupClientMessage>(&mut stream) {
+        match message {
+            PopupClientMessage::Released { buffer } => hub.released(token, buffer),
+            PopupClientMessage::Scale { scale_120 } => hub.scale(token, scale_120),
+        }
+    }
+    hub.detach(token);
 }
 
 /// Whether the other end of the socket is the same user.

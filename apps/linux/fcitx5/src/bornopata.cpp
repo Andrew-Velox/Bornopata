@@ -18,7 +18,7 @@
 namespace fcitx {
 namespace {
 /// The wire protocol version; the Server refuses any other.
-constexpr int PROTOCOL = 3;
+constexpr int PROTOCOL = 4;
 
 /// Candidates the panel shows at once; the Server never sends more.
 constexpr size_t PANEL_CANDIDATES = 9;

@@ -25,8 +25,8 @@ int main(int argc, char **argv) {
         int connection = accept(listener, nullptr, nullptr);
         auto opened = readMessage(connection).at("Open");
         const auto session = opened.at("session");
-        assert(opened.at("protocol") == 3);
-        writeMessage(connection, {{"Opened", {{"session", session}, {"protocol", failure == "old-version" ? 4 : 3}, {"mode", "Bangla"}}}});
+        assert(opened.at("protocol") == 4);
+        writeMessage(connection, {{"Opened", {{"session", session}, {"protocol", failure == "old-version" ? 5 : 4}, {"mode", "Bangla"}}}});
         if (failure != "old-version") {
             Json identity = {{"generation", opened.at("generation")}, {"context", opened.at("context")}, {"revision", 1}};
             for (const auto *name : {"Capabilities", "Focus", "Cursor"}) {

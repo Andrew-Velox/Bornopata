@@ -44,8 +44,8 @@ struct Mock {
         int fd = accept(listener, nullptr, nullptr);
         auto opened = readMessage(fd).at("Open");
         const auto session = opened.at("session");
-        assert(opened.at("protocol") == 3);
-        writeMessage(fd, {{"Opened", {{"session", session}, {"protocol", mode == "mismatch" ? 4 : 3}, {"mode", "Bangla"}}}});
+        assert(opened.at("protocol") == 4);
+        writeMessage(fd, {{"Opened", {{"session", session}, {"protocol", mode == "mismatch" ? 5 : 4}, {"mode", "Bangla"}}}});
         if (mode == "mismatch") { close(fd); return; }
         Json identity = {{"generation", opened.at("generation")}, {"context", opened.at("context")}, {"revision", 0}};
         auto frame = emptyFrame();

@@ -25,6 +25,9 @@ pub enum ServerMessage {
         frame: Frame,
     },
 
+    /// Reply to `Attach`.
+    Attached { protocol: u32 },
+
     /// The event was for a session the Server does not know (a late callback); nothing to do.
     Ignored { session: SessionId },
 }
@@ -38,6 +41,7 @@ impl ServerMessage {
             | Self::Ignored { session } => {
                 *session = id;
             }
+            Self::Attached { .. } => {}
         }
         self
     }

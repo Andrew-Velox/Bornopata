@@ -21,6 +21,18 @@ pub enum ClientMessage {
 
         /// The shell's identifier of the input context, echoed in every identity.
         context: String,
+
+        /// The token the shell attached its popup channel with, when this context can show the popup surface.
+        /// The Server then draws this session's frames there.
+        #[serde(default)]
+        popup: Option<u64>,
+    },
+
+    /// The first message of a popup channel instead of a session connection. Answered with
+    /// [`super::ServerMessage::Attached`]; the connection then carries [`crate::protocol::popup`] messages only.
+    Attach {
+        protocol: u32,
+        token: u64,
     },
 
     /// Ends a session. No reply.

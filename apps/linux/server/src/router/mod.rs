@@ -1,6 +1,7 @@
 //! The input logic of the Server: sessions and what each event does. No sockets here.
 
 mod events;
+mod present;
 
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
@@ -9,6 +10,7 @@ use borno_platform::Config;
 use borno_platform::protocol::{ClientMessage, PROTOCOL_VERSION, ServerMessage, SessionId};
 
 use crate::panel::PanelSink;
+use crate::popup::PopupSink;
 use crate::session::Session;
 use crate::shared::Shared;
 
@@ -29,8 +31,11 @@ pub struct Router {
     /// The self-drawn candidate window, when there is one. Without it the shell draws the candidates.
     panel: Option<Box<dyn PanelSink>>,
 
-    /// The session whose frame the window shows.
-    visible: Option<SessionId>,
+    /// The popup surfaces of the shells, when the Server draws for them.
+    popup: Option<Box<dyn PopupSink>>,
+
+    /// The session whose frame is on screen, and where.
+    visible: Option<(SessionId, present::Shown)>,
 }
 
 impl Router {
@@ -41,6 +46,7 @@ impl Router {
             sessions: HashMap::new(),
             unsaved_since: None,
             panel: None,
+            popup: None,
             visible: None,
         }
     }
@@ -48,6 +54,12 @@ impl Router {
     /// Gives the Router a candidate window to draw frames in.
     pub fn with_panel(mut self, panel: Option<Box<dyn PanelSink>>) -> Self {
         self.panel = panel;
+        self
+    }
+
+    /// Gives the Router the popup surfaces to draw frames in for the shells that can show them.
+    pub fn with_popup(mut self, popup: Option<Box<dyn PopupSink>>) -> Self {
+        self.popup = popup;
         self
     }
 
@@ -60,12 +72,14 @@ impl Router {
                 generation,
                 context,
                 app,
+                popup,
             } => {
                 tracing::info!(session = session.0, app, "session opened");
                 if protocol != PROTOCOL_VERSION {
                     return None;
                 }
-                let created = Session::new(self.shared.engine(), generation, context);
+                let mut created = Session::new(self.shared.engine(), generation, context);
+                created.popup = popup;
                 let mode = created.mode();
                 self.sessions.insert(session, created);
                 Some(ServerMessage::Opened {
@@ -76,15 +90,12 @@ impl Router {
             }
             ClientMessage::Close { session } => {
                 self.sessions.remove(&session);
-                if self.visible == Some(session) {
-                    self.visible = None;
-                    if let Some(panel) = self.panel.as_mut() {
-                        panel.hide();
-                    }
-                }
+                self.hide_session(session);
                 None
             }
             ClientMessage::Event { session, event } => Some(self.event(session, event)),
+            // Popup channels are the connection layer's business; a session connection never carries one.
+            ClientMessage::Attach { .. } => None,
         }
     }
 

@@ -4,6 +4,7 @@ use std::path::Path;
 use std::sync::Arc;
 
 use borno_learning::FrequencyLearner;
+use borno_linux_server::popup::PopupSink;
 use borno_linux_server::{Router, ServerError, Shared, ipc};
 use borno_lm::BigramModel;
 use borno_platform::{Config, paths};
@@ -48,7 +49,10 @@ fn run() -> Result<(), ServerError> {
     let words = borno_dictionary::word_source(dictionary.as_deref())?;
     let shared = Shared::new(Arc::from(words), learner, model);
     let panel = borno_linux_server::panel::start(&config.panel);
-    let mut router = Router::new(config, shared).with_panel(panel);
+    let popup = borno_linux_server::popup::start(&config.panel);
+    let mut router = Router::new(config, shared)
+        .with_panel(panel)
+        .with_popup(popup.clone().map(|hub| Box::new(hub) as Box<dyn PopupSink>));
 
     extern "C" fn stop(_: libc::c_int) {
         ipc::request_shutdown();
@@ -59,7 +63,7 @@ fn run() -> Result<(), ServerError> {
     }
     let socket = ipc::socket_path();
     tracing::info!(path = %socket.display(), "Bornopata Linux Server started");
-    ipc::serve(socket, &mut router)?;
+    ipc::serve_with_popup(socket, &mut router, popup)?;
     Ok(())
 }
 

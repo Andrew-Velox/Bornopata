@@ -33,9 +33,16 @@ impl PanelSink for NativePanel {
 /// Starts the window the config asks for. `None` means Fcitx5's own panel does the drawing: the config says so, or
 /// the compositor cannot show the window (no Wayland session, no layer-shell), which is logged.
 pub fn start(config: &PanelConfig) -> Option<Box<dyn PanelSink>> {
-    if config.mode == PanelMode::Fcitx {
-        tracing::info!("candidate window: Fcitx5 panel (configured)");
-        return None;
+    match config.mode {
+        PanelMode::Fcitx => {
+            tracing::info!("candidate window: Fcitx5 panel (configured)");
+            return None;
+        }
+        PanelMode::Popup => {
+            tracing::info!("candidate window: input-method popup only (configured)");
+            return None;
+        }
+        PanelMode::Auto | PanelMode::Native => {}
     }
     let window = WindowConfig {
         theme: config.theme.clone(),

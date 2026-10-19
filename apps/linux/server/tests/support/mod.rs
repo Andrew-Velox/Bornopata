@@ -1,6 +1,8 @@
 //! Helpers: a Router over a fixed word list and shorthand for the messages tests send.
 #![allow(dead_code)] // each test crate uses a different part of this shared module
 
+pub mod shell;
+
 use std::sync::Arc;
 
 use borno_learning::FrequencyLearner;
@@ -70,8 +72,22 @@ impl Rig {
         shared: Shared,
         panel: Option<Box<dyn borno_linux_server::panel::PanelSink>>,
     ) -> Self {
+        Self::with_surfaces(config, shared, panel, None, None)
+    }
+
+    /// A Router with a window and/or popup surfaces, and a session opened by a shell that attached its popup channel
+    /// with `token`.
+    pub fn with_surfaces(
+        config: Config,
+        shared: Shared,
+        panel: Option<Box<dyn borno_linux_server::panel::PanelSink>>,
+        popup: Option<Box<dyn borno_linux_server::popup::PopupSink>>,
+        token: Option<u64>,
+    ) -> Self {
         let mut rig = Self {
-            router: Router::new(config, shared).with_panel(panel),
+            router: Router::new(config, shared)
+                .with_panel(panel)
+                .with_popup(popup),
         };
         let opened = rig.router.handle(ClientMessage::Open {
             session: SESSION,
@@ -79,6 +95,7 @@ impl Rig {
             protocol: borno_platform::protocol::PROTOCOL_VERSION,
             generation: 1,
             context: "ctx".into(),
+            popup: token,
         });
         assert!(matches!(opened, Some(ServerMessage::Opened { .. })));
         rig.event(Event::Capabilities(Capabilities::default()));

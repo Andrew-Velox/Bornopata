@@ -34,6 +34,7 @@ fn open(stream: &mut UnixStream, session: u64, protocol: u32) {
             protocol,
             generation: 1,
             context: format!("ctx{session}"),
+            popup: None,
         },
     )
     .unwrap();

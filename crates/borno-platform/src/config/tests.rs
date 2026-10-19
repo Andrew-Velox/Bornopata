@@ -78,6 +78,9 @@ fn the_panel_defaults_and_overrides() {
     assert!(config.panel.dark);
     assert_eq!(config.panel.layout, PanelLayout::Horizontal);
 
+    std::fs::write(&path, "[panel]\nmode = \"popup\"\n").unwrap();
+    assert_eq!(Config::load(&path).unwrap().panel.mode, PanelMode::Popup);
+
     std::fs::write(&path, "[panel]\nmode = \"sideways\"\n").unwrap();
     assert!(Config::load(&path).is_err());
 }

@@ -15,6 +15,7 @@ use std::time::Instant;
 
 use borno_platform::protocol::{ClientMessage, ServerMessage};
 
+use crate::popup::PopupHub;
 use crate::router::Router;
 
 pub use socket::{bind_socket, socket_path};
@@ -36,8 +37,17 @@ pub fn request_shutdown() {
     STOP.store(true, Ordering::Relaxed);
 }
 
-/// Serves `router` on `path` until [`request_shutdown`]. Removes the socket file on the way out.
+/// Serves `router` on `path` until [`request_shutdown`], without popup channels. Removes the socket file on the way out.
 pub fn serve(path: impl AsRef<Path>, router: &mut Router) -> io::Result<()> {
+    serve_with_popup(path, router, None)
+}
+
+/// Like [`serve`], and shells may attach popup channels when `popup` is the hub that draws for them.
+pub fn serve_with_popup(
+    path: impl AsRef<Path>,
+    router: &mut Router,
+    popup: Option<PopupHub>,
+) -> io::Result<()> {
     let listener = bind_socket(path.as_ref())?;
     let (sender, receiver) = mpsc::sync_channel::<Request>(QUEUE);
     thread::spawn(move || {
@@ -49,8 +59,9 @@ pub fn serve(path: impl AsRef<Path>, router: &mut Router) -> io::Result<()> {
                         continue;
                     }
                     let sender = sender.clone();
+                    let popup = popup.clone();
                     thread::spawn(move || {
-                        connection::serve_connection(stream, &sender);
+                        connection::serve_connection(stream, &sender, popup.as_ref());
                         CONNECTIONS.fetch_sub(1, Ordering::Relaxed);
                     });
                 }

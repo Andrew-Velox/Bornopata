@@ -29,6 +29,9 @@ pub struct Session {
 
     /// Where the text cursor is, as the shell last reported it; the self-drawn window needs it to know where to go.
     pub(crate) cursor: Option<CursorRect>,
+
+    /// The token of the shell's popup channel, when this context can show the input-method popup.
+    pub(crate) popup: Option<u64>,
 }
 
 impl Session {
@@ -44,7 +47,13 @@ impl Session {
             suggestion_highlight: 0,
             consumed_press: None,
             cursor: None,
+            popup: None,
         }
+    }
+
+    /// The shell's identifier of the input context.
+    pub fn context(&self) -> &str {
+        &self.context
     }
 
     pub fn mode(&self) -> Mode {
