@@ -31,9 +31,24 @@ std::string contextIdentity(const InputContext *context) {
     return out.str();
 }
 
-/// Annotation shown beside a candidate: a star for what the user chose before.
+/// A string member of an object, or empty when it is missing or not a string: a gloss that does not fit must never
+/// bring the connection down.
+std::string text(const nlohmann::json &object, const char *name) {
+    auto found = object.find(name);
+    return found != object.end() && found->is_string() ? found->get<std::string>() : "";
+}
+
+/// Annotation shown beside a candidate: a star for what the user chose before, then the gloss with its part of speech
+/// ("n. rice") when the Server sent one.
 std::string annotation(const nlohmann::json &item) {
-    return item.value("source", "") == "Learned" ? "★" : "";
+    std::string note = item.value("source", "") == "Learned" ? "★" : "";
+    auto gloss = item.find("gloss");
+    if (gloss == item.end() || !gloss->is_object()) return note;
+    const auto meaning = text(*gloss, "text");
+    if (meaning.empty()) return note;
+    const auto pos = text(*gloss, "pos");
+    if (!note.empty()) note += " ";
+    return note + (pos.empty() ? "" : pos + " ") + meaning;
 }
 }
 

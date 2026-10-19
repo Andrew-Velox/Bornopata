@@ -45,9 +45,9 @@ inline void sendWithFd(int socketFd, const Json &message, int fd) {
 inline Json emptyFrame() {
     return Json::parse(R"({"roman":"","preedit":"","candidates":[],"highlight":0,"suggesting":false,"mode":"Bangla"})");
 }
-/// The frame the mock shows after the letters "ami": Bangla preedit and three candidates.
+/// The frame the mock shows after the letters "ami": Bangla preedit and three candidates, the second with a gloss.
 inline Json amiFrame() {
     return Json::parse(R"({"roman":"ami","preedit":"\u0986\u09ae\u09bf","candidates":[
-        {"text":"\u0986\u09ae\u09bf","source":"Direct"},{"text":"\u0985\u09ae\u09bf","source":"Dictionary"},
+        {"text":"\u0986\u09ae\u09bf","source":"Direct"},{"text":"\u0985\u09ae\u09bf","source":"Dictionary","gloss":{"pos":"n.","text":"mine"}},
         {"text":"\u0986\u09ae\u09c0","source":"Learned"}],"highlight":0,"suggesting":false,"mode":"Bangla"})");
 }

@@ -58,6 +58,8 @@ int main(int argc, char **argv) {
     assert(candidates && candidates->size() == 3);
     assert(candidates->candidate(0).text().toString() == "আমি");
     assert(candidates->candidate(2).comment().toString() == "★");
+    // The gloss follows the part of speech; a candidate without one has no comment.
+    assert(candidates->candidate(1).comment().toString() == "n. mine");
     assert(candidates->candidate(0).comment().toString().empty());
     if (mode == "failure") {
         mock.join();
