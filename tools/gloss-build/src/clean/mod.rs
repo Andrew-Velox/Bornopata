@@ -229,6 +229,18 @@ fn form_gloss(meaning: &Meaning, lemma: &str, tags: &[String]) -> Resolved {
     }
 }
 
+/// The text of a gloss written by someone else (a model): at most two cleaned meanings, joined by commas. Empty when
+/// nothing usable is left.
+pub fn meanings(gloss: &str, verb: bool) -> String {
+    let kind = if verb { Kind::Verb } else { Kind::Other };
+    let found = items(gloss, kind);
+    if found.is_empty() {
+        String::new()
+    } else {
+        join(&found, MAX_MEANINGS)
+    }
+}
+
 /// The first `count` meanings joined by commas; only the first one when the joined text would be long.
 fn join(items: &[String], count: usize) -> String {
     let joined = items

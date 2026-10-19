@@ -5,6 +5,7 @@ mod clean;
 mod error;
 mod export;
 mod kaikki;
+mod llm;
 mod prefer;
 mod ranks;
 mod sheet;
@@ -54,6 +55,37 @@ enum Command {
         /// Where to write the gloss table.
         #[arg(long, short)]
         output: PathBuf,
+    },
+
+    /// Asks a language model for the words Wiktionary left without a gloss. Needs `BORNO_LLM_API_KEY`,
+    /// `BORNO_LLM_BASE_URL` and `BORNO_LLM_MODEL` in the environment or in an ignored `.env` file; without a key it does
+    /// nothing and the table stays Wiktionary-only. Resumable: run it again to continue.
+    Generate {
+        #[arg(long)]
+        counts: PathBuf,
+
+        #[arg(long, default_value_t = 5000)]
+        top: usize,
+
+        /// Gloss tables whose words are not asked for (the Wiktionary table). Repeatable.
+        #[arg(long = "entries")]
+        entries: Vec<PathBuf>,
+
+        /// The table the model's glosses are appended to.
+        #[arg(long, short)]
+        output: PathBuf,
+
+        /// Words per request.
+        #[arg(long, default_value_t = 25)]
+        batch: usize,
+
+        /// Milliseconds between requests, to stay inside a free tier's rate limit.
+        #[arg(long, default_value_t = 2500)]
+        delay_ms: u64,
+
+        /// Stop after this many requests (a free tier has a daily cap).
+        #[arg(long)]
+        max_requests: Option<usize>,
     },
 
     /// Writes a review sheet of the most frequent words next to their glosses.
@@ -119,6 +151,15 @@ fn run(command: Command) -> Result<(), BuildError> {
             prefer,
             output,
         } => wiktionary(&kaikki, &counts, top, prefer.as_deref(), &output),
+        Command::Generate {
+            counts,
+            top,
+            entries,
+            output,
+            batch,
+            delay_ms,
+            max_requests,
+        } => generate(&counts, top, entries, output, batch, delay_ms, max_requests),
         Command::Sheet {
             entries,
             counts,
@@ -157,6 +198,46 @@ fn run(command: Command) -> Result<(), BuildError> {
             Ok(())
         }
     }
+}
+
+fn generate(
+    counts: &std::path::Path,
+    top: usize,
+    existing: Vec<PathBuf>,
+    output: PathBuf,
+    batch: usize,
+    delay_ms: u64,
+    max_requests: Option<usize>,
+) -> Result<(), BuildError> {
+    let dotenv = std::fs::read_to_string(".env").unwrap_or_default();
+    let settings = match llm::Settings::resolve(|name| std::env::var(name).ok(), &dotenv) {
+        Ok(settings) => settings,
+        Err(llm::Missing::Key) => {
+            eprintln!(
+                "no BORNO_LLM_API_KEY in the environment or .env: skipping the language model; the words Wiktionary does not cover keep no gloss"
+            );
+            return Ok(());
+        }
+        Err(llm::Missing::Other(name)) => {
+            return Err(BuildError::Llm(format!("{name} is not set")));
+        }
+    };
+    let options = llm::Options {
+        counts: ranks::read_counts(counts)?,
+        top,
+        existing,
+        output,
+        batch,
+        delay: std::time::Duration::from_millis(delay_ms),
+        max_requests,
+    };
+    let client = llm::Client::new(settings);
+    let report = llm::generate(&client, &options)?;
+    eprintln!(
+        "{} requests, {} words asked, {} glossed",
+        report.requests, report.asked, report.glossed
+    );
+    Ok(())
 }
 
 /// The tables merged: for a word in several, the last file wins.

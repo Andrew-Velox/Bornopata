@@ -26,6 +26,9 @@ pub enum BuildError {
     #[error("glossary: {0}")]
     Glossary(#[from] borno_gloss::GlossaryError),
 
+    #[error("language model: {0}")]
+    Llm(String),
+
     #[error("nothing to write: no entries")]
     Empty,
 }
