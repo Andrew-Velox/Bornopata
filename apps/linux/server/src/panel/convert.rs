@@ -59,6 +59,7 @@ mod tests {
         FrameCandidate {
             text: text.to_owned(),
             source,
+            gloss: None,
         }
     }
 

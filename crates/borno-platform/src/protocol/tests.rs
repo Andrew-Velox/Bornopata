@@ -69,6 +69,7 @@ fn a_result_serializes_for_the_plugin() {
             candidates: vec![FrameCandidate {
                 text: "আমি".into(),
                 source: Source::Direct,
+                gloss: None,
             }],
             ..Frame::default()
         },
@@ -207,4 +208,33 @@ fn the_popup_channel_uses_the_shape_the_plugin_reads_and_writes() {
     let scale: PopupClientMessage =
         serde_json::from_value(json!({"Scale": {"scale_120": 150}})).unwrap();
     assert_eq!(scale, PopupClientMessage::Scale { scale_120: 150 });
+}
+
+#[test]
+fn a_gloss_travels_with_its_candidate_and_is_absent_when_there_is_none() {
+    let with = FrameCandidate {
+        text: "ভাত".into(),
+        source: Source::Dictionary,
+        gloss: Some(FrameGloss {
+            pos: "n.".into(),
+            text: "rice".into(),
+        }),
+    };
+    assert_eq!(
+        serde_json::to_value(&with).unwrap(),
+        json!({"text": "ভাত", "source": "Dictionary", "gloss": {"pos": "n.", "text": "rice"}})
+    );
+    let without = FrameCandidate {
+        gloss: None,
+        ..with.clone()
+    };
+    assert_eq!(
+        serde_json::to_value(&without).unwrap(),
+        json!({"text": "ভাত", "source": "Dictionary"})
+    );
+    // A candidate from a Server that knows no glosses has none.
+    let old: FrameCandidate =
+        serde_json::from_value(json!({"text": "ভাত", "source": "Dictionary"})).unwrap();
+    assert_eq!(old, without);
+    assert_eq!(PROTOCOL_VERSION, 4);
 }

@@ -5,6 +5,9 @@ use std::path::PathBuf;
 /// The dictionary file name inside the user data directory.
 pub const DICTIONARY_FILE: &str = "words.bnd";
 
+/// The English gloss file next to the dictionary.
+pub const GLOSS_FILE: &str = "gloss-en.bnd";
+
 fn xdg(variable: &str, fallback: &str) -> PathBuf {
     std::env::var_os(variable)
         .map(PathBuf::from)
@@ -35,5 +38,14 @@ pub fn dictionary_path() -> Option<PathBuf> {
     let path = std::env::var_os("BORNOPATA_DICT")
         .map(PathBuf::from)
         .unwrap_or_else(|| user_dir().join(DICTIONARY_FILE));
+    path.is_file().then_some(path)
+}
+
+/// The gloss file to use: `$BORNOPATA_GLOSS`, else `gloss-en.bnd` in the user directory. `None` when there is no such
+/// file, in which case candidates have no gloss.
+pub fn gloss_path() -> Option<PathBuf> {
+    let path = std::env::var_os("BORNOPATA_GLOSS")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| user_dir().join(GLOSS_FILE));
     path.is_file().then_some(path)
 }

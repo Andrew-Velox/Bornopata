@@ -1,9 +1,17 @@
 //! The frame the shell draws for a session.
 
+use borno_core::Annotation;
 use borno_core::CandidateSource;
-use borno_platform::protocol::{Frame, FrameCandidate, Source};
+use borno_platform::protocol::{Frame, FrameCandidate, FrameGloss, Source};
 
 use super::Session;
+
+fn gloss(annotation: Option<Annotation>) -> Option<FrameGloss> {
+    annotation.map(|annotation| FrameGloss {
+        pos: annotation.pos,
+        text: annotation.text,
+    })
+}
 
 fn source(source: CandidateSource) -> Source {
     match source {
@@ -19,13 +27,17 @@ impl Session {
     /// or nothing.
     pub fn frame(&self) -> Frame {
         if !self.engine.composition().is_empty() {
+            // The candidates exist first; their glosses are looked up afterwards, from the mapped table.
+            let annotations = self.engine.annotations();
             let candidates: Vec<FrameCandidate> = self
                 .engine
                 .candidates()
                 .iter()
-                .map(|candidate| FrameCandidate {
+                .zip(annotations)
+                .map(|(candidate, annotation)| FrameCandidate {
                     text: candidate.text.clone(),
                     source: source(candidate.source),
+                    gloss: gloss(annotation),
                 })
                 .collect();
             let highlight = self
@@ -53,6 +65,7 @@ impl Session {
                     .map(|text| FrameCandidate {
                         text: text.clone(),
                         source: Source::Next,
+                        gloss: gloss(self.engine.annotate(text)),
                     })
                     .collect(),
                 highlight: self.suggestion_highlight,

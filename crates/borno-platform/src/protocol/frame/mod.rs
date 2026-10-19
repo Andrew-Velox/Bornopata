@@ -1,9 +1,11 @@
 //! What the shell should show for one session.
 
 mod candidate;
+mod gloss;
 mod source;
 
 pub use candidate::FrameCandidate;
+pub use gloss::FrameGloss;
 pub use source::Source;
 
 use serde::{Deserialize, Serialize};

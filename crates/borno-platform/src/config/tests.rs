@@ -16,6 +16,7 @@ fn the_template_parses_to_the_defaults() {
     assert_eq!(parsed, Config::default());
     assert!(parsed.general.learning);
     assert!(parsed.general.bangla_digits);
+    assert!(parsed.general.gloss);
     assert_eq!(parsed.shortcut.toggle.spelling(), "ctrl+alt+space");
 }
 
@@ -83,4 +84,12 @@ fn the_panel_defaults_and_overrides() {
 
     std::fs::write(&path, "[panel]\nmode = \"sideways\"\n").unwrap();
     assert!(Config::load(&path).is_err());
+}
+
+#[test]
+fn the_gloss_setting_defaults_on_and_can_be_turned_off() {
+    assert!(Config::default().general.gloss);
+    let path = scratch("gloss");
+    std::fs::write(&path, "[general]\ngloss = false\n").unwrap();
+    assert!(!Config::load(&path).unwrap().general.gloss);
 }

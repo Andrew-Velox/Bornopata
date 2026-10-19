@@ -33,6 +33,10 @@ learning = true
 # Type digits as Bangla digits (০-৯). Set to false to keep ASCII digits.
 bangla_digits = true
 
+# Show a short English gloss with its part of speech beside each candidate, such as "n. rice". Needs gloss-en.bnd in
+# the data directory (~/.local/share/bornopata).
+gloss = true
+
 # error, warn, info or debug
 log_level = "info"
 
@@ -41,8 +45,9 @@ log_level = "info"
 toggle = "ctrl+alt+space"
 
 [panel]
-# "auto": Bornopata's own candidate window where the compositor allows it (Wayland with layer-shell: Hyprland, Sway),
-# otherwise Fcitx5's panel. "fcitx": always Fcitx5's panel.
+# "auto": Bornopata's own candidate window where it can be shown (the input-method popup in Wayland applications,
+# a layer-shell window for X11 ones), otherwise Fcitx5's panel. "popup": only the input-method popup. "native": only
+# the layer-shell window. "fcitx": always Fcitx5's panel.
 mode = "auto"
 
 # "bornopata" or "sakura", or the path of a theme directory.

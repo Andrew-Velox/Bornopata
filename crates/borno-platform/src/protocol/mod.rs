@@ -19,7 +19,7 @@ mod session;
 pub use capabilities::Capabilities;
 pub use codec::{CodecError, read_message, write_message};
 pub use cursor::CursorRect;
-pub use frame::{Frame, FrameCandidate, Source};
+pub use frame::{Frame, FrameCandidate, FrameGloss, Source};
 pub use identity::Identity;
 pub use key::{KeyEvent, KeyModifiers, KeyOutcome};
 pub use message::{ClientMessage, Event, ServerMessage};

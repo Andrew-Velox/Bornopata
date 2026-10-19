@@ -10,6 +10,7 @@ mod words;
 use std::sync::{Arc, Mutex};
 
 use borno_core::Engine;
+use borno_gloss::Glossary;
 use borno_learning::FrequencyLearner;
 use borno_lm::BigramModel;
 use borno_transliteration::WordSource;
@@ -26,6 +27,7 @@ pub struct Shared {
     words: Arc<dyn WordSource + Send + Sync>,
     learner: Option<Arc<Mutex<FrequencyLearner>>>,
     model: Option<Arc<BigramModel>>,
+    glossary: Option<Arc<Glossary>>,
 }
 
 impl Shared {
@@ -39,7 +41,14 @@ impl Shared {
             words,
             learner: learner.map(|learner| Arc::new(Mutex::new(learner))),
             model: model.map(Arc::new),
+            glossary: None,
         }
+    }
+
+    /// Shows the gloss of each candidate from `glossary`, which every engine shares.
+    pub fn with_glossary(mut self, glossary: Option<Glossary>) -> Self {
+        self.glossary = glossary.map(Arc::new);
+        self
     }
 
     /// A new engine for one input context.
@@ -51,6 +60,9 @@ impl Shared {
         }
         if let Some(model) = &self.model {
             engine = engine.with_language_model(Box::new(SharedModel(model.clone())));
+        }
+        if let Some(glossary) = &self.glossary {
+            engine = engine.with_annotator(Box::new(glossary.clone()));
         }
         engine
     }
