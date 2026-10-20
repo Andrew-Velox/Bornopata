@@ -35,6 +35,12 @@ int main(int argc, char **argv) {
         // The Server draws the word: the Fcitx5 panel stays empty and only the inline Bangla preedit is the plugin's.
         assert(context.inputPanel().clientPreedit().toString() == "আমি");
         assert(!context.inputPanel().candidateList() && context.inputPanel().preedit().empty());
+        // Each key draws a frame and the first one shown can be the one for `a`, whose list is wider or narrower than the
+        // final one's; wait for the frames to stop coming before measuring.
+        for (size_t seen = 0; seen != fake->shown.size();) {
+            seen = fake->shown.size();
+            pump(instance, 150000);
+        }
         const auto first = fake->shown.back();
         assert(first.context == FakePresenter::identity(&context));
         assert(first.bitmap.width > 100 && first.bitmap.height > 60 && first.bitmap.scale120 == 120);
