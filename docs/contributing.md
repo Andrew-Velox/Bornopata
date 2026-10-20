@@ -64,6 +64,7 @@ Design background is in [design/architecture.md](design/architecture.md) (inheri
 
 - Hooks: `.githooks/pre-commit` (divider-comment ban, fmt, clippy), `.githooks/commit-msg` (message format), `.githooks/pre-push` (whole-workspace tests). Enable once with `git config core.hooksPath .githooks`.
 - Changes to ranking, conversion or correction: run `apps/cli` first.
+- Builds and tests are heavy on a laptop. Run them at a low priority and only for what you touched: `nice -n 19 cargo test -p <crate>`, and the whole workspace once before pushing. Debug builds keep line tables only so the `target/debug` directory stays small; `cargo clean --profile dev` clears it.
 
 ## CI and releases
 

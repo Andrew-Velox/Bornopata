@@ -39,7 +39,9 @@ The Server keeps three slots; a frame is skipped when all are in use. A bitmap b
 
 ## The shape of the bitmap
 
-The compositor puts the top-left corner of the popup at the caret. The popup therefore shows the card only: the bitmap is cropped to the content rectangle and a shadow would show as a tint in the rounded corners, and the parts of decorations that hang over the card (the Sakura blossom) are cut off. The Sakura theme therefore has no shadow and a 2 pt border. A theme variant that fits is possible later.
+The compositor puts the top-left corner of the popup at the caret. Whatever the popup shows above or to the left of the card therefore moves the card down or right, away from the caret; what it shows to the right or below costs nothing. The bitmap is cropped to the card plus the overhang the theme declares in `meta.popup_overhang` (top, right, bottom, left, in points), at most what the bitmap holds. A theme without the field shows the card only, and a shadow would show as a tint in the rounded corners, so themes meant for the popup have no shadow. The Sakura theme declares 58 pt above (the mascot's head), 14 pt below (the blossoms) and 10 pt to the left, so the card sits about 58 pt below the caret there.
+
+The overhang is a fixed number, never measured from the pixels. A crop that followed the visible pixels moved the card by a pixel or two with every animation frame, because the petals and the crown move; `popup/pixels.rs` is plain arithmetic for this reason.
 
 ## Which window shows what
 

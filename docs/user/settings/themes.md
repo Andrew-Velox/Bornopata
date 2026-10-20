@@ -11,7 +11,7 @@ Set `theme` in `[panel]` of [the config file](config-file.md); the window change
 | Theme | Look |
 |---|---|
 | `bornopata` (default) | ![bornopata](images/theme-bornopata.png) Soft green and white. Has a dark variant (`dark = true`). |
-| `sakura` | ![sakura](images/theme-sakura.png) Lavender and pink, with Pata, the Bornopata mascot, peeking over the corner, a hanging leaf charm, falling petals and a ribbon that says "চলুন, আনন্দের গল্প লিখি।". Always light. |
+| `sakura` | ![sakura](images/theme-sakura.png) Bright pink, with a little mascot peeking over the corner of the window, a bow, a crown that bobs, and falling petals. Always light. |
 | `shapla` | ![shapla](images/theme-shapla.png) Mint and teal with a water lily (shapla), the national flower of Bangladesh. Always light. |
 | `borsha` | ![borsha](images/theme-borsha.png) Rain blue with a cloud. Always light. |
 | `jonaki` | ![jonaki](images/theme-jonaki.png) A night sky: deep blue with a moon and drifting fireflies (`jonaki`). Always dark. |

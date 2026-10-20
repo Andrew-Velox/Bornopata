@@ -39,8 +39,10 @@ Cost of the choice: the popup is placed at window origin + cursor rectangle, so 
 
 ## Themes
 
+The horizontal list draws each candidate as a small column: the number and the word on top and the English meaning on a line below, with the highlight covering both lines. The line is reserved only when some candidate has a meaning (`when: "annotations"`). All built-in themes share this item. There is no paging: the Server shows at most nine candidates, so there are no page arrows.
+
 - `bornopata`: white-to-mint card, radius 14, layered shadow, green highlight pill with a gradient, star for learned words, trailing ellipsis for completions, arrow for next-word suggestions, a `Tab` chip.
-- `sakura`: lavender glass with Pata, the Bornopata mascot, peeking over the top-left corner (an original vector character, `images/character.svg`, with the green leaf of the logo in her hair), a hanging leaf charm, a bow, a crown, blossoms and petals drifting in a loop (the animation is why the window asks for repeated frames), and a ribbon with two lines of Bangla. The left padding of 60 is her room. Locked to light. Built-in themes list their images in `src/theme/mod.rs`; a test fails when a file is not listed.
+- `sakura`: bright pink glass with a mascot (a chibi girl with a green leaf hairpin, `images/character.png`, supplied by the project owner; see the theme's README) resting her paws on the top-left edge of the card, a bow, an outline crown that bobs, petals drifting and blossoms rocking in a loop (the animation is why the window asks for repeated frames). `meta.popup_overhang` says how far this decoration may hang over the card in the Wayland popup. Locked to light. Built-in themes list their images in `src/theme/mod.rs`; a test fails when a file is not listed.
 - `shapla`: a cool water-lily card (the national flower of Bangladesh), white and pale teal, a lily in the top-right corner and two ripples spreading at the bottom. Locked to light.
 - `borsha`: a rainy-day card, blue-grey with squarer corners, a cloud in the corner and raindrops falling through the window. Locked to light.
 - `jonaki`: a night card, deep indigo with a gold border, a crescent moon in the corner and three fireflies drifting and glowing. Locked to dark.
