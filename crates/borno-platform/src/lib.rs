@@ -7,6 +7,6 @@ pub mod protocol;
 
 pub use config::{
     Config, GeneralConfig, KeyCombo, LogLevel, Modifiers, PanelConfig, PanelLayout, PanelMode,
-    ShortcutConfig,
+    Setting, ShortcutConfig,
 };
 pub use error::ConfigError;

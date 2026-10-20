@@ -1,5 +1,6 @@
 //! The config file (`config.toml`): read at Server start, written as a commented template when missing.
 
+mod edit;
 mod general;
 mod key_combo;
 mod log_level;
@@ -14,6 +15,7 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
+pub use edit::Setting;
 pub use general::GeneralConfig;
 pub use key_combo::{ComboKey, KeyCombo};
 pub use log_level::LogLevel;

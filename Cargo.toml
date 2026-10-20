@@ -51,6 +51,7 @@ tracing-appender = "0.2.5"
 clap = { version = "4.6.6", features = ["derive", "env"] }
 serde_json = "1.0.151"
 toml = "1.1.5"
+toml_edit = "0.25"
 # Finite state transducer for the dictionary key index (MIT / Unlicense)
 fst = "0.4.7"
 # Unicode normalization of corpus text

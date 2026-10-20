@@ -27,4 +27,12 @@ pub enum ConfigError {
         #[source]
         source: Box<toml::de::Error>,
     },
+
+    #[error("cannot change config {path}: {source}")]
+    Edit {
+        path: PathBuf,
+
+        #[source]
+        source: Box<toml_edit::TomlError>,
+    },
 }
