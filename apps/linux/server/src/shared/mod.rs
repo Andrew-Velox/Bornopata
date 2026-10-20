@@ -120,6 +120,20 @@ impl Shared {
         }
     }
 
+    /// Forgets everything learned, in memory and on disk.
+    pub fn forget_learned(&self) -> std::io::Result<()> {
+        match &self.learner {
+            Some(learner) => {
+                let mut learner = learner
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner);
+                learner.clear();
+                learner.save()
+            }
+            None => Ok(()),
+        }
+    }
+
     pub fn learning(&self) -> bool {
         self.learner.is_some()
     }

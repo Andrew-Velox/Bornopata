@@ -47,6 +47,9 @@ pub struct Router {
 
     /// The config file changed and the Server has not started over with it yet.
     reload_pending: bool,
+
+    /// A file the settings program drops to ask the Server to forget what it learned.
+    forget_marker: Option<PathBuf>,
 }
 
 impl Router {
@@ -62,6 +65,7 @@ impl Router {
             drawn: None,
             watch: None,
             reload_pending: false,
+            forget_marker: None,
         }
     }
 
@@ -81,6 +85,11 @@ impl Router {
     /// start over with it.
     pub fn watch_config(&mut self, path: PathBuf) {
         self.watch = Some(watch::ConfigWatch::new(path));
+    }
+
+    /// Watches for the marker file at `path`: when it appears the learned data is forgotten and the file removed.
+    pub fn watch_forget_marker(&mut self, path: PathBuf) {
+        self.forget_marker = Some(path);
     }
 
     /// Whether the Server should start over now: the config changed and nobody is in the middle of a word, so no
@@ -131,6 +140,17 @@ impl Router {
 
     /// Writes unsaved learned data once the typing has been quiet for a moment.
     pub fn tick(&mut self) {
+        if let Some(marker) = &self.forget_marker
+            && marker.exists()
+        {
+            let _ = std::fs::remove_file(marker);
+            match self.shared.forget_learned() {
+                Ok(()) => {
+                    tracing::info!("forgot everything learned, as the settings program asked")
+                }
+                Err(error) => tracing::warn!(%error, "could not forget the learned data"),
+            }
+        }
         if let Some(watch) = &mut self.watch
             && watch.changed()
         {

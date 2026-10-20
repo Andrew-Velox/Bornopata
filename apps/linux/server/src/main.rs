@@ -65,6 +65,7 @@ fn run() -> Result<(), ServerError> {
         .with_panel(panel)
         .with_popup(popup.clone().map(|hub| Box::new(hub) as Box<dyn PopupSink>));
     router.watch_config(config_path);
+    router.watch_forget_marker(paths::forget_marker_path());
 
     extern "C" fn stop(_: libc::c_int) {
         ipc::request_shutdown();

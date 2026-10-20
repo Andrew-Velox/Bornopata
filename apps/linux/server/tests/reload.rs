@@ -58,3 +58,35 @@ fn a_broken_config_is_ignored_until_it_is_fixed() {
     rig.router.tick();
     assert!(rig.router.reload_due());
 }
+
+#[test]
+fn the_forget_marker_empties_what_was_learned_and_goes_away() {
+    use borno_platform::protocol::{Event, Source};
+    let marker = config_in("forget", "").with_file_name("forget-learned");
+    let mut rig = Rig::scaffold();
+    rig.router.watch_forget_marker(marker.clone());
+
+    // Choose the second spelling once, so it leads the next time.
+    rig.type_text("ami");
+    rig.function(DOWN);
+    rig.type_char(' ');
+    rig.event(Event::Reset);
+    let mut reply = None;
+    for ch in "ami".chars() {
+        reply = Some(rig.type_char(ch));
+    }
+    assert_eq!(reply.unwrap().frame.candidates[0].source, Source::Learned);
+    rig.event(Event::Reset);
+
+    std::fs::write(&marker, b"").unwrap();
+    rig.router.tick();
+    assert!(
+        !marker.exists(),
+        "the marker is removed once it has been obeyed"
+    );
+    let mut reply = None;
+    for ch in "ami".chars() {
+        reply = Some(rig.type_char(ch));
+    }
+    assert_ne!(reply.unwrap().frame.candidates[0].source, Source::Learned);
+}

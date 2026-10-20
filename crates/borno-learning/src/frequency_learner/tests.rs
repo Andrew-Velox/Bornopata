@@ -149,3 +149,21 @@ fn a_forgotten_choice_stays_forgotten_after_a_restart() {
     assert_eq!(reloaded.pair_count("আমি", "কোথা"), 0);
     let _ = std::fs::remove_dir_all(&directory);
 }
+
+#[test]
+fn clearing_forgets_everything_and_the_files_follow() {
+    let directory = temporary_directory("clear");
+    let mut learner = FrequencyLearner::open(&directory).unwrap();
+    learner.record("kotha", "কোথা", Some("আমি"));
+    learner.save().unwrap();
+    learner.clear();
+    assert_eq!(learner.word_count(), 0);
+    assert!(learner.choices("kotha").is_empty());
+    assert!(learner.followers(Some("আমি"), 5).is_empty());
+    assert!(learner.is_dirty());
+    learner.save().unwrap();
+
+    let reloaded = FrequencyLearner::open(&directory).unwrap();
+    assert_eq!(reloaded.word_count(), 0);
+    let _ = std::fs::remove_dir_all(&directory);
+}

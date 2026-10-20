@@ -59,6 +59,14 @@ impl FrequencyLearner {
         Self::default()
     }
 
+    /// Forgets everything: words, choices and the personal bigram. The files are emptied by the next `save`.
+    pub fn clear(&mut self) {
+        self.counts.clear();
+        self.choices.clear();
+        self.ngram = UserNgram::default();
+        self.dirty = true;
+    }
+
     /// Overrides the decay half-life in days; 0 turns decay off.
     pub fn set_half_life_days(&mut self, days: f64) {
         self.half_life_days = days;
