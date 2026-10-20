@@ -33,7 +33,9 @@ install_prefix=$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1])
 cargo_output=$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "${CARGO_TARGET_DIR:-$repo_root/target}")
 cargo_args=(build --manifest-path "$repo_root/Cargo.toml" --target-dir "$cargo_output" -p borno-linux-server -p borno-settings --locked)
 [[ "$build_profile" != release ]] || cargo_args+=(--release)
-cargo "${cargo_args[@]}"
+# Build at a lower priority: the release link is heavy and should not slow the desktop down.
+polite=(); ! command -v nice >/dev/null || polite=(nice -n 10)
+"${polite[@]}" cargo "${cargo_args[@]}"
 # The English glosses beside the candidates: built from the table in assets/gloss and installed next to the dictionary.
 gloss_file="$repo_root/target/gloss-install/gloss-en.bnd"
 gloss_flags=()
@@ -41,7 +43,7 @@ gloss_flags=()
 "$repo_root/apps/linux/scripts/build-gloss.sh" "$gloss_file" "${gloss_flags[@]}"
 cmake_output="$repo_root/target/fcitx5-install-$build_profile"
 cmake -S "$repo_root/apps/linux/fcitx5" -B "$cmake_output" "-DCMAKE_BUILD_TYPE=$cmake_type" -DBUILD_TESTING=OFF
-cmake --build "$cmake_output" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
+"${polite[@]}" cmake --build "$cmake_output" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
 python3 "$repo_root/apps/linux/scripts/files.py" install "$install_prefix" "$repo_root" "$cargo_output/$build_profile/borno-linux-server" "$cmake_output/bornopata.so" "$gloss_file" \
   --settings "$cargo_output/$build_profile/bornopata-settings"
 printf 'Glosses: %s\n' "$(cat "$repo_root/assets/gloss/ATTRIBUTION.txt")"

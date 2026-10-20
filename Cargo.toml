@@ -76,6 +76,14 @@ foldhash = "0.2.0"
 memmap2 = "0.9"
 zerocopy = { version = "0.8", features = ["derive"] }
 
+# Debug builds (and so every `cargo test`) keep line numbers for backtraces but no variable information, and none at all
+# for dependencies: the debug directory had grown to 76 GB, and linking that much debug info is what made test runs heavy.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
 # Release binaries are about a third smaller with these (12 MB to 8 MB each); panic stays unwind so a crash in the window thread cannot take typing down.
 [profile.release]
 lto = "fat"
