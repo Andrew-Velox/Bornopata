@@ -71,6 +71,9 @@ jobs:
           mkdir -p target/ci-logs
           env -u DBUS_SESSION_BUS_ADDRESS ctest --test-dir target/fcitx5-stage1 --output-on-failure 2>&1 | tee target/ci-logs/fcitx5-ctest.log
 
+      - name: Check the user docs
+        run: python3 docs/user/check.py
+
       - name: Validate Linux install scripts
         run: |
           for script in apps/linux/scripts/*.sh; do bash -n "$script"; done

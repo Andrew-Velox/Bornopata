@@ -57,7 +57,7 @@ Design background is in [design/architecture.md](design/architecture.md) (inheri
 ## Documentation sync
 
 - Code wins over docs when they disagree; fix the docs. Technical direction goes in `docs/design/`, plans in `docs/plan/`, engineering records in `docs/notes/`. Keep technical content out of the README.
-- Changed user-visible behavior (keys, settings, config or data files): update the matching page under `docs/user/` in the same commit (the directory will return with the first user-facing release).
+- Changed user-visible behavior (keys, settings, config or data files): update the matching page under `docs/user/` in the same commit (`python3 docs/user/check.py` checks the pages and their links).
 - Changed a crate's implementation facts (data files, constants, generation commands): update `docs/notes/crate-notes.md`.
 
 ## Before committing
