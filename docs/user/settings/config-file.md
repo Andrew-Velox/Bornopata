@@ -1,6 +1,6 @@
 ---
 title: The config file
-order: 1
+order: 2
 description: Every option in ~/.config/bornopata/config.toml with its default, and how to apply a change.
 ---
 

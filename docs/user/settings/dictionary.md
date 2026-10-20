@@ -1,6 +1,6 @@
 ---
 title: The dictionary
-order: 3
+order: 4
 description: The word list behind the candidates, about 413,000 Bangla words with frequencies, built from Bengali Wikipedia and Common Voice, under CC BY-SA 4.0.
 ---
 

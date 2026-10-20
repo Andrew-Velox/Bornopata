@@ -4,6 +4,9 @@ Written by hand by the maintainers at release time; pull requests do not edit it
 
 ## Unreleased
 
+- Bornopata Settings: a settings program in the application launcher (typing, keys, appearance with a live preview, phrases, learning, about).
+- The Server starts over by itself within a second or two of a saved config change, and forgets everything learned when the settings program asks.
+
 ## 0.1.0-alpha.1 - 2026-10-20
 
 First preview, for Linux with Fcitx5 only. Tested on Arch with Hyprland and Brave; other desktops are untested.

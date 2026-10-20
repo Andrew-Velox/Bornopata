@@ -34,7 +34,7 @@ Updated 2026-10-20.
 1. Use it daily on Arch/Hyprland and collect what is wrong: key behavior, candidate order, the next-word hint, applications that misbehave. Fix in small commits.
 2. A bigram model from the same corpora (`borno-lm` takes TSV counts) for context ranking and next-word suggestions; retune the ranking on real typing data instead of the hand-written evaluation set. Decide whether to drop the `upodesh` fallback and its git pin once the dictionary covers enough; ship `words.bnd` with the package (CC BY-SA 4.0, see [assets/dictionary/README.md](../../assets/dictionary/README.md)).
 3. Spelling variants the key cannot reach (`moddhe` for মধ্যে, `porjonto` for পর্যন্ত): extra key rules or a small list of alternative spellings.
-4. Settings: a settings UI or at least `fcitx5-configtool` integration, config reload without restart.
+4. Settings: done on Linux (Bornopata Settings, [design/settings.md](../design/settings.md)). To do: animated previews, Bangla labels, the settings program on Windows and macOS.
 5. Packaging for Arch (AUR). The release workflow, the tarball and the third-party notices exist ([release.md](release.md)); the AUR package and a public repository are still to do.
 6. Windows shell, then macOS.
 
@@ -43,7 +43,6 @@ Updated 2026-10-20.
 - Candidate window: fractional scale, clicking rows, Sway and KDE placement, hover states; check the placement in GTK apps with client-side shadows and with `scaleFactor()` on HiDPI.
 
 - Whether to send the courtesy question to the `upodesh` / OpenBangla maintainers (draft in [notes/upodesh-provenance-inquiry.md](../notes/upodesh-provenance-inquiry.md)). The fallback is used meanwhile.
-- The settings program and self-drawn renderer (`bamboo-slip`, `qingjian-render`) were removed; recover them from `upstream` if a candidate window or settings UI is needed beyond Fcitx5's default panel.
 - `upodesh` is a git dependency until 0.4.1 is published to crates.io, and remains the fallback where the dictionary has no spelling of the input.
 - The dictionary's license (CC BY-SA 4.0 because of the Wikipedia counts) needs a place in the installer and the About text before anything is released.
 - Ported C++ tests dropped `multiplex` and `reentrant` (they tested removed pinyin features); add equivalents if connection sharing or reentrancy regress.

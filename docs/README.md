@@ -15,6 +15,7 @@ The README only introduces the project; technical content lives here, in three k
 | [contributing.md](contributing.md) | Conventions: architecture constraints, code layout, versions, commit messages, doc sync, checks, external PRs (CLAUDE.md loads it) |
 | [design/candidate-window.md](design/candidate-window.md) | The self-drawn candidate window: parts, why a layer-shell overlay, placement, fonts, themes |
 | [design/popup-surface.md](design/popup-surface.md) | The candidate window inside the compositor-placed input-method popup: spike result, popup channel, limits |
+| [design/settings.md](design/settings.md) | Bornopata Settings: principles, pages, how changes reach the Server |
 | [design/glosses.md](design/glosses.md) | The English gloss beside each candidate: what it is, the parts, where the data comes from, license, limits |
 | [design/bangla-reuse-plan.md](design/bangla-reuse-plan.md) | Decision to depend on the MIT OpenBangla crates, not `riti`; license consequences; word list provenance |
 | [design/bangla-engine.md](design/bangla-engine.md) | The Bangla engine: composition, candidates, ranking, learning, next-word suggestions |

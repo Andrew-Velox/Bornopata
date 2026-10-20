@@ -80,7 +80,7 @@ Then typing `bangl` offers বাংল first (what you typed) followed by ব�
 
 ## Configuration
 
-`~/.config/bornopata/config.toml` is written with comments on first start. A saved change takes effect by itself: the Server checks the file once a second, and when it changed to something valid and no session is in the middle of a word, the process starts itself over (`exec` of the same program with the same arguments: same pid, so systemd notices nothing, and a shell reconnects on its next key). A file that does not parse is logged and ignored until it is fixed. Manual restart: `systemctl --user restart bornopata`.
+`~/.config/bornopata/config.toml` is written with comments on first start. A saved change takes effect by itself: the Server checks the file once a second, and when it changed to something valid and no session is in the middle of a word, the process starts itself over (`exec` of the same program with the same arguments: same pid, so systemd notices nothing, and a shell reconnects on its next key). A file that does not parse is logged and ignored until it is fixed. Manual restart: `systemctl --user restart bornopata`. Bornopata Settings (`bornopata-settings`, installed with a launcher entry; [design/settings.md](../design/settings.md)) edits this file in place and keeps its comments. "Forget everything learned" there creates `forget-learned` in the user data directory; the Server clears the learner on its next tick and removes the file.
 
 ```toml
 [general]

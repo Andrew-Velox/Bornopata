@@ -1,6 +1,6 @@
 ---
 title: Themes and the window
-order: 2
+order: 3
 description: The five candidate-window themes (bornopata, sakura, shapla, borsha, jonaki), light and dark, vertical or horizontal, and which window is used in which application.
 ---
 
