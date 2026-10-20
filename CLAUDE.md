@@ -8,7 +8,7 @@ Bornopata is a cross-platform Bangla input method (phonetic, Avro-style first). 
 The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git fetch upstream` brings back any stripped file), and is being converted. Right now:
 
 - **Done:** the Bangla Core and the Linux path. `Engine` takes raw Roman letters (case kept), builds candidates from the direct Avro conversion, a `WordSource` and learned choices, ranks them and commits word by word. `borno-cli` drives it. `borno-linux-server` serves it over a Unix socket to the Fcitx5 plugin, so Bangla can be typed in real applications (`docs/notes/linux-fcitx5.md`).
-- **Not done:** our own word list (the `upodesh` list is a scaffold with unverified provenance), packaging and releases, Windows and macOS shells.
+- **Not done:** packaging and releases, Windows and macOS shells. Our own dictionary (`words.bnd`) answers first; the MIT-licensed `upodesh` list is only the fallback (see `docs/design/bangla-reuse-plan.md`).
 - Many comments in inherited files are still Chinese. Translate a file when you change it substantially; new code and docs are English.
 - Direction, decisions and open items: `docs/plan/roadmap.md`, `docs/design/bangla-engine.md`, `docs/design/bangla-reuse-plan.md`.
 

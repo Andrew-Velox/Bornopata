@@ -27,11 +27,19 @@ Switch back to crates.io when 0.4.1 is published. The seam is `borno_translitera
 - Any vendored `riti` file stays MPL-2.0 under its own header. MPL file-level copyleft is allowed inside a GPL project.
 - The dual-licensed crates (`bamboo-slip`, the renderer, if they return) must not depend on or include MPL code or any word-list data. Transliteration data lives in Core only.
 
-## Word list provenance (blocking for release)
+## Word list provenance (decided 2026-10-20: accepted, with the lineage recorded)
 
-`upodesh` ships a word list (`data/dictionary.json`, `source-words.txt`) and `riti` ships `dictionary.json` and `autocorrect.json`. Neither repo states where the words came from. The lineage points at Avro Keyboard via `libavrophonetic`, but that is an inference.
+`upodesh` ships a word list (`data/dictionary.json`, `source-words.txt`) and `riti` ships `dictionary.json` and `autocorrect.json`. Neither repo states where the words originally came from.
 
-- `upodesh` goes behind a trait (`WordSource`, word suggestions for a Roman input) so the list can be swapped without touching Core.
-- Until replaced, `upodesh`'s word list is a **development scaffold only: provenance unverified, must be replaced before release.** Say so in `assets/*/README.md` wherever it appears, and in any release checklist.
+What was checked (2026-10-20):
+
+- `upodesh` is MIT (Copyright 2025 OpenBangla). Its README says it is inspired by `libavrophonetic` and thanks its authors, Mehdi Hasan Khan and Tahmid Sadik.
+- `libavrophonetic` (Go) is MIT (Copyright 2021 Mehdi Hasan Khan) and carries the same `data/source-words.txt`; its README now points to `upodesh` as the better implementation. So `upodesh`'s list is the `libavrophonetic` list. That lineage and the credit are about the code and the method; neither repo says where the words themselves first came from (probably the Avro Keyboard dictionary, which is an inference).
+
+Decision of the project owner: use the `upodesh` list as the fallback under its MIT license, accepting that the original source of the words is not stated. The risk is low (a list of common Bangla words, published under MIT by the maintainers of the GPL-3.0 OpenBangla Keyboard, whose input method it serves) but not zero, so:
+
+- `upodesh` stays behind a trait (`WordSource`), so the list can be swapped or dropped without touching Core. Our own dictionary answers first and `upodesh` only fills in where it has no spelling.
+- The MIT notices of `upodesh` and `libavrophonetic` ship with every binary release (third-party notices in the release checklist).
+- `riti`'s data stays excluded: nothing of it is used.
+- The question to the maintainers (draft: [notes/upodesh-provenance-inquiry.md](../notes/upodesh-provenance-inquiry.md), not sent) can still be sent as a courtesy; if the answer is bad, the fallback is dropped.
 - Our own word list and frequencies come from a clearly redistributable corpus. Candidates and their license implications: [plan/word-list-sources.md](../plan/word-list-sources.md).
-- A draft question to the maintainers (not sent) is in [notes/upodesh-provenance-inquiry.md](../notes/upodesh-provenance-inquiry.md).

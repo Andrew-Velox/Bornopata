@@ -1,6 +1,6 @@
 # Draft: question to the upodesh and OpenBangla maintainers
 
-**Status: draft, not sent.** The project owner decides whether and how to send it. Suggested place: an issue on `OpenBangla/upodesh`, cross-linked from `OpenBangla/riti`.
+**Status: draft, not sent. Not blocking:** on 2026-10-20 the project owner decided to use the `upodesh` list under its MIT license (see [../design/bangla-reuse-plan.md](../design/bangla-reuse-plan.md)); this question would only be a courtesy. The project owner decides whether and how to send it. Suggested place: an issue on `OpenBangla/upodesh`, cross-linked from `OpenBangla/riti`.
 
 ---
 

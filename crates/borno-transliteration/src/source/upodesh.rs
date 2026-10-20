@@ -4,8 +4,8 @@ use upodesh::avro::Suggest;
 
 use super::WordSource;
 
-/// Development scaffold only: the word list bundled in `upodesh` has unverified provenance
-/// and must be replaced before release (docs/design/bangla-reuse-plan.md).
+/// The fallback word list bundled in `upodesh` (MIT; the original source of the words is not stated, which the project
+/// accepted, see docs/design/bangla-reuse-plan.md).
 pub struct UpodeshWordSource {
     suggest: Suggest,
 }
