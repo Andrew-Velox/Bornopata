@@ -72,3 +72,9 @@ foldhash = "0.2.0"
 # .bnd data container: opened with mmap, structs read without copying
 memmap2 = "0.9"
 zerocopy = { version = "0.8", features = ["derive"] }
+
+# Release binaries are about a third smaller with these (12 MB to 8 MB each); panic stays unwind so a crash in the window thread cannot take typing down.
+[profile.release]
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
