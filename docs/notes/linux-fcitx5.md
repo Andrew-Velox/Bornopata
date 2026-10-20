@@ -104,6 +104,8 @@ Fonts: the window needs a Bengali font (Noto Sans Bengali from `noto-fonts` on A
 
 The gloss file `gloss-en.bnd` (installed next to `words.bnd` by `install.sh`, or `$BORNOPATA_GLOSS`) is mapped at Server start when `gloss = true`; the log says how many entries were loaded. See [../design/glosses.md](../design/glosses.md).
 
+Your own phrases go in `~/.local/share/bornopata/phrases.tsv` (the Server writes a commented template on first start and never overwrites it). One phrase per line, `code<TAB>text`: a code is Roman letters only and is matched exactly as typed, `\n` `\t` `\\` in the text give a line break, a tab and a backslash, and several lines with one code give several candidates in file order. Typing the code puts the text first in the list (marked like a learned choice); the ordinary words stay behind it. Phrases are never learned, so private text lives only in that file. The Server reads the file again within a couple of seconds of a save; a bad line is skipped and logged as a warning with its line number.
+
 Learned data (`user-words.tsv`, `user-choices.tsv`, `user-ngram.tsv`) is written a few seconds after the last commit and when the Server stops. An optional language model goes in `~/.local/share/bornopata/lm.bnd`. Typed text is never written to the logs.
 
 ## Protocol

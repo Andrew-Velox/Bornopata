@@ -6,9 +6,13 @@ use std::sync::Arc;
 use borno_gloss::Glossary;
 use borno_learning::FrequencyLearner;
 use borno_linux_server::popup::PopupSink;
+use borno_linux_server::shared::FilePhrases;
 use borno_linux_server::{Router, ServerError, Shared, ipc};
 use borno_lm::BigramModel;
 use borno_platform::{Config, paths};
+
+/// What a new `phrases.tsv` starts with.
+const PHRASE_TEMPLATE: &str = include_str!("phrases-template.tsv");
 
 /// The optional language model, looked up in the user data directory.
 const LANGUAGE_MODEL_FILE: &str = "lm.bnd";
@@ -49,7 +53,10 @@ fn run() -> Result<(), ServerError> {
     }
     let words = borno_dictionary::word_source(dictionary.as_deref())?;
     let glossary = load_glossary(&config);
-    let shared = Shared::new(Arc::from(words), learner, model).with_glossary(glossary);
+    write_phrase_template(&user_dir);
+    let shared = Shared::new(Arc::from(words), learner, model)
+        .with_glossary(glossary)
+        .with_phrases(FilePhrases::open(paths::phrases_path()));
     let panel = borno_linux_server::panel::start(&config.panel);
     let popup = borno_linux_server::popup::start(&config.panel);
     let mut router = Router::new(config, shared)
@@ -109,6 +116,19 @@ fn load_glossary(config: &Config) -> Option<Glossary> {
             tracing::warn!(%error, path = %path.display(), "the gloss file cannot be used");
             None
         }
+    }
+}
+
+/// The phrase file with its instructions, so the user finds it where the Server looks. Never overwrites.
+fn write_phrase_template(user_dir: &Path) {
+    let path = user_dir.join(paths::PHRASES_FILE);
+    if path.exists() {
+        return;
+    }
+    if let Err(error) =
+        std::fs::create_dir_all(user_dir).and_then(|()| std::fs::write(&path, PHRASE_TEMPLATE))
+    {
+        tracing::warn!(%error, path = %path.display(), "cannot write the phrase template");
     }
 }
 

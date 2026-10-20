@@ -1,0 +1,12 @@
+# Your own phrases. Type the code in Roman letters and the text is the first candidate.
+#
+# One phrase per line: the code, a TAB, then the text.
+#   mymail<TAB>me@example.com
+#   sig<TAB>ধন্যবাদ,\nমোহাব্বত
+#
+# - A code is Roman letters only (a-z, A-Z), matched exactly as typed.
+# - In the text, \n is a line break, \t a tab and \\ a backslash.
+# - Several lines with one code give several candidates, in the order you list them.
+# - Lines starting with # and blank lines are ignored.
+# - Phrases are never learned, so private text stays in this file only.
+# - Saving the file is enough; the Server reads it again within a few seconds.

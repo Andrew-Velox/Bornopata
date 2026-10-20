@@ -5,6 +5,7 @@
 
 mod learner;
 mod model;
+mod phrases;
 mod words;
 
 use std::sync::{Arc, Mutex};
@@ -17,7 +18,10 @@ use borno_transliteration::WordSource;
 
 use learner::SharedLearner;
 use model::SharedModel;
+use phrases::SharedPhrases;
 use words::SharedWords;
+
+pub use phrases::FilePhrases;
 
 /// Candidates the panel can show; the engine never returns more, so the highlight stays on screen.
 const PANEL_CANDIDATES: usize = 9;
@@ -28,6 +32,7 @@ pub struct Shared {
     learner: Option<Arc<Mutex<FrequencyLearner>>>,
     model: Option<Arc<BigramModel>>,
     glossary: Option<Arc<Glossary>>,
+    phrases: Option<Arc<FilePhrases>>,
 }
 
 impl Shared {
@@ -42,12 +47,19 @@ impl Shared {
             learner: learner.map(|learner| Arc::new(Mutex::new(learner))),
             model: model.map(Arc::new),
             glossary: None,
+            phrases: None,
         }
     }
 
     /// Shows the gloss of each candidate from `glossary`, which every engine shares.
     pub fn with_glossary(mut self, glossary: Option<Glossary>) -> Self {
         self.glossary = glossary.map(Arc::new);
+        self
+    }
+
+    /// Gives every engine the user's phrases from `phrases`, which follows the file as it is edited.
+    pub fn with_phrases(mut self, phrases: FilePhrases) -> Self {
+        self.phrases = Some(Arc::new(phrases));
         self
     }
 
@@ -60,6 +72,9 @@ impl Shared {
         }
         if let Some(model) = &self.model {
             engine = engine.with_language_model(Box::new(SharedModel(model.clone())));
+        }
+        if let Some(phrases) = &self.phrases {
+            engine = engine.with_phrases(Box::new(SharedPhrases(phrases.clone())));
         }
         if let Some(glossary) = &self.glossary {
             engine = engine.with_annotator(Box::new(glossary.clone()));

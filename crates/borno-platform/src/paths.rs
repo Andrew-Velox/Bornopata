@@ -8,6 +8,9 @@ pub const DICTIONARY_FILE: &str = "words.bnd";
 /// The English gloss file next to the dictionary.
 pub const GLOSS_FILE: &str = "gloss-en.bnd";
 
+/// The user's own phrases next to the dictionary.
+pub const PHRASES_FILE: &str = "phrases.tsv";
+
 fn xdg(variable: &str, fallback: &str) -> PathBuf {
     std::env::var_os(variable)
         .map(PathBuf::from)
@@ -48,4 +51,9 @@ pub fn gloss_path() -> Option<PathBuf> {
         .map(PathBuf::from)
         .unwrap_or_else(|| user_dir().join(GLOSS_FILE));
     path.is_file().then_some(path)
+}
+
+/// The phrase file the user edits: `phrases.tsv` in the user directory. It may not exist yet.
+pub fn phrases_path() -> PathBuf {
+    user_dir().join(PHRASES_FILE)
 }
