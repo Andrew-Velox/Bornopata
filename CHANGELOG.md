@@ -4,6 +4,16 @@ Written by hand by the maintainers at release time; pull requests do not edit it
 
 ## Unreleased
 
+## 0.1.0-alpha.1 - 2026-10-20
+
+First preview, for Linux with Fcitx5 only. Tested on Arch with Hyprland and Brave; other desktops are untested.
+
+Install: unpack the tarball, run `./install.sh`, then `systemctl --user enable --now bornopata`, restart Fcitx5 and add "Bornopata" in its configuration tool. The prebuilt plugin is built against Ubuntu's Fcitx5; if Fcitx5 cannot load it, build from the source archive (`docs/notes/linux-fcitx5.md`).
+
+Known limits: no mouse clicks on the candidate window; the English glosses cover only part of the 5,000 most frequent words and are not reviewed by a Bangla speaker; ranking is tuned on a small hand-written set.
+
+What is in it:
+
 - Project started as Bornopata, imported from the Qingjian pinyin input method (history up to tag `qingjian-import-base`).
 - Stripped to Core, CLI and the Linux Server with the Fcitx5 shell.
 - Real word data: `tools/dict-build` builds a 413k-word dictionary from Bengali Wikipedia and Common Voice counts; typing shows frequency-ranked spellings and prefix completions (`bangl` gives বাংলা, বাংলাদেশ ...).
