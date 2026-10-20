@@ -9,6 +9,11 @@ const DICTIONARY_PRIOR: f64 = 1.5;
 /// The direct conversion that is also a dictionary word.
 const CONFIRMED_PRIOR: f64 = 1.7;
 
+/// Added to the direct conversion when the typed letters include a capital and the conversion is a real word: in Avro
+/// a capital is part of the spelling (`T` is ট, `t` is ত), so that word must not lose to what the context makes
+/// likelier. A capital that makes no word (`ShikkhA`) is only a habit, and the dictionary word still wins.
+const EXPLICIT_CASE_BONUS: f64 = 1.0;
+
 /// A word that only starts with what was typed. These are listed after every spelling of the input.
 const COMPLETION_PRIOR: f64 = 1.0;
 const CHOICE_WEIGHT: f64 = 4.0;
@@ -42,6 +47,9 @@ pub(super) struct Evidence {
 
     /// The direct conversion produced this text.
     pub direct: bool,
+
+    /// The direct conversion of an input that has a capital letter in it.
+    pub explicit_case: bool,
 
     /// The word source suggested this text as a spelling of the input.
     pub dictionary: bool,
@@ -99,10 +107,15 @@ impl Evidence {
         } else {
             0.0
         };
+        let explicit_case = if self.direct && self.dictionary && self.explicit_case {
+            EXPLICIT_CASE_BONUS
+        } else {
+            0.0
+        };
         let phrase = self
             .phrase
             .map_or(0.0, |position| PHRASE_PRIOR - PHRASE_STEP * position as f64);
-        phrase + prior - spelling_gap
+        phrase + prior + explicit_case - spelling_gap
             + FREQUENCY_WEIGHT * f64::from(self.frequency).log10_1p()
             + CHOICE_WEIGHT * f64::from(self.choice_weight).ln_1p()
             + WORD_WEIGHT * f64::from(self.word_weight).ln_1p()

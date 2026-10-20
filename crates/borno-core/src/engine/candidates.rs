@@ -101,6 +101,7 @@ impl Engine {
                 known.pair_count =
                     previous.map_or(0, |previous| self.learner.pair_count(previous, &text));
                 known.log_prob = self.language_model.log_prob(previous, &text);
+                known.explicit_case = input.chars().any(|c| c.is_ascii_uppercase());
                 if known.dictionary && !known.direct {
                     known.distance = edit_distance(&text, &direct);
                 }

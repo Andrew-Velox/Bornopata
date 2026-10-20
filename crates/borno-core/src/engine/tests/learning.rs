@@ -68,6 +68,19 @@ fn next_words_merge_personal_followers_and_the_model_without_repeats() {
 }
 
 #[test]
+fn a_capital_letter_keeps_the_direct_spelling_ahead_of_the_context() {
+    let model = || FixedModel(vec![("আমি", vec!["তা", "টা"])]);
+    let words = [("ta", &["তা", "টা"][..]), ("Ta", &["টা", "তা"][..])];
+    let mut lower = fixed_engine(&words).with_language_model(Box::new(model()));
+    type_word(&mut lower, "ami ta");
+    assert_eq!(lower.candidates()[0].text, "তা");
+    // The model prefers তা here too, but the typed T asked for ট.
+    let mut capital = fixed_engine(&words).with_language_model(Box::new(model()));
+    type_word(&mut capital, "ami Ta");
+    assert_eq!(capital.candidates()[0].text, "টা");
+}
+
+#[test]
 fn a_suggestion_from_the_model_stays_hidden_once_forgotten() {
     let model = FixedModel(vec![("আমি", vec!["ভাত", "যাই", "যাব"])]);
     let mut engine = fixed_engine(&[("ami", &["আমি"])])
