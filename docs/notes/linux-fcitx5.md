@@ -60,7 +60,9 @@ Configuration, learned data and logs are never touched by install or uninstall.
 | Backspace | edit the Roman word; passes through when it is empty |
 | Esc | cancel the word |
 | Up / Down / Tab (Shift+Tab back) | move the highlight |
-| Tab on next-word suggestions, or a click | take the suggestion |
+| Up / Down on next-word suggestions | move through them (they wrap); the arrow does not reach the application |
+| Tab on next-word suggestions, or a click | take the highlighted suggestion |
+| Esc, or any other key, on next-word suggestions | dismiss them |
 | Left, Right, Home, End, Delete ... | commit the word, then move |
 | Ctrl / Alt / Super chords | commit the word, then the application gets the chord |
 | `ctrl+alt+space` (configurable) | switch between Bangla and English; English passes every key through |

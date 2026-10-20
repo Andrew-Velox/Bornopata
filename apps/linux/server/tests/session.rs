@@ -77,11 +77,43 @@ fn any_other_key_dismisses_the_suggestions() {
     assert_eq!(escaped.outcome, KeyOutcome::Consumed);
     assert!(escaped.frame.is_empty());
 
+    // Left and Right are not for the suggestions: they go to the application and dismiss them.
     rig.event(Event::Reset);
     rig.type_text("ami ");
-    let arrow = rig.function(DOWN);
+    let arrow = rig.function(LEFT);
     assert_eq!(arrow.outcome, KeyOutcome::Passthrough);
     assert!(arrow.frame.is_empty());
+}
+
+#[test]
+fn the_arrows_move_through_the_suggestions_and_tab_takes_the_highlighted_one() {
+    let mut rig = Rig::fixed(&[("ami", &["আমি"]), ("bhat", &["ভাত"]), ("jai", &["যাই"])]);
+    for _ in 0..2 {
+        for sentence in ["ami bhat ", "ami jai "] {
+            rig.type_text(sentence);
+            rig.event(Event::Reset);
+        }
+    }
+    rig.type_text("ami");
+    let shown = rig.type_char(' ');
+    assert!(shown.frame.suggesting);
+    let count = shown.frame.candidates.len();
+    assert!(count >= 2, "{count} suggestions");
+    assert_eq!(shown.frame.highlight, 0);
+
+    // Down moves on and the arrow is eaten: nothing reaches the application and the window stays.
+    let down = rig.function(DOWN);
+    assert_eq!(down.outcome, KeyOutcome::Consumed);
+    assert!(down.frame.suggesting && down.frame.highlight == 1);
+    // It wraps at both ends.
+    assert_eq!(rig.function(UP).frame.highlight, 0);
+    assert_eq!(rig.function(UP).frame.highlight, count - 1);
+    assert_eq!(rig.function(DOWN).frame.highlight, 0);
+
+    // Tab takes the highlighted suggestion.
+    let second = rig.function(DOWN).frame.candidates[1].text.clone();
+    let accepted = rig.function(TAB);
+    assert_eq!(accepted.commit.as_deref(), Some(second.as_str()));
 }
 
 #[test]

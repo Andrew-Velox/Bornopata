@@ -94,6 +94,17 @@ impl Session {
         if !composing && !self.suggestions.is_empty() {
             match function {
                 TAB => return self.accept_suggestion(),
+                // Down and Up choose among the suggestions, so the arrow neither dismisses them nor reaches the
+                // application (whose cursor would move under the window).
+                UP | DOWN => {
+                    let count = self.suggestions.len();
+                    self.suggestion_highlight = if function == DOWN {
+                        (self.suggestion_highlight + 1) % count
+                    } else {
+                        (self.suggestion_highlight + count - 1) % count
+                    };
+                    return KeyReply::consumed(None);
+                }
                 ESCAPE => {
                     self.suggestions.clear();
                     return KeyReply::consumed(None);
