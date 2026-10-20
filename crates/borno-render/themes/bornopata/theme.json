@@ -76,9 +76,13 @@
         { "type": "frame", "id": "highlight", "transition": { "duration": 110, "easing": "ease-out" },
           "when": "highlighted", "position": "absolute", "inset": [0, -5, 0, -5],
           "fill": { "linear": 180, "stops": ["@pill_top", "@pill_bottom"] }, "radius": 9 },
-        { "type": "text", "bind": "index", "font": "index", "margin": [9, 3, 0, 0],
+        { "type": "text", "bind": "index", "font": "index", "margin": [7, 3, 0, 0],
           "color": { "if": "highlighted", "then": "@accent", "else": "@faint" } },
-        { "type": "use", "component": "word", "margin": [4, 0, 0, 0] }
+        { "type": "frame", "direction": "column", "children": [
+          { "type": "use", "component": "word", "margin": [4, 0, 0, 0] },
+          { "type": "annotation", "bind": "annotation", "when": "annotations", "font": "annotation", "senses": 1,
+            "height": 17, "gloss": "@gloss", "fresh": "@accent", "faint": "@faint" }
+        ] }
       ]
     }
   },
