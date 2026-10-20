@@ -1,0 +1,17 @@
+[package]
+name = "borno-emoji-build"
+description = "Builds the Bornopata emoji table from Unicode's emoji-test.txt and the CLDR annotations"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "borno-emoji-build"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

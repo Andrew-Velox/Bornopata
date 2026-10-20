@@ -7,6 +7,7 @@ members = [
     "crates/borno-lm",
     "crates/borno-format",
     "crates/borno-dictionary",
+    "crates/borno-emoji",
     "crates/borno-gloss",
     "crates/bamboo-slip",
     "crates/borno-render",
@@ -16,6 +17,7 @@ members = [
     "apps/linux/server",
     "tools/dict-build",
     "tools/gloss-build",
+    "tools/emoji-build",
 ]
 
 [workspace.package]
@@ -36,6 +38,7 @@ borno-lm = { path = "crates/borno-lm" }
 borno-format = { path = "crates/borno-format" }
 borno-dictionary = { path = "crates/borno-dictionary" }
 borno-gloss = { path = "crates/borno-gloss" }
+borno-emoji = { path = "crates/borno-emoji" }
 bamboo-slip = { path = "crates/bamboo-slip" }
 borno-render = { path = "crates/borno-render" }
 borno-panel = { path = "crates/borno-panel" }

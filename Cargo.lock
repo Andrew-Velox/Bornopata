@@ -113,6 +113,7 @@ version = "0.1.1"
 dependencies = [
  "borno-core",
  "borno-dictionary",
+ "borno-emoji",
  "borno-format",
  "borno-learning",
  "borno-lm",
@@ -151,6 +152,22 @@ dependencies = [
  "tracing",
  "unicode-normalization",
  "zerocopy",
+]
+
+[[package]]
+name = "borno-emoji"
+version = "0.1.1"
+dependencies = [
+ "borno-core",
+ "borno-dictionary",
+]
+
+[[package]]
+name = "borno-emoji-build"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "thiserror",
 ]
 
 [[package]]
@@ -207,6 +224,7 @@ version = "0.1.0-dev"
 dependencies = [
  "borno-core",
  "borno-dictionary",
+ "borno-emoji",
  "borno-format",
  "borno-gloss",
  "borno-learning",

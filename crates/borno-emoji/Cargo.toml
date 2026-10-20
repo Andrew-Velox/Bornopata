@@ -1,0 +1,13 @@
+[package]
+name = "borno-emoji"
+description = "Emoji for Bangla words and English keywords, from Unicode CLDR names, built into the program"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+borno-core.workspace = true
+borno-dictionary.workspace = true
