@@ -5,10 +5,10 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, Read};
 use std::path::{Path, PathBuf};
 
+use borno_corpus_text::wikitext;
 use borno_dictionary::{normalize, tokens};
 
 use crate::error::BuildError;
-use crate::wikitext;
 
 /// Word counts gathered from any number of inputs.
 #[derive(Debug, Default)]

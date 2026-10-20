@@ -16,7 +16,9 @@ members = [
     "apps/cli",
     "apps/linux/server",
     "apps/settings",
+    "tools/corpus-text",
     "tools/dict-build",
+    "tools/lm-build",
     "tools/gloss-build",
     "tools/emoji-build",
 ]
@@ -36,6 +38,7 @@ borno-transliteration = { path = "crates/borno-transliteration" }
 borno-learning = { path = "crates/borno-learning" }
 borno-platform = { path = "crates/borno-platform" }
 borno-lm = { path = "crates/borno-lm" }
+borno-corpus-text = { path = "tools/corpus-text" }
 borno-format = { path = "crates/borno-format" }
 borno-dictionary = { path = "crates/borno-dictionary" }
 borno-gloss = { path = "crates/borno-gloss" }

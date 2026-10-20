@@ -10,6 +10,7 @@ name = "borno-dict-build"
 path = "src/main.rs"
 
 [dependencies]
+borno-corpus-text.workspace = true
 borno-dictionary.workspace = true
 borno-format.workspace = true
 clap.workspace = true

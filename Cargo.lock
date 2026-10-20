@@ -233,9 +233,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "borno-corpus-text"
+version = "0.1.0"
+
+[[package]]
 name = "borno-dict-build"
 version = "0.1.0"
 dependencies = [
+ "borno-corpus-text",
  "borno-dictionary",
  "borno-format",
  "clap",
@@ -354,6 +359,18 @@ dependencies = [
  "thiserror 2.0.21",
  "tracing",
  "zerocopy",
+]
+
+[[package]]
+name = "borno-lm-build"
+version = "0.1.0"
+dependencies = [
+ "borno-corpus-text",
+ "borno-dictionary",
+ "borno-format",
+ "borno-lm",
+ "clap",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

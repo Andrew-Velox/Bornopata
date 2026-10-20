@@ -4,7 +4,6 @@ mod args;
 mod counter;
 mod error;
 mod report;
-mod wikitext;
 
 use borno_dictionary::DictionaryBuilder;
 use borno_format::Metadata;
