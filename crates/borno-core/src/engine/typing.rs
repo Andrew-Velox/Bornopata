@@ -92,9 +92,11 @@ impl Engine {
         forgotten
     }
 
-    /// Takes back what the learner knows about a next-word suggestion, so it is not offered again.
+    /// Takes back what the learner knows about a next-word suggestion and hides it after this word, so it is not
+    /// offered again even when it comes from the language model.
     pub fn forget_word(&mut self, word: &str) -> bool {
-        self.learner.forget("", word)
+        let hidden = self.learner.hide_suggestion(self.previous.as_deref(), word);
+        self.learner.forget("", word) || hidden
     }
 
     /// The user took a next-word suggestion: remembers the transition and makes the word the new context.

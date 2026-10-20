@@ -39,8 +39,14 @@ def main():
         at = args.index('--settings')
         settings = Path(args[at + 1])
         del args[at:at + 2]
+    # The language model of word pairs is optional too: --lm FILE.
+    model = None
+    if '--lm' in args:
+        at = args.index('--lm')
+        model = Path(args[at + 1])
+        del args[at:at + 2]
     if len(args) not in (4, 5):
-        raise SystemExit('install needs: <prefix> <repo root> <server binary> <plugin> <gloss file> [dictionary file] [--settings FILE]')
+        raise SystemExit('install needs: <prefix> <repo root> <server binary> <plugin> <gloss file> [dictionary file] [--settings FILE] [--lm FILE]')
     root, server, plugin, gloss, *dictionary = map(Path, args)
     data = Path(os.environ.get('XDG_DATA_HOME', str(Path.home() / '.local/share')))
     if not data.is_absolute():
@@ -55,6 +61,8 @@ def main():
         # A packaged release brings the dictionary; installing from source leaves it to the user (docs/notes/linux-fcitx5.md).
         files[prefix / 'share/licenses/bornopata/DICTIONARY-ATTRIBUTION.txt'] = root / 'assets/dictionary/ATTRIBUTION.txt'
         files[data / 'bornopata/words.bnd'] = dictionary[0]
+    if model:
+        files[data / 'bornopata/lm.bnd'] = model
     desktop = data / 'applications/bornopata-settings.desktop'
     if settings:
         files[prefix / 'bin/bornopata-settings'] = settings

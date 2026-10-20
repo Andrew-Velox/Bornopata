@@ -24,13 +24,14 @@ The Server and the plugin talk through a private socket (`$XDG_RUNTIME_DIR/borno
 | `~/.local/share/bornopata/user-choices.tsv` | Which word you chose for which letters, with a count and the last day used. |
 | `~/.local/share/bornopata/user-words.tsv` | How often you committed each word. |
 | `~/.local/share/bornopata/user-ngram.tsv` | Which word you typed after which. |
-| `~/.local/share/bornopata/lm.bnd` | An optional language model; not part of this preview. |
+| `~/.local/share/bornopata/lm.bnd` | The word pair model behind next-word suggestions (CC BY-SA 4.0). |
+| `~/.local/share/bornopata/user-hidden.tsv` | Suggestions you removed with `Shift+Delete`, so they are not offered again. |
 | `~/.local/state/bornopata/logs/` | Server logs, one file per day, the last seven kept. |
 | `~/.local/lib/fcitx5/bornopata.so`, `~/.local/bin/borno-linux-server` | The plugin and the Server (under the install prefix). |
 | `~/.config/systemd/user/bornopata.service` | The unit that starts the Server. |
 | `~/.local/share/licenses/bornopata/` | The licences and attributions. |
 
-The three `user-*.tsv` files are the whole of what Bornopata has learned about you. Open them in a text editor to see exactly what is stored. To erase them, stop the Server, delete the files and start it again; see [What it learns](../learning/learning.md).
+The `user-*.tsv` files are the whole of what Bornopata has learned about you. Open them in a text editor to see exactly what is stored. To erase them, stop the Server, delete the files and start it again; see [What it learns](../learning/learning.md).
 
 Installing and uninstalling never touch your config, phrases, learned data or logs.
 

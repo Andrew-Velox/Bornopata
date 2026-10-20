@@ -26,6 +26,7 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 - `tools/gloss-build`: `borno-gloss-build` cleans Wiktionary entries into the gloss table (`wiktionary`), optionally fills gaps with a language model (`generate`, key from the environment or `.env` only), writes the review sheet (`sheet`) and the `.bnd` (`export`).
 - `tools/emoji-build`: `borno-emoji-build` builds `assets/emoji/emoji.tsv` from Unicode's `emoji-test.txt` and the CLDR annotations.
 - `tools/dict-build`: `borno-dict-build` counts Bengali words in corpus text (wiki XML included) and writes the dictionary. Corpora are never committed.
+- `tools/lm-build`: `borno-lm-build` counts which word follows which in the same corpora and writes the word pair model `lm.bnd` (next-word suggestions and context ranking). `tools/corpus-text` holds the wiki markup cleaner both build tools share.
 - `crates/borno-platform`: the config file (`[general]`, `[shortcut]`) and the Server and shell wire protocol (`protocol`).
 - `crates/bamboo-slip`: the self-drawn UI engine (scene tree, layout, text shaping, animation to a bitmap, plus the widget kit, input handling and, behind the `host` feature, a winit window host), from Qingjian, GPL side of its dual license. The settings program is built on it.
 - `crates/borno-render`: the candidate window renderer: `Frame` + theme to a bitmap. Themes `bornopata` and `sakura` are in `themes/`; `cargo run -p borno-render --example preview` draws them to PNG.

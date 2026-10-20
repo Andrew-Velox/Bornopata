@@ -68,6 +68,18 @@ fn next_words_merge_personal_followers_and_the_model_without_repeats() {
 }
 
 #[test]
+fn a_suggestion_from_the_model_stays_hidden_once_forgotten() {
+    let model = FixedModel(vec![("আমি", vec!["ভাত", "যাই", "যাব"])]);
+    let mut engine = fixed_engine(&[("ami", &["আমি"])])
+        .with_learner(Box::new(MemoryLearner::default()))
+        .with_language_model(Box::new(model));
+    type_word(&mut engine, "ami ");
+    assert_eq!(engine.next_words(2), ["ভাত", "যাই"]);
+    assert!(engine.forget_word("ভাত"));
+    assert_eq!(engine.next_words(2), ["যাই", "যাব"]);
+}
+
+#[test]
 fn next_words_are_empty_without_any_knowledge() {
     let engine = fixed_engine(&[]);
     assert!(engine.next_words(5).is_empty());

@@ -56,7 +56,7 @@ On `assets/dictionary/eval-spellings.tsv` (142 typical spellings) with the shipp
 ## Learning and prediction
 
 - `Learner` (trait in `borno-core`, implemented by `borno-learning`) records what the user committed: per-input choices, plain word counts, and the personal bigram/trigram (`UserNgram`). Choices decay with time.
-- `LanguageModel` (trait in `borno-core`, implemented by `borno-lm`) scores `log P(word | previous)` and lists likely successors for next-word suggestions.
+- `LanguageModel` (trait in `borno-core`, implemented by `borno-lm`) scores `log P(word | previous)` and lists likely successors for next-word suggestions. The shipped `lm.bnd` (built by `tools/lm-build`: 30,000 words, the 16 likeliest successors of each, pairs seen at least three times, about 2 MB) is looked up like the dictionary: user directory, then the system data directories. A suggestion the user removes with the forget key is kept in `user-hidden.tsv` and filtered out of the model's list, because the model itself cannot be edited.
 - Next-word suggestions after a commit merge the personal n-gram followers and the language model successors. They are separate from candidates and shown only when the buffer is empty.
 
 ## Input before learning

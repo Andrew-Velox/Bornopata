@@ -14,9 +14,6 @@ use borno_platform::{Config, paths};
 /// What a new `phrases.tsv` starts with.
 const PHRASE_TEMPLATE: &str = include_str!("phrases-template.tsv");
 
-/// The optional language model, looked up in the user data directory.
-const LANGUAGE_MODEL_FILE: &str = "lm.bnd";
-
 fn main() {
     if std::env::args().any(|argument| argument == "--version") {
         println!("borno-linux-server {}", env!("CARGO_PKG_VERSION"));
@@ -45,7 +42,7 @@ fn run() -> Result<(), ServerError> {
     } else {
         None
     };
-    let model = load_model(&user_dir)?;
+    let model = load_model()?;
     let dictionary = paths::dictionary_path();
     match &dictionary {
         Some(path) => tracing::info!(path = %path.display(), "using the dictionary"),
@@ -162,10 +159,9 @@ fn write_phrase_template(user_dir: &Path) {
     }
 }
 
-fn load_model(user_dir: &Path) -> Result<Option<BigramModel>, ServerError> {
-    let path = user_dir.join(LANGUAGE_MODEL_FILE);
-    if !path.is_file() {
+fn load_model() -> Result<Option<BigramModel>, ServerError> {
+    let Some(path) = paths::language_model_path() else {
         return Ok(None);
-    }
+    };
     Ok(Some(BigramModel::from_path(&path)?))
 }

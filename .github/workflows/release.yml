@@ -73,6 +73,17 @@ jobs:
           gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern words.bnd --dir target/release-inputs
           echo "$sha  target/release-inputs/words.bnd" | sha256sum --check
 
+      # The word pair model comes the same way, pinned in assets/dictionary/lm.bnd.release.
+      - name: Fetch the word pair model
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(sed -n 's/^tag=//p' assets/dictionary/lm.bnd.release)
+          sha=$(sed -n 's/^sha256=//p' assets/dictionary/lm.bnd.release)
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern lm.bnd --dir target/release-inputs
+          echo "$sha  target/release-inputs/lm.bnd" | sha256sum --check
+
       - name: Test
         run: cargo test --workspace --locked
 
@@ -100,6 +111,7 @@ jobs:
             --plugin target/fcitx5-release/bornopata.so \
             --gloss target/release-inputs/gloss-en.bnd \
             --dictionary target/release-inputs/words.bnd \
+            --lm target/release-inputs/lm.bnd \
             --licenses target/release-inputs/THIRD-PARTY-LICENSES.txt \
             --out target/package $ALLOW_DEV
           git archive --format=tar.gz --prefix="bornopata-$VERSION/" -o "target/package/bornopata-$VERSION-source.tar.gz" "$GITHUB_SHA"

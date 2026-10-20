@@ -58,12 +58,12 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
 # A packaged release also brings the dictionary and its attribution.
 with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     directory = Path(temporary)
-    for name in ('server', 'plugin', 'gloss-en.bnd', 'words.bnd', 'settings'):
+    for name in ('server', 'plugin', 'gloss-en.bnd', 'words.bnd', 'settings', 'lm.bnd'):
         (directory / name).write_bytes(f'test {name}\n'.encode())
     env = dict(os.environ, XDG_DATA_HOME=str(directory / 'data'), XDG_CONFIG_HOME=str(directory / 'config'))
     args = ['python3', str(helper), 'install', str(directory / 'prefix'), str(root)]
     args += [str(directory / name) for name in ('server', 'plugin', 'gloss-en.bnd', 'words.bnd')]
-    args += ['--settings', str(directory / 'settings')]
+    args += ['--settings', str(directory / 'settings'), '--lm', str(directory / 'lm.bnd')]
     subprocess.run(args, env=env, check=True)
     # The settings program comes with a launcher entry that names it by absolute path, and an icon.
     entry = (directory / 'data/applications/bornopata-settings.desktop').read_text()
@@ -71,8 +71,9 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     assert (directory / 'data/icons/hicolor/scalable/apps/bornopata.svg').is_file()
     assert (directory / 'prefix/bin/bornopata-settings').read_bytes() == b'test settings\n'
     assert (directory / 'data/bornopata/words.bnd').read_bytes() == b'test words.bnd\n'
+    assert (directory / 'data/bornopata/lm.bnd').read_bytes() == b'test lm.bnd\n'
     assert 'CC BY-SA 4.0' in (directory / 'prefix/share/licenses/bornopata/DICTIONARY-ATTRIBUTION.txt').read_text()
     subprocess.run(['python3', str(helper), 'uninstall', str(directory / 'prefix')], env=env, check=True)
-    assert not (directory / 'data/bornopata/words.bnd').exists()
+    assert not (directory / 'data/bornopata/words.bnd').exists() and not (directory / 'data/bornopata/lm.bnd').exists()
     assert not (directory / 'data/applications/bornopata-settings.desktop').exists()
 print('install, reinstall, manifest and uninstall tests passed')

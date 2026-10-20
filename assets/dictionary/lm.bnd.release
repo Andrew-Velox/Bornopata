@@ -1,0 +1,4 @@
+# Where the release workflow gets the built word pair model (it is not committed; see README.md). Upload a new
+# lm.bnd to a new release named by `tag`, never replace the asset of an old one, and update both lines.
+tag=data-lm-v1
+sha256=60a8ef66dde12085a4626ace1b8d8b1dc955229882fd1fe3118774c8f339a733

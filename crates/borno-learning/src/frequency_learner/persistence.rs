@@ -1,4 +1,4 @@
-//! Loading and saving the learner's files: `user-words.tsv`, `user-choices.tsv` and `user-ngram.tsv`.
+//! Loading and saving the learner's files: `user-words.tsv`, `user-choices.tsv`, `user-ngram.tsv` and `user-hidden.tsv`.
 
 use std::fs;
 use std::io::{self, Write};
@@ -14,6 +14,7 @@ use crate::user_ngram::UserNgram;
 const WORDS_FILE: &str = "user-words.tsv";
 const CHOICES_FILE: &str = "user-choices.tsv";
 const NGRAM_FILE: &str = "user-ngram.tsv";
+const HIDDEN_FILE: &str = "user-hidden.tsv";
 
 impl FrequencyLearner {
     /// Opens the learner stored in `directory`, creating nothing until the first `flush`. Missing files mean a
@@ -63,11 +64,22 @@ impl FrequencyLearner {
             }
             learner.ngram = ngram;
         }
+        if let Some(text) = read_optional(&directory.join(HIDDEN_FILE))? {
+            for line in data_lines(&text) {
+                if let Some((previous, word)) = line.split_once('\t') {
+                    learner
+                        .hidden
+                        .insert((previous.to_owned(), word.to_owned()));
+                } else {
+                    tracing::warn!(file = HIDDEN_FILE, line, "skipped a malformed line");
+                }
+            }
+        }
         learner.directory = Some(directory);
         Ok(learner)
     }
 
-    /// Writes the three files atomically when something changed. Entries unused for [`COLD_DAYS`] are dropped.
+    /// Writes the four files atomically when something changed. Entries unused for [`COLD_DAYS`] are dropped.
     /// Does nothing for an in-memory learner.
     pub fn save(&mut self) -> io::Result<()> {
         let Some(directory) = self.directory.clone() else {
@@ -112,6 +124,14 @@ impl FrequencyLearner {
         let ngram = self.ngram.to_tsv();
         write_atomic(&directory.join(NGRAM_FILE), |out| {
             out.write_all(ngram.as_bytes())
+        })?;
+        let mut hidden: Vec<_> = self.hidden.iter().collect();
+        hidden.sort();
+        write_atomic(&directory.join(HIDDEN_FILE), |out| {
+            for (previous, word) in hidden {
+                writeln!(out, "{previous}\t{word}")?;
+            }
+            Ok(())
         })?;
         self.dirty = false;
         Ok(())

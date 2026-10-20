@@ -6,7 +6,7 @@ How a Linux release is cut and what the workflow (`.github/workflows/release.yml
 
 A GitHub release named after the tag (`v0.1.0-alpha.1`; a version with a hyphen is marked pre-release) with:
 
-- `bornopata-<version>-linux-x86_64.tar.gz` (+ `.sha256`): the Server, the Fcitx5 plugin, `words.bnd`, `gloss-en.bnd`, the systemd unit, the Fcitx5 files, an `install.sh` that installs into `~/.local` without building anything, and every license and attribution (`LICENSE`, `NOTICE.md`, `THIRD-PARTY-LICENSES.txt`, the dictionary, gloss and emoji notices).
+- `bornopata-<version>-linux-x86_64.tar.gz` (+ `.sha256`): the Server, the settings program, the Fcitx5 plugin, `words.bnd`, `lm.bnd`, `gloss-en.bnd`, the systemd unit, the Fcitx5 files, an `install.sh` that installs into `~/.local` without building anything, and every license and attribution (`LICENSE`, `NOTICE.md`, `THIRD-PARTY-LICENSES.txt`, the dictionary, gloss and emoji notices).
 - `bornopata-<version>-source.tar.gz` (+ `.sha256`): `git archive` of the tagged commit, with a stable checksum for packagers.
 
 The prebuilt plugin is built on Ubuntu against its Fcitx5. It may not load on a distribution with another Fcitx5; building from source is the fallback (the AUR package builds from the source archive).
@@ -14,6 +14,8 @@ The prebuilt plugin is built on Ubuntu against its Fcitx5. It may not load on a 
 ## Where the dictionary comes from
 
 `words.bnd` is not in the repository (about 20 MB, built from corpora that are not committed). It lives in a **data release** (`data-v1`, `data-v2`, ...), and `assets/dictionary/words.bnd.release` pins which one and its SHA-256. The workflow downloads it and stops if the checksum differs. A new dictionary goes to a new data release, never over an old asset, and the pin file is updated in the same commit that wants it.
+
+The word pair model `lm.bnd` (about 2 MB) is handled the same way: its own data release (`data-lm-v1`) and `assets/dictionary/lm.bnd.release`. How it is built is in [../../assets/dictionary/README.md](../../assets/dictionary/README.md).
 
 ```bash
 gh release create data-v2 --repo Andrew-Velox/Bornopata --prerelease --title "Dictionary data v2" \

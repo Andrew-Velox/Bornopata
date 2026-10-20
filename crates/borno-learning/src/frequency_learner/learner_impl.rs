@@ -83,7 +83,22 @@ impl Learner for FrequencyLearner {
         removed
     }
 
+    fn hide_suggestion(&mut self, previous: Option<&str>, text: &str) -> bool {
+        let added = self.hidden.insert(hidden_key(previous, text));
+        self.dirty |= added;
+        added
+    }
+
+    fn is_suggestion_hidden(&self, previous: Option<&str>, text: &str) -> bool {
+        self.hidden.contains(&hidden_key(previous, text))
+    }
+
     fn flush(&mut self) -> std::io::Result<()> {
         self.save()
     }
+}
+
+/// The set key of a hidden suggestion; a sentence start is written `<s>`, as in the language model.
+pub(super) fn hidden_key(previous: Option<&str>, text: &str) -> (String, String) {
+    (previous.unwrap_or("<s>").to_owned(), text.to_owned())
 }

@@ -28,6 +28,7 @@ pub struct MemoryLearner {
     words: HashMap<String, u32>,
     choices: HashMap<(String, String), u32>,
     pairs: HashMap<(Option<String>, String), u32>,
+    hidden: Vec<(Option<String>, String)>,
 }
 
 impl Learner for MemoryLearner {
@@ -41,6 +42,20 @@ impl Learner for MemoryLearner {
             .pairs
             .entry((previous.map(str::to_owned), text.to_owned()))
             .or_default() += 1;
+    }
+
+    fn hide_suggestion(&mut self, previous: Option<&str>, text: &str) -> bool {
+        let key = (previous.map(str::to_owned), text.to_owned());
+        let added = !self.hidden.contains(&key);
+        if added {
+            self.hidden.push(key);
+        }
+        added
+    }
+
+    fn is_suggestion_hidden(&self, previous: Option<&str>, text: &str) -> bool {
+        self.hidden
+            .contains(&(previous.map(str::to_owned), text.to_owned()))
     }
 
     fn weight(&self, text: &str) -> u32 {

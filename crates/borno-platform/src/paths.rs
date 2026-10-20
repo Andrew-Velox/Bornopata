@@ -8,6 +8,9 @@ pub const DICTIONARY_FILE: &str = "words.bnd";
 /// The English gloss file next to the dictionary.
 pub const GLOSS_FILE: &str = "gloss-en.bnd";
 
+/// The language model of word pairs next to the dictionary.
+pub const LANGUAGE_MODEL_FILE: &str = "lm.bnd";
+
 /// The user's own phrases next to the dictionary.
 pub const PHRASES_FILE: &str = "phrases.tsv";
 
@@ -79,6 +82,12 @@ pub fn dictionary_path() -> Option<PathBuf> {
 /// `None` when there is no such file, in which case candidates have no gloss.
 pub fn gloss_path() -> Option<PathBuf> {
     data_file("BORNOPATA_GLOSS", GLOSS_FILE)
+}
+
+/// The language model to use: `$BORNOPATA_LM`, else `lm.bnd` in the user directory or a system data directory. `None`
+/// when there is no such file, in which case only what the user typed before ranks and suggests words.
+pub fn language_model_path() -> Option<PathBuf> {
+    data_file("BORNOPATA_LM", LANGUAGE_MODEL_FILE)
 }
 
 /// The phrase file the user edits: `phrases.tsv` in the user directory. It may not exist yet.

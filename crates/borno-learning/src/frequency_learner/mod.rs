@@ -9,7 +9,7 @@ mod tests;
 use std::cell::Cell;
 use std::path::PathBuf;
 
-use foldhash::HashMap;
+use foldhash::{HashMap, HashSet};
 
 use crate::decay::{DEFAULT_HALF_LIFE_DAYS, Decay, today};
 use crate::user_ngram::UserNgram;
@@ -26,6 +26,10 @@ pub struct FrequencyLearner {
     choices: HashMap<String, HashMap<String, Decay>>,
 
     ngram: UserNgram,
+
+    /// Next-word suggestions the user rejected, as (previous word or `<s>`, word); they stay hidden whatever the
+    /// language model says.
+    hidden: HashSet<(String, String)>,
 
     half_life_days: f64,
 
@@ -45,6 +49,7 @@ impl Default for FrequencyLearner {
             counts: HashMap::default(),
             choices: HashMap::default(),
             ngram: UserNgram::default(),
+            hidden: HashSet::default(),
             half_life_days: DEFAULT_HALF_LIFE_DAYS,
             today: Cell::new(today()),
             dirty: false,
@@ -59,11 +64,12 @@ impl FrequencyLearner {
         Self::default()
     }
 
-    /// Forgets everything: words, choices and the personal bigram. The files are emptied by the next `save`.
+    /// Forgets everything: words, choices, the personal bigram and the hidden suggestions. The files are emptied by the next `save`.
     pub fn clear(&mut self) {
         self.counts.clear();
         self.choices.clear();
         self.ngram = UserNgram::default();
+        self.hidden.clear();
         self.dirty = true;
     }
 

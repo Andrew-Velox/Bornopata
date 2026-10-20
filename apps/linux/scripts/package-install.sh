@@ -14,7 +14,9 @@ done
 [[ "$install_prefix" = /* && "$install_prefix" != / ]] || { echo 'the install prefix must be an absolute path other than /' >&2; exit 2; }
 command -v python3 >/dev/null 2>&1 || { echo 'python3 is needed to run the installer' >&2; exit 1; }
 install_prefix=$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$install_prefix")
+model=()
+[[ ! -f "$here/data/lm.bnd" ]] || model=(--lm "$here/data/lm.bnd")
 python3 "$here/files.py" install "$install_prefix" "$here" "$here/bin/borno-linux-server" "$here/lib/bornopata.so" \
-  "$here/data/gloss-en.bnd" "$here/data/words.bnd" --settings "$here/bin/bornopata-settings"
+  "$here/data/gloss-en.bnd" "$here/data/words.bnd" --settings "$here/bin/bornopata-settings" "${model[@]}"
 printf 'Installed.\nSettings: search for "Bornopata Settings" in your application launcher.\nStart the Server: systemctl --user daemon-reload && systemctl --user enable --now bornopata\nRestart Fcitx5, then add "Bornopata" in the configuration tool (untick "Only show current language").\n'
 printf 'If Fcitx5 cannot load the plugin, this release was built against a different Fcitx5: build from source instead (docs/notes/linux-fcitx5.md).\n'

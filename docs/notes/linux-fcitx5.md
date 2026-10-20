@@ -115,7 +115,7 @@ Date and time shortcuts (`[general] shortcuts`, on by default): after the first 
 
 Your own phrases go in `~/.local/share/bornopata/phrases.tsv` (the Server writes a commented template on first start and never overwrites it). One phrase per line, `code<TAB>text`: a code is Roman letters only and is matched exactly as typed, `\n` `\t` `\\` in the text give a line break, a tab and a backslash, and several lines with one code give several candidates in file order. Typing the code puts the text first in the list (marked like a learned choice); the ordinary words stay behind it. Phrases are never learned, so private text lives only in that file. The Server reads the file again within a couple of seconds of a save; a bad line is skipped and logged as a warning with its line number.
 
-Learned data (`user-words.tsv`, `user-choices.tsv`, `user-ngram.tsv`) is written a few seconds after the last commit and when the Server stops. An optional language model goes in `~/.local/share/bornopata/lm.bnd`. Typed text is never written to the logs.
+Learned data (`user-words.tsv`, `user-choices.tsv`, `user-ngram.tsv`) is written a few seconds after the last commit and when the Server stops. The word pair model `lm.bnd` goes next to the dictionary (user directory, else `$XDG_DATA_DIRS/bornopata`); `$BORNOPATA_LM` overrides it. Suggestions removed with the forget key are in `user-hidden.tsv`. Typed text is never written to the logs.
 
 ## Protocol
 

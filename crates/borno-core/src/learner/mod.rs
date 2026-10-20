@@ -44,6 +44,17 @@ pub trait Learner: Send {
         false
     }
 
+    /// Stops `text` being offered as a next-word suggestion after `previous` (`None` for a sentence start), even when
+    /// it comes from the language model, which cannot be edited. Returns whether it was newly hidden.
+    fn hide_suggestion(&mut self, _previous: Option<&str>, _text: &str) -> bool {
+        false
+    }
+
+    /// Whether `text` was hidden as a suggestion after `previous`.
+    fn is_suggestion_hidden(&self, _previous: Option<&str>, _text: &str) -> bool {
+        false
+    }
+
     /// Writes pending changes to disk.
     fn flush(&mut self) -> std::io::Result<()> {
         Ok(())

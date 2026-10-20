@@ -39,7 +39,10 @@ fn language_model(args: &Args) -> Result<Option<Box<dyn LanguageModel>>, CliErro
         (None, Some(unigram), Some(bigram)) => {
             Ok(Some(Box::new(BigramModel::from_paths(unigram, bigram)?)))
         }
-        (None, None, None) => Ok(None),
+        (None, None, None) => match borno_platform::paths::language_model_path() {
+            Some(path) => Ok(Some(Box::new(BigramModel::from_path(&path)?))),
+            None => Ok(None),
+        },
         _ => Err(CliError::IncompleteLanguageModel),
     }
 }

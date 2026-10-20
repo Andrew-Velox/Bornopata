@@ -167,3 +167,24 @@ fn clearing_forgets_everything_and_the_files_follow() {
     assert_eq!(reloaded.word_count(), 0);
     let _ = std::fs::remove_dir_all(&directory);
 }
+
+#[test]
+fn a_hidden_suggestion_stays_hidden_after_a_restart_until_everything_is_cleared() {
+    let directory = temporary_directory("hidden");
+    let mut learner = FrequencyLearner::open(&directory).unwrap();
+    assert!(!learner.is_suggestion_hidden(Some("আমি"), "ভাত"));
+    assert!(learner.hide_suggestion(Some("আমি"), "ভাত"));
+    assert!(!learner.hide_suggestion(Some("আমি"), "ভাত"));
+    assert!(learner.hide_suggestion(None, "আমি"));
+    learner.save().unwrap();
+
+    let mut reloaded = FrequencyLearner::open(&directory).unwrap();
+    assert!(reloaded.is_suggestion_hidden(Some("আমি"), "ভাত"));
+    assert!(reloaded.is_suggestion_hidden(None, "আমি"));
+    assert!(!reloaded.is_suggestion_hidden(Some("তুমি"), "ভাত"));
+    reloaded.clear();
+    reloaded.save().unwrap();
+    let empty = FrequencyLearner::open(&directory).unwrap();
+    assert!(!empty.is_suggestion_hidden(Some("আমি"), "ভাত"));
+    let _ = std::fs::remove_dir_all(&directory);
+}

@@ -13,7 +13,7 @@ ami →
 → ভালো
 ```
 
-They come from **your own writing**: the words you have typed after this word before, most frequent first. At first there are none; they appear as Bornopata learns your habits. (A language model built from a text corpus can add more, but none is included in this preview.)
+They come from two places, **your own writing** first: the words you have typed after this word before, most frequent first. Then a small built-in model of which words usually follow which, made from Bengali text, so there are suggestions from the first day. As Bornopata learns your habits, your own words move to the front. Remove a suggestion you do not want with `Shift+Delete` and it is not offered after that word again.
 
 | Key | What it does |
 |---|---|

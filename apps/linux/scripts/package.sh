@@ -3,7 +3,7 @@
 # The parts are built by the release workflow (or by hand: cargo build --release, cmake, borno-gloss-build export).
 set -euo pipefail
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd)
-server='' settings='' plugin='' gloss='' dictionary='' licenses='' allow_dev=0 out="$repo_root/target/package"
+server='' settings='' plugin='' gloss='' dictionary='' model='' licenses='' allow_dev=0 out="$repo_root/target/package"
 while (($#)); do
   case "$1" in
     --server) server=${2:?}; shift 2 ;;
@@ -11,14 +11,15 @@ while (($#)); do
     --plugin) plugin=${2:?}; shift 2 ;;
     --gloss) gloss=${2:?}; shift 2 ;;
     --dictionary) dictionary=${2:?}; shift 2 ;;
+    --lm) model=${2:?}; shift 2 ;;
     --licenses) licenses=${2:?}; shift 2 ;;
     --out) out=${2:?}; shift 2 ;;
     --allow-dev) allow_dev=1; shift ;;
-    --help) echo 'usage: package.sh --server FILE --settings FILE --plugin FILE --gloss FILE --dictionary FILE [--licenses FILE] [--out DIR] [--allow-dev]'; exit 0 ;;
+    --help) echo 'usage: package.sh --server FILE --settings FILE --plugin FILE --gloss FILE --dictionary FILE [--lm FILE] [--licenses FILE] [--out DIR] [--allow-dev]'; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
-for part in "$server" "$settings" "$plugin" "$gloss" "$dictionary"; do
+for part in "$server" "$settings" "$plugin" "$gloss" "$dictionary" ${model:+"$model"}; do
   [[ -f "$part" ]] || { echo "missing part: ${part:-<not given>} (see --help)" >&2; exit 2; }
 done
 version=$("$server" --version | awk '{print $NF}')
@@ -32,6 +33,7 @@ install -m 755 "$settings" "$stage/bin/bornopata-settings"
 install -m 644 "$plugin" "$stage/lib/bornopata.so"
 install -m 644 "$gloss" "$stage/data/gloss-en.bnd"
 install -m 644 "$dictionary" "$stage/data/words.bnd"
+[[ -z "$model" ]] || install -m 644 "$model" "$stage/data/lm.bnd"
 cp "$repo_root/LICENSE" "$repo_root/NOTICE.md" "$stage/"
 [[ -z "$licenses" ]] || install -m 644 "$licenses" "$stage/THIRD-PARTY-LICENSES.txt"
 cp "$repo_root/assets/gloss/ATTRIBUTION.txt" "$stage/assets/gloss/"

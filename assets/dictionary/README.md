@@ -61,3 +61,24 @@ Without `--wikitext` the template and parameter names of the dump (`|তার�
 `borno-cli --dict words.bnd --eval assets/dictionary/eval-spellings.tsv` on this build: the right word is first for 92.3% of the 142 spellings, among the first three for 96.5%, and among the first nine for 96.5%. The ranking weights were tuned on this very set, so the numbers are optimistic for other spellings. Start-up of the Server with it is about 50 ms; a lookup takes 10-40 µs.
 
 The Server and `borno-cli` use `$BORNOPATA_DICT` or `~/.local/share/bornopata/words.bnd` when present; the `upodesh` scaffold list answers only where the dictionary has no spelling of the input.
+
+## Word pair model
+
+`lm.bnd` (built by `tools/lm-build`) counts which word follows which. It gives next-word suggestions from the first day and lets the previous word decide between spellings. It is a data file next to the dictionary; the corpora are not committed.
+
+- Source: the Mozilla Common Voice Bengali sentence corpus (`sentence-collector.txt` and `wiki.bn.txt`, the same two files as above; CC0 by Mozilla's statement, the `wiki.bn.txt` sentences come from Wikipedia, CC BY-SA 4.0). The Wikipedia dump itself was tried and rejected: its talk and project pages put boilerplate (`ভালো নিবন্ধ`, `ধন্যবাদ ব্যবহারকারী`) in the suggestions, and its formal register ranks everyday spellings worse than the sentence corpus does.
+- License: **CC BY-SA 4.0**, the same conservative position as the dictionary. Only words and pair counts are kept, no sentences.
+- Words: the first 30,000 of the dictionary's counts (`--dump-counts`), so both files spell alike. A word outside them breaks the pair chain.
+- Kept: pairs seen at least 3 times, the 16 likeliest successors of each word.
+
+```bash
+target/release/borno-dict-build ... --dump-counts counts.tsv   # as above, once
+cargo build --release -p borno-lm-build
+target/release/borno-lm-build --counts counts.tsv \
+    --corpus ~/corpora/common-voice-bn/sentence-collector.txt --corpus ~/corpora/common-voice-bn/wiki.bn.txt \
+    --min-count 3 --output lm.bnd --license CC-BY-SA-4.0 \
+    --attribution "Word pair counts derived from the Mozilla Common Voice Bengali sentence corpus (CC0), whose Wikipedia sentences are CC BY-SA 4.0" \
+    --source "https://github.com/common-voice/common-voice" --version 2026-10
+```
+
+Build record of the pinned file (`lm.bnd.release`): 28,626 words, 88,156 pairs, 2.0 MB, built in about a second. Measured with `borno-cli --eval`: top-1 of the hand-written set rose from 94.4% to 95.8%, and with the previous word `tumi kothay thako` gives কোথায় and `kono` gives কোনো.
