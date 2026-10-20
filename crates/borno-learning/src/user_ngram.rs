@@ -56,6 +56,19 @@ impl UserNgram {
         ranked
     }
 
+    /// Removes `word` as a follower of every word. Returns whether it was there.
+    pub fn forget_follower(&mut self, word: &str) -> bool {
+        let mut removed = false;
+        for followers in self.pairs.values_mut() {
+            if followers.remove(word).is_some() {
+                self.pair_total -= 1;
+                removed = true;
+            }
+        }
+        self.pairs.retain(|_, followers| !followers.is_empty());
+        removed
+    }
+
     pub fn is_empty(&self) -> bool {
         self.pair_total == 0
     }
@@ -150,6 +163,19 @@ mod tests {
         assert_eq!(bad, 2);
         assert_eq!(loaded.pair(Some("আমি"), "বাংলা"), 1);
         assert_eq!(loaded.pair(None, "আমি"), 1);
+    }
+
+    #[test]
+    fn a_forgotten_word_follows_nothing() {
+        let mut ngram = UserNgram::default();
+        ngram.record(Some("a"), "b");
+        ngram.record(Some("c"), "b");
+        ngram.record(Some("a"), "d");
+        assert!(ngram.forget_follower("b"));
+        assert!(!ngram.forget_follower("b"));
+        assert_eq!(ngram.followers(Some("a"), 5), [("d".to_owned(), 1)]);
+        assert!(ngram.followers(Some("c"), 5).is_empty());
+        assert_eq!(ngram.pair_total, 1);
     }
 
     #[test]

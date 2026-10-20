@@ -44,6 +44,10 @@ log_level = "info"
 # Switch between Bangla and English typing. Modifiers (ctrl, alt, shift, super) plus space, a letter or a digit.
 toggle = "ctrl+alt+space"
 
+# While typing a word: forget what was learned about the highlighted candidate, such as a word chosen by mistake. On a
+# next-word suggestion: stop offering it. Written like the toggle; the key may also be "delete".
+forget = "shift+delete"
+
 [panel]
 # "auto": Bornopata's own candidate window where it can be shown (the input-method popup in Wayland applications,
 # a layer-shell window for X11 ones), otherwise Fcitx5's panel. "popup": only the input-method popup. "native": only

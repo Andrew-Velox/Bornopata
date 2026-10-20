@@ -101,3 +101,51 @@ fn old_choices_cool_down() {
     assert_eq!(learner.choice_weight("kotha", "কথা"), 4);
     std::fs::remove_dir_all(&directory).unwrap();
 }
+
+#[test]
+fn forgetting_a_choice_removes_it_and_the_word_when_no_other_input_chooses_it() {
+    let mut learner = FrequencyLearner::in_memory();
+    learner.record("kotha", "কোথা", Some("আমি"));
+    learner.record("kotha", "কথা", Some("আমি"));
+
+    assert!(learner.forget("kotha", "কোথা"));
+    assert_eq!(learner.choices("kotha"), [("কথা".to_owned(), 1)]);
+    assert_eq!(learner.weight("কোথা"), 0);
+    assert_eq!(learner.followers(Some("আমি"), 5), [("কথা".to_owned(), 1)]);
+    assert!(!learner.forget("kotha", "কোথা"), "nothing left to forget");
+}
+
+#[test]
+fn a_word_chosen_for_another_input_keeps_its_count() {
+    let mut learner = FrequencyLearner::in_memory();
+    learner.record("kotha", "কথা", None);
+    learner.record("kothA", "কথা", None);
+
+    assert!(learner.forget("kotha", "কথা"));
+    assert_eq!(learner.choice_weight("kothA", "কথা"), 1);
+    assert_eq!(learner.weight("কথা"), 2);
+}
+
+#[test]
+fn forgetting_without_an_input_removes_the_word_everywhere() {
+    let mut learner = FrequencyLearner::in_memory();
+    learner.record("", "ভাত", Some("আমি"));
+    assert!(learner.forget("", "ভাত"));
+    assert!(learner.followers(Some("আমি"), 5).is_empty());
+    assert_eq!(learner.weight("ভাত"), 0);
+}
+
+#[test]
+fn a_forgotten_choice_stays_forgotten_after_a_restart() {
+    let directory = temporary_directory("forget");
+    let mut learner = FrequencyLearner::open(&directory).unwrap();
+    learner.record("kotha", "কোথা", Some("আমি"));
+    learner.save().unwrap();
+    assert!(learner.forget("kotha", "কোথা"));
+    learner.save().unwrap();
+
+    let reloaded = FrequencyLearner::open(&directory).unwrap();
+    assert!(reloaded.choices("kotha").is_empty());
+    assert_eq!(reloaded.pair_count("আমি", "কোথা"), 0);
+    let _ = std::fs::remove_dir_all(&directory);
+}

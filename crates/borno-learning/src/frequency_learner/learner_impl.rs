@@ -62,6 +62,27 @@ impl Learner for FrequencyLearner {
         self.ngram.followers(previous, limit)
     }
 
+    fn forget(&mut self, input: &str, text: &str) -> bool {
+        let mut removed = false;
+        if !input.is_empty()
+            && let Some(texts) = self.choices.get_mut(input)
+        {
+            removed |= texts.remove(text).is_some();
+            if texts.is_empty() {
+                self.choices.remove(input);
+            }
+        }
+        let chosen_elsewhere = self.choices.values().any(|texts| texts.contains_key(text));
+        if input.is_empty() || !chosen_elsewhere {
+            removed |= self.counts.remove(text).is_some();
+            removed |= self.ngram.forget_follower(text);
+        }
+        if removed {
+            self.dirty = true;
+        }
+        removed
+    }
+
     fn flush(&mut self) -> std::io::Result<()> {
         self.save()
     }

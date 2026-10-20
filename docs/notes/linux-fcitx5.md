@@ -92,6 +92,7 @@ log_level = "info"       # logs in ~/.local/state/bornopata/logs
 
 [shortcut]
 toggle = "ctrl+alt+space"
+forget = "shift+delete"  # take back what was learned about the highlighted candidate or suggestion
 
 [panel]
 mode = "auto"            # auto: popup for Wayland clients, layer-shell window for X11, else Fcitx5's panel;
@@ -104,6 +105,8 @@ layout = "vertical"      # or "horizontal"
 Fonts: the window needs a Bengali font (Noto Sans Bengali from `noto-fonts` on Arch); `journalctl --user -u bornopata` or the log says which panel was chosen.
 
 The gloss file `gloss-en.bnd` (installed next to `words.bnd` by `install.sh`, or `$BORNOPATA_GLOSS`) is mapped at Server start when `gloss = true`; the log says how many entries were loaded. See [../design/glosses.md](../design/glosses.md).
+
+Forgetting (`[shortcut] forget`, `shift+delete` by default): while a word is being typed, the key removes what the learner knows about the highlighted candidate, so a word chosen by mistake stops coming first; while next-word suggestions are shown, it removes the highlighted one from the personal bigram so it is not offered again. Words that come from the dictionary or the Avro rules stay in the list. The key is consumed whenever a word or suggestions are shown, so it does not also cut text in the application; with nothing shown it goes to the application. The change is saved with the other learned data a few seconds later. The rule in the learner: the choice for that input goes; the word's count and its place among followers go too unless another input still chooses it.
 
 Date and time shortcuts (`[general] shortcuts`, on by default): after the first candidate, `tarikh` (or `tarik`) offers today's date as `২০ অক্টোবর ২০২৬`, `২০/১০/২০২৬`, `২০২৬-১০-২০` and the Bengali-calendar date `৫ কার্তিক ১৪৩৩`; `somoy` (or `shomoy`) offers the time as `২:০৫`, `দুপুর ২:০৫` and `১৪:০৫`; `bar` offers the weekday and the weekday with the date. The first candidate stays the word the code also spells (তারিখ, সময়, বার). The Bengali date follows the calendar of Bangladesh (the 1987 revision: the year starts on 14 April, Falgun has 31 days in the year with 29 February). These texts are never learned, since a date is only true today. Core takes the time from a `Clock` the Server provides, so tests fix it.
 

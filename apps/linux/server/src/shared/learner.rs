@@ -39,6 +39,10 @@ impl Learner for SharedLearner {
         self.lock().followers(previous, limit)
     }
 
+    fn forget(&mut self, input: &str, text: &str) -> bool {
+        self.lock().forget(input, text)
+    }
+
     fn flush(&mut self) -> std::io::Result<()> {
         self.lock().save()
     }

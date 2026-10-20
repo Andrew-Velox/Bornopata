@@ -72,6 +72,31 @@ impl Engine {
         Some(text)
     }
 
+    /// Takes back what the learner knows about the highlighted candidate, for example a word chosen by mistake that
+    /// now comes first. Candidates the word source or the Avro rules produce stay in the list. Returns whether the
+    /// learner had anything to remove.
+    pub fn forget_highlighted(&mut self) -> bool {
+        let Some(text) = self
+            .candidates
+            .get(self.highlighted)
+            .map(|candidate| candidate.text.clone())
+        else {
+            return false;
+        };
+        let forgotten = self.learner.forget(self.composition.as_str(), &text);
+        if forgotten {
+            let highlighted = self.highlighted;
+            self.refresh_candidates();
+            self.highlighted = highlighted.min(self.candidates.len().saturating_sub(1));
+        }
+        forgotten
+    }
+
+    /// Takes back what the learner knows about a next-word suggestion, so it is not offered again.
+    pub fn forget_word(&mut self, word: &str) -> bool {
+        self.learner.forget("", word)
+    }
+
     /// The user took a next-word suggestion: remembers the transition and makes the word the new context.
     /// Returns the text to commit.
     pub fn accept_next_word(&mut self, word: &str) -> String {

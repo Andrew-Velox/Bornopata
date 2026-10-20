@@ -91,6 +91,9 @@ impl Session {
         if event.modifiers.has_command_key() {
             return KeyReply::passthrough(self.commit_word());
         }
+        if config.shortcut.forget.matches(&event) {
+            return self.forget(composing);
+        }
         if !composing && !self.suggestions.is_empty() {
             match function {
                 TAB => return self.accept_suggestion(),
@@ -169,6 +172,25 @@ impl Session {
                 KeyReply::consumed(Some(text))
             }
         }
+    }
+
+    /// The forget shortcut: takes back what was learned about the highlighted candidate or suggestion. While a word or
+    /// suggestions are shown the key is ours even when there is nothing to forget, so Shift+Delete does not also cut
+    /// text in the application.
+    fn forget(&mut self, composing: bool) -> KeyReply {
+        if composing {
+            self.forgot |= self.engine.forget_highlighted();
+            return KeyReply::consumed(None);
+        }
+        let Some(word) = self.suggestions.get(self.suggestion_highlight).cloned() else {
+            return KeyReply::passthrough(None);
+        };
+        self.forgot |= self.engine.forget_word(&word);
+        self.suggestions.remove(self.suggestion_highlight);
+        self.suggestion_highlight = self
+            .suggestion_highlight
+            .min(self.suggestions.len().saturating_sub(1));
+        KeyReply::consumed(None)
     }
 
     /// Tab on a next-word suggestion: commit it and offer what follows.

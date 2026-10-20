@@ -389,3 +389,44 @@ fn a_change_of_privacy_drops_the_word_typed_before_it() {
     }));
     assert_eq!(reply.frame.roman, "ami");
 }
+
+#[test]
+fn shift_delete_takes_back_a_mistaken_choice() {
+    let mut rig = Rig::fixed(KOTHA);
+    show(&mut rig, "kotha");
+    rig.function(DOWN);
+    let picked = rig.type_char(' ').commit.unwrap();
+    rig.event(Event::Reset);
+    let frame = show(&mut rig, "kotha");
+    assert_eq!(frame.candidates[0].source, Source::Learned);
+    assert_eq!(frame.candidates[0].text, picked.trim());
+
+    let reply = rig.key(function_key(
+        0x2e,
+        KeyModifiers {
+            shift: true,
+            ..KeyModifiers::default()
+        },
+    ));
+    assert_eq!(reply.outcome, KeyOutcome::Consumed);
+    assert!(
+        reply
+            .frame
+            .candidates
+            .iter()
+            .all(|candidate| candidate.source != Source::Learned)
+    );
+}
+
+#[test]
+fn shift_delete_without_a_word_goes_to_the_application() {
+    let mut rig = Rig::fixed(KOTHA);
+    let reply = rig.key(function_key(
+        0x2e,
+        KeyModifiers {
+            shift: true,
+            ..KeyModifiers::default()
+        },
+    ));
+    assert_eq!(reply.outcome, KeyOutcome::Passthrough);
+}

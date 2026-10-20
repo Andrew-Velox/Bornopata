@@ -37,6 +37,13 @@ pub trait Learner: Send {
         Vec::new()
     }
 
+    /// Takes back what was learned about `text`: the choice of it for `input`, and, when no other input still chooses
+    /// it (or `input` is empty), its word count and its place among the followers of other words. Returns whether
+    /// anything was removed.
+    fn forget(&mut self, _input: &str, _text: &str) -> bool {
+        false
+    }
+
     /// Writes pending changes to disk.
     fn flush(&mut self) -> std::io::Result<()> {
         Ok(())

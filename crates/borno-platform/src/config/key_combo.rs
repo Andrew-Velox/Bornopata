@@ -11,9 +11,14 @@ use crate::protocol::KeyEvent;
 /// X11 keysym of the space bar, which is what the shells send as the virtual key.
 const SPACE: u32 = 0x20;
 
+/// The shells' virtual key for Delete. A printable `.` has the same code but carries a character.
+const DELETE: u32 = 0x2e;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComboKey {
     Space,
+
+    Delete,
 
     /// A lower-case ASCII letter or a digit.
     Char(char),
@@ -41,6 +46,7 @@ impl KeyCombo {
         }
         match self.key {
             ComboKey::Space => event.virtual_key == SPACE,
+            ComboKey::Delete => event.virtual_key == DELETE && event.character.is_none(),
             ComboKey::Char(expected) => event
                 .character
                 .is_some_and(|typed| typed.eq_ignore_ascii_case(&expected)),
@@ -51,6 +57,7 @@ impl KeyCombo {
     pub fn spelling(&self) -> String {
         let key = match self.key {
             ComboKey::Space => "space".to_owned(),
+            ComboKey::Delete => "delete".to_owned(),
             ComboKey::Char(c) => c.to_string(),
         };
         format!("{}+{key}", self.modifiers.spelling())
@@ -72,11 +79,17 @@ impl FromStr for KeyCombo {
         let key = key.trim().to_ascii_lowercase();
         let key = if key == "space" {
             ComboKey::Space
+        } else if key == "delete" {
+            ComboKey::Delete
         } else {
             let mut chars = key.chars();
             match (chars.next(), chars.next()) {
                 (Some(c), None) if c.is_ascii_alphanumeric() => ComboKey::Char(c),
-                _ => return Err(format!("key must be space, a letter or a digit: {key:?}")),
+                _ => {
+                    return Err(format!(
+                        "key must be space, delete, a letter or a digit: {key:?}"
+                    ));
+                }
             }
         };
         Ok(Self { modifiers, key })
@@ -151,6 +164,19 @@ mod tests {
         assert!(!combo.matches(&event(0x20, Some(' '), extra)));
         assert!(!combo.matches(&event(0x20, Some(' '), KeyModifiers::default())));
         assert!(!combo.matches(&event(0x61, Some('a'), chord)));
+    }
+
+    #[test]
+    fn delete_is_a_key_without_a_character() {
+        let combo: KeyCombo = "shift+delete".parse().unwrap();
+        assert_eq!(combo.spelling(), "shift+delete");
+        let shift = KeyModifiers {
+            shift: true,
+            ..KeyModifiers::default()
+        };
+        assert!(combo.matches(&event(0x2e, None, shift)));
+        assert!(!combo.matches(&event(0x2e, Some('.'), shift)));
+        assert!(!combo.matches(&event(0x2e, None, KeyModifiers::default())));
     }
 
     #[test]

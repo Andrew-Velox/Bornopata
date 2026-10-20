@@ -69,8 +69,9 @@ impl Router {
                 }
             }
         };
-        // Learning happens on commit, so a commit is the moment there is something new to save.
-        if reply.commit.is_some() && self.shared.learning() {
+        // Learning happens on commit and forgetting on a key, so those are the moments there is something new to save.
+        let forgot = std::mem::take(&mut session.forgot);
+        if (reply.commit.is_some() || forgot) && self.shared.learning() {
             self.unsaved_since
                 .get_or_insert_with(std::time::Instant::now);
         }
