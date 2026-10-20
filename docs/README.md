@@ -20,6 +20,7 @@ The README only introduces the project; technical content lives here, in three k
 | [design/bangla-engine.md](design/bangla-engine.md) | The Bangla engine: composition, candidates, ranking, learning, next-word suggestions |
 | [design/architecture.md](design/architecture.md) | Inherited from Qingjian (Chinese): Core and platform split, crate structure, the `.bnd` container. Pinyin-specific parts will be rewritten |
 | [plan/roadmap.md](plan/roadmap.md) | Phases and open decisions |
+| [plan/release.md](plan/release.md) | How a release is cut, what the release workflow checks, where the dictionary comes from |
 | [../assets/dictionary/README.md](../assets/dictionary/README.md) | Dictionary build, sources, license and measurements |
 | [plan/word-list-sources.md](plan/word-list-sources.md) | Corpora considered for the word list, their licenses, and which are used |
 | [../assets/dictionary/README.md](../assets/dictionary/README.md) | Dictionary build, sources, license and measurements |
