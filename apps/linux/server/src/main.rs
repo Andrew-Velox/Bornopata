@@ -163,5 +163,12 @@ fn load_model() -> Result<Option<BigramModel>, ServerError> {
     let Some(path) = paths::language_model_path() else {
         return Ok(None);
     };
-    Ok(Some(BigramModel::from_path(&path)?))
+    let model = BigramModel::from_path(&path)?;
+    tracing::info!(
+        path = %path.display(),
+        words = model.word_count(),
+        pairs = model.bigram_count(),
+        "using the language model"
+    );
+    Ok(Some(model))
 }
