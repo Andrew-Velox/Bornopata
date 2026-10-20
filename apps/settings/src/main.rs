@@ -4,6 +4,7 @@
 //! - `bornopata-settings`: opens the window on the user's config (`paths::config_path`).
 //! - `--config FILE`: reads and writes another file instead, to try things without touching the real settings.
 
+mod i18n;
 mod message;
 mod page_id;
 mod settings;
@@ -11,11 +12,13 @@ mod shortcut;
 mod system;
 mod view;
 
+use crate::i18n::t;
 use std::path::PathBuf;
 
 use bamboo_slip::{WindowOptions, run_window};
 use borno_platform::paths;
 
+use page_id::PageId;
 use settings::Settings;
 
 /// The id the window manager matches against the desktop entry, which is what gives the window its icon and name.
@@ -29,6 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .init();
     let mut config = paths::config_path();
+    let mut page = None;
     let mut args = std::env::args().skip(1);
     while let Some(argument) = args.next() {
         match argument.as_str() {
@@ -38,6 +42,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .map(PathBuf::from)
                     .ok_or("--config needs a file")?
             }
+            "--page" => {
+                let name = args.next().ok_or("--page needs a page name")?;
+                page = Some(PageId::from_name(&name).ok_or(
+                    "unknown page: use typing, keys, appearance, phrases, learning or about",
+                )?);
+            }
             "--version" => {
                 println!("bornopata-settings {}", env!("CARGO_PKG_VERSION"));
                 return Ok(());
@@ -45,10 +55,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             other => return Err(format!("unknown argument: {other}").into()),
         }
     }
-    let settings = Settings::load(config)?;
-    let mut options = WindowOptions::new("Bornopata Settings", (940.0, 680.0));
+    let mut settings = Settings::load(config)?;
+    if let Some(page) = page {
+        settings.page = page;
+    }
+    let mut options = WindowOptions::new(t("Bornopata Settings"), (940.0, 680.0));
     options.min_size = (660.0, 460.0);
-    options.locale = "en".to_owned();
+    options.locale = if i18n::is_bangla() { "bn" } else { "en" }.to_owned();
     options.app_id = Some(APP_ID.to_owned());
     run_window(settings, options)?;
     Ok(())

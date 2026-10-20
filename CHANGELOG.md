@@ -5,6 +5,7 @@ Written by hand by the maintainers at release time; pull requests do not edit it
 ## Unreleased
 
 - Words the letters cannot spell are found too: `moddhe` gives মধ্যে, `porjonto` পর্যন্ত, `dukkho` দুঃখ.
+- Bornopata Settings speaks Bangla: set `language = "bn"` in the config file or pick বাংলা on the Typing page; the default follows the system language.
 - A built-in word pair model (2 MB, from the Common Voice Bengali sentences): next-word suggestions from the first day, and the previous word helps choose between spellings. `Shift+Delete` hides a suggestion for good.
 
 - Bornopata Settings: a settings program in the application launcher (typing, keys, appearance with a live preview, phrases, learning, about).

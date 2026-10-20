@@ -1,5 +1,6 @@
 //! The pages of the sidebar, in order.
 
+use crate::i18n::t;
 use crate::view::icons::Glyph;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -22,14 +23,21 @@ impl PageId {
         Self::About,
     ];
 
+    /// The page called `name` (`typing`, `keys`, ...), for `--page`.
+    pub fn from_name(name: &str) -> Option<Self> {
+        Self::ALL
+            .into_iter()
+            .find(|page| format!("{page:?}").eq_ignore_ascii_case(name))
+    }
+
     pub fn label(self) -> &'static str {
         match self {
-            Self::Typing => "Typing",
-            Self::Keys => "Keys",
-            Self::Appearance => "Appearance",
-            Self::Phrases => "Phrases",
-            Self::Learning => "Learning",
-            Self::About => "About",
+            Self::Typing => t("Typing"),
+            Self::Keys => t("Keys"),
+            Self::Appearance => t("Appearance"),
+            Self::Phrases => t("Phrases"),
+            Self::Learning => t("Learning"),
+            Self::About => t("About"),
         }
     }
 

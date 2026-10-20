@@ -3,6 +3,7 @@
 mod edit;
 mod general;
 mod key_combo;
+mod language;
 mod log_level;
 mod modifiers;
 mod panel;
@@ -18,6 +19,7 @@ use serde::{Deserialize, Serialize};
 pub use edit::Setting;
 pub use general::GeneralConfig;
 pub use key_combo::{ComboKey, KeyCombo};
+pub use language::Language;
 pub use log_level::LogLevel;
 pub use modifiers::Modifiers;
 pub use panel::{PanelConfig, PanelLayout, PanelMode};
@@ -38,6 +40,9 @@ bangla_digits = true
 # Show a short English gloss with its part of speech beside each candidate, such as "n. rice". Needs gloss-en.bnd in
 # the data directory (~/.local/share/bornopata).
 gloss = true
+
+# The language of Bornopata Settings: "auto" follows the system, "en" is English, "bn" is Bangla (বাংলা).
+language = "auto"
 
 # error, warn, info or debug
 log_level = "info"

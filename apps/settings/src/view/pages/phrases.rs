@@ -1,5 +1,6 @@
 //! The Phrases page: your own codes that type longer texts.
 
+use crate::i18n::t;
 use bamboo_slip::taffy::{
     AlignItems, Dimension, FlexDirection, JustifyContent, LengthPercentage, LengthPercentageAuto,
     NodeId, Rect, Size, Style,
@@ -25,8 +26,10 @@ pub fn phrases(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, RenderE
     let mut out = vec![heading(
         ui,
         page,
-        "Phrases",
-        "Type a short code and your own text comes first in the list. Phrases are never learned.",
+        t("Phrases"),
+        t(
+            "Type a short code and your own text comes first in the list. Phrases are never learned.",
+        ),
     )?];
 
     let entries = page.settings.phrases.entries();
@@ -35,14 +38,14 @@ pub fn phrases(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, RenderE
         rows.push(paragraph(
             ui,
             theme,
-            "No phrases yet. Add one, for example mymail for your email address.",
+            t("No phrases yet. Add one, for example mymail for your email address."),
             Some(theme.colors.secondary),
         )?);
     }
     for (index, entry) in entries.iter().enumerate() {
         rows.push(phrase_row(ui, page, index, entry)?);
     }
-    let add = Button::new("Add a phrase…").primary().build(
+    let add = Button::new(t("Add a phrase…")).primary().build(
         ui,
         theme,
         "add-phrase",
@@ -51,20 +54,20 @@ pub fn phrases(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, RenderE
     rows.push(with_notice(
         ui,
         page,
-        SettingRow::new("New phrase")
-            .info("A code of Roman letters, matched exactly as you type it. In the text, a new line is kept as a line break.")
+        SettingRow::new(t("New phrase"))
+            .info(t("A code of Roman letters, matched exactly as you type it. In the text, a new line is kept as a line break."))
             .control(add),
         "phrases",
     )?);
-    out.push(section_title(ui, theme, "Your phrases")?);
+    out.push(section_title(ui, theme, t("Your phrases"))?);
     out.push(group(ui, theme, &rows)?);
 
-    let file = actions(ui, page, &[("Open the file", Action::OpenPhrasesFile)])?;
+    let file = actions(ui, page, &[(t("Open the file"), Action::OpenPhrasesFile)])?;
     let file = with_notice(
         ui,
         page,
-        SettingRow::new("The phrases file")
-            .info("phrases.tsv, one phrase per line: the code, a Tab, then the text. Edits made there show up here when you open this page again.")
+        SettingRow::new(t("The phrases file"))
+            .info(t("phrases.tsv, one phrase per line: the code, a Tab, then the text. Edits made there show up here when you open this page again."))
             .control(file),
         "files",
     )?;
@@ -102,7 +105,7 @@ fn phrase_row(
         },
         &[],
     )?;
-    let edit = Button::new("Edit").build(
+    let edit = Button::new(t("Edit")).build(
         ui,
         theme,
         ("phrase-edit", index),
@@ -159,9 +162,9 @@ fn editor(ui: &mut Ui<Message>, page: &Page) -> Result<(), RenderError> {
         Style::default(),
         Visual::Text {
             text: if editor.index.is_some() {
-                "Edit phrase"
+                t("Edit phrase")
             } else {
-                "New phrase"
+                t("New phrase")
             }
             .to_owned(),
             style: theme.text(theme.font.size + 2.0, 600, theme.colors.text),
@@ -169,7 +172,7 @@ fn editor(ui: &mut Ui<Message>, page: &Page) -> Result<(), RenderError> {
         &[],
     )?;
     let code = TextField::new(code)
-        .placeholder("letters only, like mymail")
+        .placeholder(t("letters only, like mymail"))
         .width(220.0)
         .build(
             ui,
@@ -179,9 +182,9 @@ fn editor(ui: &mut Ui<Message>, page: &Page) -> Result<(), RenderError> {
             None,
             Some(Message::ClosePhrase),
         )?;
-    let code = SettingRow::new("Code").control(code).build(ui, theme)?;
+    let code = SettingRow::new(t("Code")).control(code).build(ui, theme)?;
     let content = TextField::new(text)
-        .placeholder("The text that is typed. It can run over several lines.")
+        .placeholder(t("The text that is typed. It can run over several lines."))
         .width(DIALOG_WIDTH - 40.0)
         .rows(4)
         .build(
@@ -200,9 +203,9 @@ fn editor(ui: &mut Ui<Message>, page: &Page) -> Result<(), RenderError> {
     if editor.index.is_some() {
         buttons.push(
             Button::new(if editor.confirm_delete {
-                "Press again to delete"
+                t("Press again to delete")
             } else {
-                "Delete"
+                t("Delete")
             })
             .build(ui, theme, "phrase-delete", Message::DeletePhrase)?,
         );
@@ -219,8 +222,13 @@ fn editor(ui: &mut Ui<Message>, page: &Page) -> Result<(), RenderError> {
         Visual::Group,
         &[],
     )?);
-    buttons.push(Button::new("Cancel").build(ui, theme, "phrase-cancel", Message::ClosePhrase)?);
-    buttons.push(Button::new("Save").primary().build(
+    buttons.push(Button::new(t("Cancel")).build(
+        ui,
+        theme,
+        "phrase-cancel",
+        Message::ClosePhrase,
+    )?);
+    buttons.push(Button::new(t("Save")).primary().build(
         ui,
         theme,
         "phrase-save",

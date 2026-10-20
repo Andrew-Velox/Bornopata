@@ -6,7 +6,7 @@ description: The settings program in your app launcher, and what each page chang
 
 Search for **Bornopata Settings** in your application launcher. Every change is saved at once and takes effect within a second or two, without restarting anything.
 
-- **Typing**: learning, Bangla digits, English glosses, shortcut words such as `tarikh`, emoji.
+- **Typing**: the language of the program itself (English or বাংলা; automatic follows your system), learning, Bangla digits, English glosses, shortcut words such as `tarikh`, emoji.
 - **Keys**: click a field and press the keys you want for switching Bangla and English, and for forgetting a word.
 - **Appearance**: choose the theme, light or dark, and a vertical or horizontal candidate list. The preview shows exactly what you will get.
 - **Phrases**: your own short words that expand to longer text, such as `mymail`.

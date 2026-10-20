@@ -1,5 +1,6 @@
 //! The Learning page: how much it has learned, and a way to start over.
 
+use crate::i18n::t;
 use bamboo_slip::taffy::NodeId;
 use bamboo_slip::{Button, RenderError, SettingRow, Ui, group, section_title};
 
@@ -16,40 +17,46 @@ pub fn learning(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, Render
     let mut out = vec![heading(
         ui,
         page,
-        "Learning",
-        "What Bornopata remembers about your typing. It all stays on this computer, in plain text files.",
+        t("Learning"),
+        t(
+            "What Bornopata remembers about your typing. It all stays on this computer, in plain text files.",
+        ),
     )?];
 
-    let words = SettingRow::new("Words")
+    let words = SettingRow::new(t("Words"))
         .detail(&count(learned.words))
         .build(ui, theme)?;
-    let choices = SettingRow::new("Choices")
+    let choices = SettingRow::new(t("Choices"))
         .detail(&format!(
-            "{} (which word you picked for which letters)",
-            count(learned.choices)
+            "{} {}",
+            count(learned.choices),
+            t("(which word you picked for which letters)")
         ))
         .build(ui, theme)?;
-    let pairs = SettingRow::new("Word order")
+    let pairs = SettingRow::new(t("Word order"))
         .detail(&format!(
-            "{} (which word came after which)",
-            count(learned.pairs)
+            "{} {}",
+            count(learned.pairs),
+            t("(which word came after which)")
         ))
         .build(ui, theme)?;
-    out.push(section_title(ui, theme, "So far")?);
+    out.push(section_title(ui, theme, t("So far"))?);
     out.push(group(ui, theme, &[words, choices, pairs])?);
 
     let remember = toggle(
         ui,
         page,
-        "Remember my choices",
-        "Turn off to stop learning. What was learned stays and still helps, until you forget it below.",
+        t("Remember my choices"),
+        t(
+            "Turn off to stop learning. What was learned stays and still helps, until you forget it below.",
+        ),
         ("general", "learning"),
         settings.config.general.learning,
     )?;
     let forget_label = if settings.armed == Some(Action::ForgetEverything) {
-        "Press again to forget everything"
+        t("Press again to forget everything")
     } else {
-        "Forget everything"
+        t("Forget everything")
     };
     let forget = Button::new(forget_label)
         .disabled(learned.is_empty() && settings.armed != Some(Action::ForgetEverything))
@@ -62,20 +69,20 @@ pub fn learning(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, Render
     let forget = with_notice(
         ui,
         page,
-        SettingRow::new("Start again")
-            .info("Removes every learned word, choice and word order. Your phrases and settings are not touched.")
+        SettingRow::new(t("Start again"))
+            .info(t("Removes every learned word, choice and word order. Your phrases and settings are not touched."))
             .control(forget),
         "forget",
     )?;
-    out.push(section_title(ui, theme, "Control")?);
+    out.push(section_title(ui, theme, t("Control"))?);
     out.push(group(ui, theme, &[remember, forget])?);
 
-    let folder = actions(ui, page, &[("Open the folder", Action::OpenDataDir)])?;
+    let folder = actions(ui, page, &[(t("Open the folder"), Action::OpenDataDir)])?;
     let files = with_notice(
         ui,
         page,
-        SettingRow::new("The files")
-            .info("user-words.tsv, user-choices.tsv and user-ngram.tsv. You can read them in any text editor.")
+        SettingRow::new(t("The files"))
+            .info(t("user-words.tsv, user-choices.tsv, user-ngram.tsv and user-hidden.tsv. You can read them in any text editor."))
             .control(folder),
         "files",
     )?;
@@ -85,7 +92,7 @@ pub fn learning(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, Render
 
 fn count(n: usize) -> String {
     match n {
-        0 => "nothing yet".to_owned(),
+        0 => t("nothing yet").to_owned(),
         n => n.to_string(),
     }
 }

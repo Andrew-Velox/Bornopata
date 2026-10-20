@@ -26,8 +26,11 @@ The settings program is a native window drawn on `bamboo-slip` (the same engine 
 - The widget kit (`SettingRow`, `Switch`, `Segmented`, `KeyRecorder`, `TextField`, dialogs, scroll area) and the winit host come from Qingjian and live in `bamboo-slip` behind the `host` feature.
 - Launcher: `apps/settings/linux/bornopata-settings.desktop` and `bornopata.svg`, installed by `install.sh` and the release package; `StartupWMClass` matches the window's app id.
 
+## Language
+
+The program speaks English or Bangla. The English text stays at the call site and is the key: `t("Save")` returns the Bangla text from `src/i18n/bangla.rs` when `[general] language` is `bn` (or `auto` on a Bangla locale) and the English text when there is no entry. A test checks that every table entry is used by some source file. The Server ignores the setting. Terms people already read in English (Fcitx5, Wayland, Ctrl) and file names are left as they are. `--page NAME` opens the program on a page, which the screenshots for review use.
+
 ## Limits
 
-- The UI is English only; Bangla labels come with the Bangla docs.
 - The previews are static frames, not the animated candidate window.
 - Linux only for now; the host is cross-platform, the launcher entry and installer are not.

@@ -1,5 +1,6 @@
 //! The Appearance page: a preview of the candidate window and the choices that shape it.
 
+use crate::i18n::t;
 use std::sync::Arc;
 
 use bamboo_slip::taffy::{
@@ -43,10 +44,10 @@ fn current_theme(settings: &Settings) -> Theme {
 
 fn panel_mode_label(mode: PanelMode) -> &'static str {
     match mode {
-        PanelMode::Auto => "Automatic",
-        PanelMode::Popup => "Popup",
-        PanelMode::Native => "Overlay",
-        PanelMode::Fcitx => "Fcitx5 panel",
+        PanelMode::Auto => t("Automatic"),
+        PanelMode::Popup => t("Popup"),
+        PanelMode::Native => t("Overlay"),
+        PanelMode::Fcitx => t("Fcitx5 panel"),
     }
 }
 
@@ -61,8 +62,8 @@ fn panel_mode_key(mode: PanelMode) -> &'static str {
 
 fn layout_label(layout: PanelLayout) -> &'static str {
     match layout {
-        PanelLayout::Vertical => "Vertical",
-        PanelLayout::Horizontal => "Horizontal",
+        PanelLayout::Vertical => t("Vertical"),
+        PanelLayout::Horizontal => t("Horizontal"),
     }
 }
 
@@ -73,18 +74,18 @@ pub fn appearance(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, Rend
         heading(
             ui,
             page,
-            "Appearance",
-            "How the candidate window looks, and where it appears.",
+            t("Appearance"),
+            t("How the candidate window looks, and where it appears."),
         )?,
         preview(ui, page)?,
     ];
 
     let tiles = tiles(ui, page)?;
-    let themes = SettingRow::new("Theme")
+    let themes = SettingRow::new(t("Theme"))
         .control(tiles)
         .stacked()
         .build(ui, theme)?;
-    out.push(section_title(ui, theme, "Theme")?);
+    out.push(section_title(ui, theme, t("Theme"))?);
     out.push(group(ui, theme, &[themes])?);
 
     let layout = choice(
@@ -105,8 +106,10 @@ pub fn appearance(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, Rend
             )
         },
     )?;
-    let layout = SettingRow::new("Layout")
-        .info("Vertical lists the candidates in a column, horizontal in a row.")
+    let layout = SettingRow::new(t("Layout"))
+        .info(t(
+            "Vertical lists the candidates in a column, horizontal in a row.",
+        ))
         .control(layout)
         .build(ui, theme)?;
     // Some themes are always light or always dark; for those the switch does nothing, so it is greyed out.
@@ -117,11 +120,11 @@ pub fn appearance(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, Rend
         ("panel", "dark"),
         Message::flag("panel", "dark", !panel.dark),
     )?;
-    let dark = SettingRow::new("Dark variant")
-        .info("Themes that have a dark variant use it. Some themes are always light or always dark, and then this does nothing.")
+    let dark = SettingRow::new(t("Dark variant"))
+        .info(t("Themes that have a dark variant use it. Some themes are always light or always dark, and then this does nothing."))
         .control(dark)
         .build(ui, theme)?;
-    out.push(section_title(ui, theme, "Layout")?);
+    out.push(section_title(ui, theme, t("Layout"))?);
     out.push(group(ui, theme, &[layout, dark])?);
 
     let mode = choice(
@@ -138,13 +141,13 @@ pub fn appearance(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, Rend
         panel_mode_label,
         |value| text("panel", "mode", panel_mode_key(value)),
     )?;
-    let mode = SettingRow::new("Window")
+    let mode = SettingRow::new(t("Window"))
         .info(
-            "Automatic uses Bornopata's own window where the desktop allows it (a popup at the cursor in Wayland applications, a small overlay window in X11 ones) and Fcitx5's panel otherwise.",
+            t("Automatic uses Bornopata's own window where the desktop allows it (a popup at the cursor in Wayland applications, a small overlay window in X11 ones) and Fcitx5's panel otherwise."),
         )
         .control(mode)
         .build(ui, theme)?;
-    out.push(section_title(ui, theme, "Where it appears")?);
+    out.push(section_title(ui, theme, t("Where it appears"))?);
     out.push(group(ui, theme, &[mode])?);
     Ok(out)
 }

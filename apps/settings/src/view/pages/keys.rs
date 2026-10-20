@@ -1,5 +1,6 @@
 //! The Keys page: the two shortcuts Bornopata adds, recorded by pressing them, and the keys that cannot change.
 
+use crate::i18n::t;
 use bamboo_slip::taffy::{LengthPercentage, NodeId, Rect, Style};
 use bamboo_slip::{
     Button, KeyRecorder, RenderError, SettingRow, Ui, Visual, group, paragraph, section_title,
@@ -19,32 +20,32 @@ pub fn keys(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, RenderErro
     let mut out = vec![heading(
         ui,
         page,
-        "Keys",
-        "Click a shortcut, then press the keys you want. Esc cancels.",
+        t("Keys"),
+        t("Click a shortcut, then press the keys you want. Esc cancels."),
     )?];
 
     let mut rows = Vec::new();
     for shortcut in Shortcut::ALL {
         rows.push(recorder(ui, page, shortcut)?);
     }
-    out.push(section_title(ui, theme, "Shortcuts")?);
+    out.push(section_title(ui, theme, t("Shortcuts"))?);
     out.push(group(ui, theme, &rows)?);
 
-    let reset = Button::new("Restore defaults").build(
+    let reset = Button::new(t("Restore defaults")).build(
         ui,
         theme,
         "reset-shortcuts",
         Message::ResetShortcuts,
     )?;
-    let reset = SettingRow::new("Both shortcuts")
-        .info("Back to Ctrl + Alt + Space and Shift + Delete.")
+    let reset = SettingRow::new(t("Both shortcuts"))
+        .info(t("Back to Ctrl + Alt + Space and Shift + Delete."))
         .control(reset)
         .build(ui, theme)?;
     out.push(group(ui, theme, &[reset])?);
 
-    let fixed = paragraph(ui, theme, FIXED, None)?;
+    let fixed = paragraph(ui, theme, t(FIXED), None)?;
     let inset = LengthPercentage::length(page.px(4.0));
-    out.push(section_title(ui, theme, "Keys that stay as they are")?);
+    out.push(section_title(ui, theme, t("Keys that stay as they are"))?);
     out.push(ui.scene().node(
         Style {
             padding: Rect {

@@ -18,9 +18,17 @@ impl Settings {
         }
     }
 
+    /// The text of the program follows the `language` setting.
+    pub(super) fn apply_language(&self) {
+        crate::i18n::use_bangla(self.config.general.language.uses_bangla());
+    }
+
     pub(super) fn reload(&mut self) {
         match Config::load(&self.path) {
-            Ok(config) => self.config = config,
+            Ok(config) => {
+                self.config = config;
+                self.apply_language();
+            }
             Err(error) => {
                 tracing::error!(%error, "could not read the config again");
                 self.problem = Some(error.to_string());

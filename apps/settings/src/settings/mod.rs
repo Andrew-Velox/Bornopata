@@ -72,7 +72,7 @@ impl Settings {
             .map(Arc::new)
             .inspect_err(|error| tracing::warn!(%error, "the logo does not parse"))
             .ok();
-        Ok(Self {
+        let settings = Self {
             path,
             config,
             problem,
@@ -86,6 +86,8 @@ impl Settings {
             editor: None,
             fields: HashMap::new(),
             learned: Learned::load(),
-        })
+        };
+        settings.apply_language();
+        Ok(settings)
     }
 }

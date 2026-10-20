@@ -1,5 +1,6 @@
 //! Recording a shortcut: which ones can be recorded, whether the pressed key is usable, and how it is written.
 
+use crate::i18n::t;
 use bamboo_slip::{KeyCode, KeyPress};
 use borno_platform::{Config, KeyCombo};
 
@@ -17,17 +18,17 @@ impl Shortcut {
 
     pub fn title(self) -> &'static str {
         match self {
-            Self::Toggle => "Switch between Bangla and English",
-            Self::Forget => "Forget a word",
+            Self::Toggle => t("Switch between Bangla and English"),
+            Self::Forget => t("Forget a word"),
         }
     }
 
     pub fn info(self) -> &'static str {
         match self {
-            Self::Toggle => "Pressed anywhere you type. English mode lets every key through.",
-            Self::Forget => {
-                "Press it on a highlighted word, or on a next-word suggestion, to take back what Bornopata learned about it."
-            }
+            Self::Toggle => t("Pressed anywhere you type. English mode lets every key through."),
+            Self::Forget => t(
+                "Press it on a highlighted word, or on a next-word suggestion, to take back what Bornopata learned about it.",
+            ),
         }
     }
 
@@ -47,7 +48,7 @@ impl Shortcut {
     }
 
     pub fn prompt(self) -> &'static str {
-        "Press the new keys"
+        t("Press the new keys")
     }
 
     /// The current value, written for people.
@@ -78,7 +79,7 @@ impl Shortcut {
             parts.push("super");
         }
         if parts.is_empty() {
-            return Err("Hold Ctrl, Alt, Shift or Super while you press the key".to_owned());
+            return Err(t("Hold Ctrl, Alt, Shift or Super while you press the key").to_owned());
         }
         let key = match &press.key {
             KeyCode::Space => "space".to_owned(),
@@ -89,10 +90,10 @@ impl Shortcut {
                     (Some(c), None) if c.is_ascii_alphanumeric() => {
                         c.to_ascii_lowercase().to_string()
                     }
-                    _ => return Err("Use Space, Delete, a letter or a digit".to_owned()),
+                    _ => return Err(t("Use Space, Delete, a letter or a digit").to_owned()),
                 }
             }
-            _ => return Err("Use Space, Delete, a letter or a digit".to_owned()),
+            _ => return Err(t("Use Space, Delete, a letter or a digit").to_owned()),
         };
         parts.push(&key);
         let spelling = parts.join("+");
@@ -102,7 +103,7 @@ impl Shortcut {
             Self::Forget => Self::Toggle,
         };
         if other.combo(config) == combo {
-            return Err(format!("Already used for “{}”", other.title()));
+            return Err(format!("{} “{}”", t("Already used for"), other.title()));
         }
         Ok(spelling)
     }

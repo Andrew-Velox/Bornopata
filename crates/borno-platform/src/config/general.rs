@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::LogLevel;
+use super::{Language, LogLevel};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
@@ -24,6 +24,9 @@ pub struct GeneralConfig {
     /// letters (`heart`).
     pub emoji: bool,
 
+    /// The language of the settings program. The Server does not use it.
+    pub language: Language,
+
     pub log_level: LogLevel,
 }
 
@@ -35,6 +38,7 @@ impl Default for GeneralConfig {
             gloss: true,
             shortcuts: true,
             emoji: true,
+            language: Language::default(),
             log_level: LogLevel::default(),
         }
     }

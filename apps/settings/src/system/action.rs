@@ -1,5 +1,6 @@
 //! One-off actions behind buttons: open a file, a folder or a web page, and forget what was learned.
 
+use crate::i18n::t;
 use std::path::Path;
 use std::process::Command;
 
@@ -60,7 +61,7 @@ fn open(target: &str) -> Result<String, String> {
         .arg(target)
         .spawn()
         .map(|_| String::new())
-        .map_err(|error| format!("Could not open it (xdg-open: {error})"))
+        .map_err(|error| format!("{} {error})", t("Could not open it (xdg-open:")))
 }
 
 /// The phrase file, created with its instructions when the Server has not yet.
@@ -79,5 +80,5 @@ fn open_phrases() -> Result<String, String> {
 fn forget_everything() -> Result<String, String> {
     std::fs::create_dir_all(paths::user_dir()).map_err(|error| error.to_string())?;
     std::fs::write(paths::forget_marker_path(), b"").map_err(|error| error.to_string())?;
-    Ok("Asked the Server to forget everything it learned.".to_owned())
+    Ok(t("Asked the Server to forget everything it learned.").to_owned())
 }

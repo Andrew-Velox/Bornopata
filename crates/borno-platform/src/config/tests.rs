@@ -93,3 +93,17 @@ fn the_gloss_setting_defaults_on_and_can_be_turned_off() {
     std::fs::write(&path, "[general]\ngloss = false\n").unwrap();
     assert!(!Config::load(&path).unwrap().general.gloss);
 }
+
+#[test]
+fn the_language_reads_as_auto_en_or_bn_and_defaults_to_auto() {
+    assert_eq!(Config::default().general.language, Language::Auto);
+    for (text, want) in [
+        ("auto", Language::Auto),
+        ("en", Language::English),
+        ("bn", Language::Bangla),
+    ] {
+        let config: Config =
+            toml::from_str(&format!("[general]\nlanguage = \"{text}\"\n")).unwrap();
+        assert_eq!(config.general.language, want, "{text}");
+    }
+}

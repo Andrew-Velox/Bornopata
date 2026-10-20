@@ -1,5 +1,6 @@
 //! The kinds of rows every page uses: a switch, a choice between a few values, a title, a notice.
 
+use crate::i18n::t;
 use bamboo_slip::taffy::{FlexDirection, LengthPercentage, NodeId, Rect, Style};
 use bamboo_slip::{RenderError, Segmented, SettingRow, Switch, Ui, Visual, paragraph};
 use borno_platform::Setting;
@@ -43,7 +44,7 @@ pub fn heading(
 
 /// Why the config file could not be read or written.
 pub fn banner(ui: &mut Ui<Message>, page: &Page, text: &str) -> Result<NodeId, RenderError> {
-    let sentence = format!("The settings file has a problem: {text}");
+    let sentence = format!("{} {text}", t("The settings file has a problem:"));
     paragraph(ui, &page.theme, &sentence, Some(page.theme.colors.accent))
 }
 

@@ -1,5 +1,6 @@
 //! The phrase file as a list the program can edit, keeping its comments and every line it does not understand.
 
+use crate::i18n::t;
 use std::path::PathBuf;
 
 use borno_platform::paths;
@@ -72,10 +73,10 @@ impl Phrases {
     pub fn set(&mut self, nth: Option<usize>, code: &str, text: &str) -> Result<(), String> {
         let code = code.trim();
         if code.is_empty() || !code.chars().all(|c| c.is_ascii_alphabetic()) {
-            return Err("The code is Roman letters only, for example mymail".to_owned());
+            return Err(t("The code is Roman letters only, for example mymail").to_owned());
         }
         if text.is_empty() {
-            return Err("The text is empty".to_owned());
+            return Err(t("The text is empty").to_owned());
         }
         let line = Line::Phrase {
             code: code.to_owned(),
