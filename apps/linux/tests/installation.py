@@ -68,7 +68,8 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     # The settings program comes with a launcher entry that names it by absolute path, and an icon.
     entry = (directory / 'data/applications/bornopata-settings.desktop').read_text()
     assert f"Exec={directory / 'prefix'}/bin/bornopata-settings\n" in entry and '@PREFIX@' not in entry
-    assert (directory / 'data/icons/hicolor/scalable/apps/bornopata.svg').is_file()
+    assert (directory / 'data/icons/hicolor/256x256/apps/bornopata.png').is_file()
+    assert (directory / 'data/icons/hicolor/16x16/apps/bornopata.png').is_file()
     assert (directory / 'prefix/bin/bornopata-settings').read_bytes() == b'test settings\n'
     assert (directory / 'data/bornopata/words.bnd').read_bytes() == b'test words.bnd\n'
     assert (directory / 'data/bornopata/lm.bnd').read_bytes() == b'test lm.bnd\n'

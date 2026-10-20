@@ -4,6 +4,8 @@ Written by hand by the maintainers at release time; pull requests do not edit it
 
 ## Unreleased
 
+- A new logo: a white ব with two leaves on green, in the settings program, the launcher entry, Fcitx5's list of input methods and the website.
+
 - Words the letters cannot spell are found too: `moddhe` gives মধ্যে, `porjonto` পর্যন্ত, `dukkho` দুঃখ.
 - Bornopata Settings speaks Bangla: set `language = "bn"` in the config file or pick বাংলা on the Typing page; the default follows the system language.
 - Bengali conjuncts such as প্র, ক্রি, ন্ত্র and স্ব are drawn correctly in the candidate window and the settings program (they showed a stray hasanta and a full-width letter).

@@ -46,7 +46,9 @@ package() {
     install -Dm644 /dev/stdin "$pkgdir/usr/lib/systemd/user/bornopata.service"
   sed 's|@PREFIX@|/usr|' apps/settings/linux/bornopata-settings.desktop |
     install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/bornopata-settings.desktop"
-  install -Dm644 apps/settings/linux/bornopata.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/bornopata.svg"
+  for icon in apps/settings/linux/icons/*/apps/bornopata.png; do
+    install -Dm644 "$icon" "$pkgdir/usr/share/icons/hicolor/$(basename "$(dirname "$(dirname "$icon")")")/apps/bornopata.png"
+  done
   local licenses="$pkgdir/usr/share/licenses/$pkgname"
   install -Dm644 LICENSE "$licenses/LICENSE"
   install -Dm644 NOTICE.md "$licenses/NOTICE.md"

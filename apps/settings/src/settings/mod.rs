@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use bamboo_slip::{SvgImage, TextEdit};
+use bamboo_slip::{Pixmap, TextEdit};
 use borno_platform::Config;
 
 use crate::message::FieldId;
@@ -42,7 +42,7 @@ pub struct Settings {
 
     pub previews: RefCell<Previews>,
 
-    pub logo: Option<Arc<SvgImage>>,
+    pub logo: Option<Arc<Pixmap>>,
 
     /// The shortcut being recorded.
     pub recording: Option<Shortcut>,
@@ -68,9 +68,9 @@ impl Settings {
             Ok(config) => (config, None),
             Err(error) => (Config::default(), Some(error.to_string())),
         };
-        let logo = SvgImage::parse(include_bytes!("../../assets/logo.svg"))
+        let logo = Pixmap::decode_png(include_bytes!("../../assets/logo.png"))
             .map(Arc::new)
-            .inspect_err(|error| tracing::warn!(%error, "the logo does not parse"))
+            .inspect_err(|error| tracing::warn!(%error, "the logo does not decode"))
             .ok();
         let settings = Self {
             path,

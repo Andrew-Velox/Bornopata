@@ -63,11 +63,13 @@ def main():
         files[data / 'bornopata/words.bnd'] = dictionary[0]
     if model:
         files[data / 'bornopata/lm.bnd'] = model
+    # The logo in every size: the launcher entry, Fcitx5's list of input methods and its status area use it.
+    for icon in sorted((root / 'apps/settings/linux/icons').glob('*/apps/bornopata.png')):
+        files[data / 'icons/hicolor' / icon.parent.parent.name / 'apps/bornopata.png'] = icon
     desktop = data / 'applications/bornopata-settings.desktop'
     if settings:
         files[prefix / 'bin/bornopata-settings'] = settings
         files[desktop] = root / 'apps/settings/linux/bornopata-settings.desktop'
-        files[data / 'icons/hicolor/scalable/apps/bornopata.svg'] = root / 'apps/settings/linux/bornopata.svg'
     for kind in ('addon', 'inputmethod'):
         files[data / f'fcitx5/{kind}/bornopata.conf'] = root / f'apps/linux/fcitx5/data/{kind}/bornopata.conf'
     config = Path(os.environ.get('XDG_CONFIG_HOME', str(Path.home() / '.config')))

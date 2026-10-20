@@ -24,7 +24,7 @@ The settings program is a native window drawn on `bamboo-slip` (the same engine 
 
 - `apps/settings` (`borno-settings`, binary `bornopata-settings`): Elm-style `App` (`view`, `update`) over a `Message` enum; one file per page in `view/pages/`.
 - The widget kit (`SettingRow`, `Switch`, `Segmented`, `KeyRecorder`, `TextField`, dialogs, scroll area) and the winit host come from Qingjian and live in `bamboo-slip` behind the `host` feature.
-- Launcher: `apps/settings/linux/bornopata-settings.desktop` and `bornopata.svg`, installed by `install.sh` and the release package; `StartupWMClass` matches the window's app id.
+- Launcher: `apps/settings/linux/bornopata-settings.desktop` and the logo as PNGs from 16 to 512 pixels in `apps/settings/linux/icons/` (made from `assets/logo/bornopata.png`), installed by `install.sh` and the release package; `StartupWMClass` matches the window's app id.
 
 ## Language
 

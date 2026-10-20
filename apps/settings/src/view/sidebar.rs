@@ -74,25 +74,24 @@ fn navigation(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, RenderEr
     })
 }
 
-/// The blossom and the name.
+/// The logo and the name.
 fn brand(ui: &mut Ui<Message>, page: &Page) -> Result<NodeId, RenderError> {
     let mut children = Vec::new();
     if let Some(logo) = &page.settings.logo {
-        let height = page.px(24.0);
-        let (width, natural) = logo.size();
+        let side = page.px(28.0);
         children.push(ui.scene().node(
             Style {
                 size: Size {
-                    width: Dimension::length(height * width / natural),
-                    height: Dimension::length(height),
+                    width: Dimension::length(side),
+                    height: Dimension::length(side),
                 },
                 ..Style::default()
             },
             Visual::Box(BoxPaint {
-                fill: Some(Fill::Svg {
-                    image: Arc::clone(logo),
+                fill: Some(Fill::Image {
+                    pixmap: Arc::clone(logo),
                     slice: None,
-                    px_per_unit: height / natural,
+                    pixels_per_px: logo.width() as f32 / side,
                 }),
                 border: None,
                 radius: 0.0,
