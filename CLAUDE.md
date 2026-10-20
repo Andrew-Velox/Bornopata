@@ -33,6 +33,7 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 - `crates/borno-panel`: the Wayland window: a layer-shell surface on its own thread, popup placement, Hyprland geometry. `examples/show.rs` puts it on a real screen.
 - `apps/linux`: `server` (`Router` input logic, Unix socket IPC), `fcitx5` (C++ plugin; draws the Fcitx5 panel only when the Server's own window is not available, and shows the Server's bitmaps in the input-method popup of Wayland clients), `scripts` (user-level install and uninstall), `systemd` (user unit).
 - `apps/settings`: `borno-settings` (`bornopata-settings`), the settings program drawn on `bamboo-slip` (pages in `view/pages/`, `linux/` holds the launcher entry and icon). Edits the config file and `phrases.tsv`; see `docs/design/settings.md`.
+- `vendor/cosmic-text`: cosmic-text 0.19.0 with its shaper moved to `harfrust` 0.14 so Bengali conjuncts form correctly; wired in by `[patch.crates-io]`, see `docs/notes/text-shaping.md`. Do not edit it for anything else.
 - `assets/`: sample data. Every directory has a README with source and license. Data without a verified license must not ship.
 
 `docs/` has three kinds of pages (index in `docs/README.md`): `design/` decisions, `plan/` roadmap, `notes/` engineering records.

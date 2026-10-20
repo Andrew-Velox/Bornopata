@@ -6,6 +6,9 @@ mod measure_key;
 mod size;
 mod style;
 
+#[cfg(test)]
+mod tests;
+
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;

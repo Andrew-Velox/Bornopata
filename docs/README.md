@@ -27,5 +27,6 @@ The README only introduces the project; technical content lives here, in three k
 | [plan/word-list-sources.md](plan/word-list-sources.md) | Corpora considered for the word list, their licenses, and which are used |
 | [../assets/dictionary/README.md](../assets/dictionary/README.md) | Dictionary build, sources, license and measurements |
 | [notes/crate-notes.md](notes/crate-notes.md) | Inherited (Chinese): per-crate implementation facts |
+| [notes/text-shaping.md](notes/text-shaping.md) | Why `vendor/cosmic-text` exists: Bengali conjuncts and `harfrust`, and when to remove it |
 | [notes/linux-fcitx5.md](notes/linux-fcitx5.md) | Linux Server and Fcitx5 plugin: Arch packages, build, install, enabling on Hyprland, keys, config, protocol, tests |
 | [notes/upodesh-provenance-inquiry.md](notes/upodesh-provenance-inquiry.md) | Draft question to the upodesh maintainers, not sent |

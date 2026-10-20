@@ -81,3 +81,7 @@ zerocopy = { version = "0.8", features = ["derive"] }
 lto = "fat"
 codegen-units = 1
 strip = "symbols"
+
+# cosmic-text with its shaping moved to harfrust 0.14, which forms Bengali conjuncts correctly (vendor/cosmic-text).
+[patch.crates-io]
+cosmic-text = { path = "vendor/cosmic-text" }
