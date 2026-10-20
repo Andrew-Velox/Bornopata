@@ -8,6 +8,11 @@ use crate::session::Session;
 impl Router {
     pub(super) fn event(&mut self, id: SessionId, event: Event) -> ServerMessage {
         let learning = self.config.general.learning;
+        // A focus or capability change may have taken the popup away on the shell's side, so it is drawn again whatever it
+        // shows.
+        if matches!(event, Event::Focus { .. } | Event::Capabilities(_)) {
+            self.drawn = None;
+        }
         let Some(session) = self.sessions.get_mut(&id) else {
             return ServerMessage::Ignored { session: id };
         };

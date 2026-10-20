@@ -18,6 +18,10 @@ const SCALES: std::ops::RangeInclusive<u32> = 120..=720;
 
 const WRITE_TIMEOUT: Duration = Duration::from_secs(1);
 
+/// Animation frames are at least this far apart. Every frame is a new buffer the compositor has to take and the
+/// popup has to be re-laid out for; 30 per second is smooth enough for drifting petals and keeps the load low.
+const MIN_FRAME_INTERVAL: Duration = Duration::from_millis(33);
+
 /// What one shell channel has: its socket, the scale it asked for and the memory the Server draws into.
 struct Channel {
     stream: UnixStream,
@@ -220,7 +224,9 @@ impl Worker {
         let Some(channel) = self.channels.get_mut(&token) else {
             return;
         };
-        self.tick_at = rendered.next_frame.map(|after| Instant::now() + after);
+        self.tick_at = rendered
+            .next_frame
+            .map(|after| Instant::now() + after.max(MIN_FRAME_INTERVAL));
         let (width, height) = (rendered.content_width, rendered.content_height);
         if width == 0 || height == 0 {
             return;
@@ -278,6 +284,7 @@ impl Worker {
             logical_width: logical(width),
             logical_height: logical(height),
         };
+        tracing::debug!(buffer, scale_120, "popup frame presented");
         channel.in_flight.insert(buffer, (pool.id(), slot));
         if send_message(
             &mut channel.stream,

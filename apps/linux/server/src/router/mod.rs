@@ -36,6 +36,9 @@ pub struct Router {
 
     /// The session whose frame is on screen, and where.
     visible: Option<(SessionId, present::Shown)>,
+
+    /// What is on screen now, so an identical frame is not drawn again.
+    drawn: Option<present::Drawn>,
 }
 
 impl Router {
@@ -48,6 +51,7 @@ impl Router {
             panel: None,
             popup: None,
             visible: None,
+            drawn: None,
         }
     }
 

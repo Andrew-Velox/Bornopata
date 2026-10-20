@@ -172,3 +172,57 @@ fn closing_the_session_that_owns_the_popup_hides_it() {
     rig.router.handle(ClientMessage::Close { session: SESSION });
     assert_eq!(popup.log.lock().unwrap().last(), Some(&Action::Hide(TOKEN)));
 }
+
+fn shows(popup: &FakePopup) -> usize {
+    popup
+        .log
+        .lock()
+        .unwrap()
+        .iter()
+        .filter(|action| matches!(action, Action::Show(..)))
+        .count()
+}
+
+#[test]
+fn a_frame_that_is_already_showing_is_not_drawn_again_by_the_key_release_or_a_cursor_report() {
+    let popup = FakePopup::attached_with(TOKEN);
+    let mut rig = rig(&popup, None, Some(TOKEN));
+    rig.type_text("kotha");
+    let after_typing = shows(&popup);
+    assert!(after_typing > 0);
+    // The release of the last key, a cursor that did not matter and an unchanged capability set answer with the same frame.
+    rig.release(char_key('a'));
+    rig.event(Event::Cursor(CURSOR));
+    assert_eq!(shows(&popup), after_typing);
+}
+
+#[test]
+fn a_changed_frame_is_drawn_and_a_focus_change_draws_the_same_frame_again() {
+    let popup = FakePopup::attached_with(TOKEN);
+    let mut rig = rig(&popup, None, Some(TOKEN));
+    rig.type_text("kotha");
+    let typed = shows(&popup);
+    // The highlight moved: another frame.
+    rig.function(DOWN);
+    assert_eq!(shows(&popup), typed + 1);
+    // The shell may have hidden its popup when the focus left, so the same frame is sent again on a focus event.
+    rig.event(Event::Focus { focused: false });
+    rig.event(Event::Focus { focused: true });
+    assert_eq!(shows(&popup), typed + 3);
+}
+
+#[test]
+fn after_a_hide_the_same_frame_is_drawn_again() {
+    let popup = FakePopup::attached_with(TOKEN);
+    let mut rig = rig(&popup, None, Some(TOKEN));
+    rig.type_text("kotha");
+    rig.type_char(' ');
+    assert_eq!(popup.log.lock().unwrap().last(), Some(&Action::Hide(TOKEN)));
+    let before = shows(&popup);
+    rig.type_text("kotha");
+    assert!(shows(&popup) > before);
+    assert!(matches!(
+        popup.log.lock().unwrap().last(),
+        Some(Action::Show(..))
+    ));
+}
