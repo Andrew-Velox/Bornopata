@@ -38,22 +38,47 @@ pub fn log_dir() -> PathBuf {
     xdg("XDG_STATE_HOME", ".local/state").join("logs")
 }
 
-/// The dictionary to use: `$BORNOPATA_DICT`, else `words.bnd` in the user directory. `None` when there is no such
-/// file, in which case only the built-in scaffold word list answers.
-pub fn dictionary_path() -> Option<PathBuf> {
-    let path = std::env::var_os("BORNOPATA_DICT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| user_dir().join(DICTIONARY_FILE));
-    path.is_file().then_some(path)
+/// The directories of system-wide data, `bornopata` inside each of `$XDG_DATA_DIRS` (default `/usr/local/share:/usr/share`),
+/// where a distribution package puts the dictionary.
+fn system_dirs() -> Vec<PathBuf> {
+    let dirs = std::env::var_os("XDG_DATA_DIRS")
+        .filter(|value| !value.is_empty())
+        .unwrap_or_else(|| "/usr/local/share:/usr/share".into());
+    std::env::split_paths(&dirs)
+        .filter(|path| path.is_absolute())
+        .map(|path| path.join("bornopata"))
+        .collect()
 }
 
-/// The gloss file to use: `$BORNOPATA_GLOSS`, else `gloss-en.bnd` in the user directory. `None` when there is no such
-/// file, in which case candidates have no gloss.
+/// The first `name` that exists in `directories`, in order.
+fn find_in(directories: &[PathBuf], name: &str) -> Option<PathBuf> {
+    directories
+        .iter()
+        .map(|directory| directory.join(name))
+        .find(|path| path.is_file())
+}
+
+/// A data file: the override variable if set, else the user directory, then the system directories. `None` when there
+/// is no such file.
+fn data_file(variable: &str, name: &str) -> Option<PathBuf> {
+    if let Some(path) = std::env::var_os(variable).map(PathBuf::from) {
+        return path.is_file().then_some(path);
+    }
+    let mut directories = vec![user_dir()];
+    directories.extend(system_dirs());
+    find_in(&directories, name)
+}
+
+/// The dictionary to use: `$BORNOPATA_DICT`, else `words.bnd` in the user directory or a system data directory. `None`
+/// when there is no such file, in which case only the built-in scaffold word list answers.
+pub fn dictionary_path() -> Option<PathBuf> {
+    data_file("BORNOPATA_DICT", DICTIONARY_FILE)
+}
+
+/// The gloss file to use: `$BORNOPATA_GLOSS`, else `gloss-en.bnd` in the user directory or a system data directory.
+/// `None` when there is no such file, in which case candidates have no gloss.
 pub fn gloss_path() -> Option<PathBuf> {
-    let path = std::env::var_os("BORNOPATA_GLOSS")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| user_dir().join(GLOSS_FILE));
-    path.is_file().then_some(path)
+    data_file("BORNOPATA_GLOSS", GLOSS_FILE)
 }
 
 /// The phrase file the user edits: `phrases.tsv` in the user directory. It may not exist yet.
@@ -64,4 +89,24 @@ pub fn phrases_path() -> PathBuf {
 /// The marker file that asks the Server to forget everything it learned; the Server deletes it once it has.
 pub fn forget_marker_path() -> PathBuf {
     user_dir().join(FORGET_MARKER)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_first_directory_that_has_the_file_wins() {
+        let base = std::env::temp_dir().join(format!("borno-paths-{}", std::process::id()));
+        let (user, system) = (base.join("user"), base.join("system"));
+        std::fs::create_dir_all(&user).unwrap();
+        std::fs::create_dir_all(&system).unwrap();
+        std::fs::write(system.join("words.bnd"), "system").unwrap();
+        let both = [user.clone(), system.clone()];
+        assert_eq!(find_in(&both, "words.bnd"), Some(system.join("words.bnd")));
+        std::fs::write(user.join("words.bnd"), "user").unwrap();
+        assert_eq!(find_in(&both, "words.bnd"), Some(user.join("words.bnd")));
+        assert_eq!(find_in(&both, "missing.bnd"), None);
+        std::fs::remove_dir_all(&base).unwrap();
+    }
 }
