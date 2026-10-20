@@ -52,12 +52,8 @@ const BUILTINS: [(&str, &str, EmbeddedFiles); 5] = [
                 include_bytes!("../../themes/sakura/images/petal.svg"),
             ),
             (
-                "images/character.svg",
-                include_bytes!("../../themes/sakura/images/character.svg"),
-            ),
-            (
-                "images/charm.svg",
-                include_bytes!("../../themes/sakura/images/charm.svg"),
+                "images/character.png",
+                include_bytes!("../../themes/sakura/images/character.png"),
             ),
             (
                 "images/bow.svg",
@@ -277,6 +273,11 @@ impl Theme {
 
     fn default_builtin() -> &'static Theme {
         &builtins()[0]
+    }
+
+    /// How far decoration may hang over the card in a popup, in points: top, right, bottom, left (see `Meta`).
+    pub fn popup_overhang(&self) -> [f32; 4] {
+        self.file.meta.popup_overhang
     }
 
     /// The appearance the theme is fixed to: `Some(true)` only dark, `Some(false)` only light, `None` both.

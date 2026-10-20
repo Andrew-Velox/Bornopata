@@ -193,7 +193,7 @@ fn a_horizontal_layout_draws_the_same_frame_wider_and_shorter() {
 }
 
 #[test]
-fn the_sakura_theme_animates_and_keeps_its_blossom_inside_the_bitmap() {
+fn the_sakura_theme_animates_and_its_card_stays_put_between_frames() {
     let Some(mut renderer) = renderer() else {
         return;
     };
@@ -202,15 +202,20 @@ fn the_sakura_theme_animates_and_keeps_its_blossom_inside_the_bitmap() {
     let first = renderer
         .render(&shaping(), Layout::Vertical, &sakura, 2.0)
         .unwrap();
-    // The looping petals ask for more frames, and the blossom hangs over the corner of the card, so the bitmap is
-    // larger than the content on the top and right.
+    // The looping petals ask for more frames, and the crown and bow hang over the top of the card, so the bitmap is
+    // larger than the content on the top.
     assert!(first.next_frame.is_some());
     assert!(first.content_y > 0);
-    assert!(first.pixmap.width() > first.content_x + first.content_width);
     let later = renderer
         .tick_at(std::time::Instant::now() + std::time::Duration::from_millis(2500))
         .unwrap();
-    assert!(later.is_some());
+    let later = later.expect("the petals ask for more frames");
+    // The card must not move inside the bitmap from frame to frame: the popup is pinned to the caret by its top-left
+    // corner, so a moving card would bob.
+    assert_eq!(
+        (later.content_x, later.content_y),
+        (first.content_x, first.content_y)
+    );
     // The base theme has no animation.
     renderer.forget();
     let plain = renderer

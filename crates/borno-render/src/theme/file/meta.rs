@@ -17,6 +17,12 @@ pub(crate) struct Meta {
     #[serde(default)]
     pub(crate) license: String,
 
+    /// How far decoration hangs over the card in the Wayland popup, in points: top, right, bottom, left. A fixed number
+    /// on purpose: the compositor puts the popup's top-left corner at the caret, so anything measured per frame would
+    /// make the card move with every animation frame. Nothing by default: the popup shows the card only.
+    #[serde(default)]
+    pub(crate) popup_overhang: [f32; 4],
+
     /// 只有一种外观时写 `"light"` / `"dark"`，不再跟随外观设置切换（背景是浅色图片的主题配深色文字就看不清）。
     pub(crate) appearance: Option<LockedAppearance>,
 }

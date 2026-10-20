@@ -9,7 +9,7 @@ use std::time::{Duration, Instant};
 use borno_platform::protocol::{PopupFrame, PopupServerMessage};
 use borno_render::{Frame, Layout, Rendered, Renderer, Theme};
 
-use super::pixels::copy_cropped;
+use super::pixels::{copy_cropped, popup_rect};
 use super::pool::Pool;
 use super::wire::send_message;
 
@@ -227,10 +227,23 @@ impl Worker {
         self.tick_at = rendered
             .next_frame
             .map(|after| Instant::now() + after.max(MIN_FRAME_INTERVAL));
-        let (width, height) = (rendered.content_width, rendered.content_height);
-        if width == 0 || height == 0 {
+        if rendered.content_width == 0 || rendered.content_height == 0 {
             return;
         }
+        // The card and the overhang the theme declares (see `popup_rect`).
+        let scale = rendered.scale;
+        let pixels = |points: f32| (points * scale).round() as u32;
+        let [top, right, bottom, left] = self.theme.popup_overhang().map(pixels);
+        let (x, y, width, height) = popup_rect(
+            (rendered.pixmap.width(), rendered.pixmap.height()),
+            (
+                rendered.content_x,
+                rendered.content_y,
+                rendered.content_width,
+                rendered.content_height,
+            ),
+            [top, right, bottom, left],
+        );
         let stride = width * 4;
         let bytes = stride as usize * height as usize;
         if channel
@@ -265,7 +278,7 @@ impl Worker {
         copy_cropped(
             rendered.pixmap.data(),
             rendered.pixmap.width(),
-            (rendered.content_x, rendered.content_y, width, height),
+            (x, y, width, height),
             pool.slot_mut(slot),
         );
         let buffer = self.next_buffer;
