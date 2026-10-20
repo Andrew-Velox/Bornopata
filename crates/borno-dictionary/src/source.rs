@@ -8,7 +8,11 @@ use borno_transliteration::{
 
 use crate::dictionary::Dictionary;
 use crate::error::DictionaryError;
-use crate::key::key;
+use crate::key::{key, variant_keys};
+
+/// A word found through a variant spelling counts as this many times rarer, so the words the typing itself reaches
+/// come first and a variant wins only when it is far more common.
+const VARIANT_PENALTY: u32 = 16;
 
 /// Looks the typed Roman up by its phonetic key: the Avro conversion of the input, reduced to its key
 /// (see [`crate::key`]), finds the words people mean by it and, further down, the words it is the start of.
@@ -60,7 +64,8 @@ impl WordSource for DictionarySource {
 
     fn lookup(&self, roman: &str, limit: usize) -> Vec<WordSuggestion> {
         let typed = self.transliterator.convert(roman);
-        self.dictionary
+        let mut found: Vec<WordSuggestion> = self
+            .dictionary
             .lookup(&key(&typed), limit)
             .into_iter()
             .map(|found| WordSuggestion {
@@ -68,7 +73,19 @@ impl WordSource for DictionarySource {
                 frequency: found.frequency,
                 completion: !found.exact,
             })
-            .collect()
+            .collect();
+        for variant in variant_keys(&typed) {
+            for word in self.dictionary.lookup(&variant, limit) {
+                if found.iter().all(|known| known.text != word.text) {
+                    found.push(WordSuggestion {
+                        text: word.text.to_owned(),
+                        frequency: word.frequency / VARIANT_PENALTY,
+                        completion: !word.exact,
+                    });
+                }
+            }
+        }
+        found
     }
 }
 

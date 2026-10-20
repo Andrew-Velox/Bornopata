@@ -47,6 +47,71 @@ pub fn key(text: &str) -> String {
     out
 }
 
+/// Keys of other spellings people mean by the same typing, besides [`key`] of the text itself: the word they have in
+/// mind is written in a way the typed letters do not reach, so these only make candidates, never replace the main key.
+///
+/// - `দ্ধ` read as `ধ` (`moddhe` for মধ্যে, `oddhokkho` for অধ্যক্ষ): the y-phala after ধ is spoken as a doubled sound.
+/// - A `জ` or `য` right after `র` dropped (`porjonto` for পর্যন্ত, `surjo` for সূর্য): র্য is typed `rj`.
+/// - `ক্ষ` read as `ঃখ` (`dukkho` for দুঃখ): `kkh` is ক্ষ in Avro and the visarga has no key of its own.
+/// - `ছ` and `চ` swapped (`chai` for চাই): `ch` is both letters in everyday Roman spelling.
+///
+/// Each rule is tried alone. The result holds no duplicates and never the key of `text` itself.
+pub fn variant_keys(text: &str) -> Vec<String> {
+    let text = canonical(text);
+    let main = key(&text);
+    let mut keys: Vec<String> = Vec::new();
+    for variant in [
+        text.replace("দ্ধ", "ধ"),
+        drop_after_ra(&text),
+        text.replace("ক্ষ", "ঃখ"),
+        swap_cha(&text),
+    ] {
+        let variant = key(&variant);
+        if variant != main && !variant.is_empty() && !keys.contains(&variant) {
+            keys.push(variant);
+        }
+    }
+    keys
+}
+
+/// `text` without the `জ` and `য` that follow a `র`, with or without a hasanta between.
+fn drop_after_ra(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut after_ra = false;
+    let mut pending_hasanta = false;
+    for c in text.chars() {
+        if after_ra && matches!(c, 'জ' | 'য') {
+            pending_hasanta = false;
+            continue;
+        }
+        if after_ra && c == '\u{09CD}' && !pending_hasanta {
+            pending_hasanta = true;
+            continue;
+        }
+        if pending_hasanta {
+            out.push('\u{09CD}');
+            pending_hasanta = false;
+        }
+        after_ra = c == 'র';
+        out.push(c);
+    }
+    if pending_hasanta {
+        out.push('\u{09CD}');
+    }
+    out
+}
+
+/// `text` with every `চ` turned into `ছ` and every `ছ` into `চ`.
+fn swap_cha(text: &str) -> String {
+    text.chars()
+        .map(|c| match c {
+            'চ' => 'ছ',
+            'ছ' => 'চ',
+            other => other,
+        })
+        .collect()
+}
+
 fn is_consonant_class(c: char) -> bool {
     ('\u{0995}'..='\u{09B9}').contains(&c) || matches!(c, '\u{09DF}')
 }
@@ -148,6 +213,28 @@ mod tests {
         different("চাল", "ছাল");
         different("কাল", "কুল");
         different("ক্ষমা", "খমা");
+    }
+
+    #[test]
+    fn variants_reach_spellings_the_typing_cannot() {
+        assert!(variant_keys("মদ্ধে").contains(&key("মধ্যে")));
+        assert!(variant_keys("পরজন্ত").contains(&key("পর্যন্ত")));
+        assert!(variant_keys("সুরজ").contains(&key("সূর্য")));
+        assert!(variant_keys("দুক্ষে").contains(&key("দুঃখে")));
+        assert!(variant_keys("ছাই").contains(&key("চাই")));
+        assert!(variant_keys("চাঁদ").contains(&key("ছাঁদ")));
+    }
+
+    #[test]
+    fn variants_leave_out_the_key_itself_and_duplicates() {
+        assert!(variant_keys("আমি").is_empty());
+        for text in ["মদ্ধে", "পরজন্ত", "ছাই", "মর্জি"] {
+            let variants = variant_keys(text);
+            assert!(!variants.contains(&key(text)), "{text}");
+            let mut unique = variants.clone();
+            unique.dedup();
+            assert_eq!(unique, variants, "{text}");
+        }
     }
 
     #[test]

@@ -75,5 +75,5 @@ Two consonants typed one after the other join automatically.
 ## Tips
 
 - `o` is the inherent vowel: it gives `অ` at the start of a word (`onek` gives `অনেক`) and nothing after a consonant (`kotha` gives `কথা`). Type `O` for the sound `ও` or the sign `ো` (`gOru` gives `গোরু`).
-- When a word comes out wrong, look down the candidate list before retyping. The dictionary often has the spelling you meant.
+- When a word comes out wrong, look down the candidate list before retyping. The dictionary often has the spelling you meant, including some you cannot spell with the letters: `moddhe` finds মধ্যে, `porjonto` পর্যন্ত, `dukkho` দুঃখ.
 - Case is part of the spelling. If `Ta` gives `টা` and you wanted `তা`, you typed a capital `T`.
