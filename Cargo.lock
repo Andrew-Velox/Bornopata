@@ -391,6 +391,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "borno-settings"
+version = "0.1.0-alpha.2-dev"
+dependencies = [
+ "bamboo-slip",
+ "borno-platform",
+ "borno-render",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "borno-transliteration"
 version = "0.1.1"
 dependencies = [

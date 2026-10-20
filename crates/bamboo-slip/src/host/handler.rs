@@ -64,6 +64,19 @@ impl<A: App> Handler<A> {
             .with_title(self.options.title.clone())
             .with_inner_size(LogicalSize::new(width, height))
             .with_min_inner_size(LogicalSize::new(min_width, min_height));
+        #[cfg(all(unix, not(target_os = "macos")))]
+        let attributes = match &self.options.app_id {
+            Some(id) => {
+                use winit::platform::wayland::WindowAttributesExtWayland;
+                use winit::platform::x11::WindowAttributesExtX11;
+                WindowAttributesExtX11::with_name(
+                    WindowAttributesExtWayland::with_name(attributes, id, id),
+                    id,
+                    id,
+                )
+            }
+            None => attributes,
+        };
         #[cfg(target_os = "macos")]
         let attributes = {
             use winit::platform::macos::WindowAttributesExtMacOS;

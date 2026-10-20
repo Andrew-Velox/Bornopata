@@ -11,6 +11,9 @@ pub const GLOSS_FILE: &str = "gloss-en.bnd";
 /// The user's own phrases next to the dictionary.
 pub const PHRASES_FILE: &str = "phrases.tsv";
 
+/// A file the settings program drops to ask the Server to forget what it learned.
+pub const FORGET_MARKER: &str = "forget-learned";
+
 fn xdg(variable: &str, fallback: &str) -> PathBuf {
     std::env::var_os(variable)
         .map(PathBuf::from)
@@ -56,4 +59,9 @@ pub fn gloss_path() -> Option<PathBuf> {
 /// The phrase file the user edits: `phrases.tsv` in the user directory. It may not exist yet.
 pub fn phrases_path() -> PathBuf {
     user_dir().join(PHRASES_FILE)
+}
+
+/// The marker file that asks the Server to forget everything it learned; the Server deletes it once it has.
+pub fn forget_marker_path() -> PathBuf {
+    user_dir().join(FORGET_MARKER)
 }

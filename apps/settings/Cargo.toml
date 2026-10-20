@@ -1,0 +1,20 @@
+[package]
+name = "borno-settings"
+description = "Bornopata Settings: the settings program, drawn on bamboo-slip, reading and writing the same config file as the input method"
+version = "0.1.0-alpha.2-dev"
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "bornopata-settings"
+path = "src/main.rs"
+
+[dependencies]
+bamboo-slip = { workspace = true, features = ["host"] }
+borno-platform.workspace = true
+borno-render.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[lints]
+workspace = true

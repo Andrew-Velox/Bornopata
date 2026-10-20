@@ -10,8 +10,9 @@ messages follow the repository's `docs/contributing.md`.
   through a trait such as `Icon`.
 - No dependency on any `borno-*` crate.
 - The scene tree holds pixels only; the user multiplies points by the scale factor.
-- Only the drawing engine is kept from the upstream crate (scene, layout, text, fonts, animation, SVG): the window host, the settings widgets and the
-  macOS and Windows font code were removed.
+- The drawing engine (scene, layout, text, fonts, animation, SVG) is the core. The widget kit (`widgets/`), the interaction layer (`ui/`, `app/`) and,
+  behind the `host` feature, the winit window host (`host/`) were restored from Qingjian for the settings program. The macOS and Windows font code
+  is not here until those shells exist.
 - After a change run this crate's tests and `cargo test -p borno-render`, whose rendering tests are the regression check.
 
 ## Commands

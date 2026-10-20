@@ -15,6 +15,7 @@ members = [
     "crates/borno-platform",
     "apps/cli",
     "apps/linux/server",
+    "apps/settings",
     "tools/dict-build",
     "tools/gloss-build",
     "tools/emoji-build",

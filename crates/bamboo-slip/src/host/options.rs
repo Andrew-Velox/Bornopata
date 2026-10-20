@@ -9,6 +9,10 @@ pub struct WindowOptions {
 
     pub min_size: (f32, f32),
 
+    /// The application id (Wayland) and class (X11) the window manager matches against the program's desktop entry, so
+    /// the window gets its icon and name. `None` leaves it to the system.
+    pub app_id: Option<String>,
+
     /// 中日字形回退按它挑字体，见 [`crate::FontLibrary::system`]。
     pub locale: String,
 }
@@ -19,6 +23,7 @@ impl WindowOptions {
             title: title.into(),
             size,
             min_size: (size.0 * 0.6, size.1 * 0.5),
+            app_id: None,
             locale: "zh-CN".to_owned(),
         }
     }

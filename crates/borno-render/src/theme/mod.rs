@@ -259,8 +259,8 @@ impl Theme {
         &builtins()[0]
     }
 
-    /// 锁定的外观：`Some(true)` 只有深色，`Some(false)` 只有浅色。
-    pub(crate) fn locked_dark(&self) -> Option<bool> {
+    /// The appearance the theme is fixed to: `Some(true)` only dark, `Some(false)` only light, `None` both.
+    pub fn locked_dark(&self) -> Option<bool> {
         self.file
             .meta
             .appearance
