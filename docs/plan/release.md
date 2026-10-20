@@ -39,7 +39,7 @@ A bad release is deleted (`gh release delete --repo ... --cleanup-tag v<version>
 
 ## Not yet done
 
-- An AUR package (`PKGBUILD`) on top of the source archive and the data release.
+- Publishing the AUR package. `apps/linux/packaging/aur/PKGBUILD` is written and was built with `makepkg` from a local copy of the source (files land under `/usr`; the Server finds `/usr/share/bornopata/words.bnd` through `XDG_DATA_DIRS`). To publish: after the tag exists, set `pkgver` (hyphen becomes underscore), run `updpkgsums`, check with `namcap` and `makepkg`, then push `PKGBUILD`, `bornopata.install` and `.SRCINFO` (`makepkg --printsrcinfo`) to the AUR git repository.
 - The repository is private. A public release, and the AUR, need it public (or the files hosted elsewhere).
 - Windows and macOS packages.
 - Signing the files (checksums only for now).
