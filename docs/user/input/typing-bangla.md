@@ -1,7 +1,7 @@
 ---
 title: Typing Bangla
 order: 1
-description: The Avro phonetic letters: which Roman letters give which Bangla letters, vowels, conjuncts and marks, with examples.
+description: The Avro phonetic letters. Which Roman letters give which Bangla consonants, vowels, conjuncts and marks, with examples.
 ---
 
 Bornopata uses the **Avro phonetic** rules: you type the sound in Roman letters. **Capitals matter**: `t` and `T` are different letters, so keep the shift key in mind.

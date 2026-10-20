@@ -14,6 +14,8 @@ for page in sorted(root.rglob('*.md')):
     where = page.relative_to(root)
     if not match:
         problems.append(f'{where}: needs frontmatter with title, order and description')
+    elif re.search(r': |\s#', match.group(1) + match.group(3)) or match.group(1)[0] in '"\'[{&*!|>%@`' or match.group(3)[0] in '"\'[{&*!|>%@`':
+        problems.append(f'{where}: title and description must be plain YAML (no ": " or " #" inside, no leading quote or symbol)')
     elif len(match.group(3)) > 200:
         problems.append(f'{where}: the description is longer than 200 characters')
     for target in re.findall(r'!?\[[^\]]*\]\(([^)#\s]+)(?:#[^)]*)?\)', text):

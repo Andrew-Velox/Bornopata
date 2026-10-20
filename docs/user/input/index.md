@@ -1,7 +1,7 @@
 ---
 title: Typing
 order: 2
-description: How to spell Bangla in Roman letters, how the candidate list is built, and the extras: phrases, date and time, emoji and English mode.
+description: How to spell Bangla in Roman letters, how the candidate list is built, your own phrases, date and time, emoji and English mode.
 ---
 
 - [Typing Bangla](typing-bangla.md): the letters and what they give.

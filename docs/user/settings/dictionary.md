@@ -1,7 +1,7 @@
 ---
 title: The dictionary
 order: 3
-description: The word list behind the candidates: about 413,000 Bangla words with frequencies, built from Bengali Wikipedia and Common Voice, under CC BY-SA 4.0.
+description: The word list behind the candidates, about 413,000 Bangla words with frequencies, built from Bengali Wikipedia and Common Voice, under CC BY-SA 4.0.
 ---
 
 Bornopata's candidates come from a dictionary of about **413,000 Bangla words** with how often each occurs. It is the file `~/.local/share/bornopata/words.bnd`, loaded in a few milliseconds when the Server starts.
