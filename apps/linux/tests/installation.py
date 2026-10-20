@@ -14,12 +14,14 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     data = directory / 'user data'
     server = directory / 'server'
     plugin = directory / 'plugin'
+    gloss = directory / 'gloss-en.bnd'
     server.write_bytes(b'test binary\n')
     plugin.write_bytes(b'test plugin\n')
+    gloss.write_bytes(b'test glosses\n')
     server.chmod(0o755)
     config = directory / 'user config'
     env = dict(os.environ, XDG_DATA_HOME=str(data), XDG_CONFIG_HOME=str(config))
-    args = ['python3', str(helper), 'install', str(prefix), str(root), str(server), str(plugin)]
+    args = ['python3', str(helper), 'install', str(prefix), str(root), str(server), str(plugin), str(gloss)]
     subprocess.run(args, env=env, check=True)
     subprocess.run(args, env=env, check=True)
     addon = data / 'fcitx5/addon/bornopata.conf'
@@ -28,6 +30,9 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     unit = config / 'systemd/user/bornopata.service'
     assert f'ExecStart={prefix}/bin/borno-linux-server\n' in unit.read_text()
     assert '@PREFIX@' not in unit.read_text()
+    # The gloss file goes next to the dictionary, and its attribution into the license directory.
+    assert (data / 'bornopata/gloss-en.bnd').read_bytes() == b'test glosses\n'
+    assert 'Wiktionary' in (prefix / 'share/licenses/bornopata/GLOSS-ATTRIBUTION.txt').read_text()
     manifest = json.loads((prefix / 'share/bornopata/install-manifest.json').read_text())
     assert all(Path(filename).is_file() for filename in manifest)
     user = data / 'bornopata/user.tsv'
@@ -43,6 +48,8 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     subprocess.run(['python3', str(helper), 'uninstall', str(prefix)], env=env, check=True)
     assert not addon.exists() and not (prefix / 'bin/borno-linux-server').exists()
     assert not (prefix / 'lib/fcitx5/bornopata.so').exists()
+    assert not (data / 'bornopata/gloss-en.bnd').exists()
+    assert not (prefix / 'share/licenses/bornopata/GLOSS-ATTRIBUTION.txt').exists()
     assert user.read_text() == 'learned data' and other.read_text() == 'another input method'
     assert modified.read_text() == 'edited by the user'
 print('install, reinstall, manifest and uninstall tests passed')
