@@ -14,7 +14,7 @@ use crate::{FontLibrary, Frame, Layout, Renderer, Theme};
 /// Twice the point size, as sharp as a HiDPI screenshot.
 const SCALE: f32 = 2.0;
 
-/// Draws the vertical samples of `theme_dir` (and a dark one unless the theme locks its appearance) into
+/// Draws the vertical samples and one horizontal sample of `theme_dir` (and a dark one unless the theme locks its appearance) into
 /// `out_dir`, overwriting files of the same name. A picture that fails is recorded in its [`Shot`] and the rest are
 /// still drawn; only a theme that cannot be read or a font library that cannot be built fails the whole run.
 /// `family_files` finds font files of a system family by name, as the shell does when it loads theme fonts.
@@ -35,6 +35,7 @@ pub fn write_previews(
         ("completion.png", bangl(), Layout::Vertical, false),
         ("next-words.png", next_words(), Layout::Vertical, false),
         ("showcase.png", showcase(), Layout::Vertical, false),
+        ("horizontal.png", showcase(), Layout::Horizontal, false),
     ];
     if theme.locked_dark().is_none() {
         shots.push(("vertical-dark.png", shaping(), Layout::Vertical, true));

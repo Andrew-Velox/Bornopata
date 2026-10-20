@@ -40,7 +40,7 @@ Cost of the choice: the popup is placed at window origin + cursor rectangle, so 
 ## Themes
 
 - `bornopata`: white-to-mint card, radius 14, layered shadow, green highlight pill with a gradient, star for learned words, trailing ellipsis for completions, arrow for next-word suggestions, a `Tab` chip.
-- `sakura`: pink-and-lavender glass, a blossom hanging over the corner, two petals drifting down in a loop (the animation is why the window asks for repeated frames). Locked to light.
+- `sakura`: lavender glass with Pata, the Bornopata mascot, peeking over the top-left corner (an original vector character, `images/character.svg`, with the green leaf of the logo in her hair), a hanging leaf charm, a bow, a crown, blossoms and petals drifting in a loop (the animation is why the window asks for repeated frames), and a ribbon with two lines of Bangla. The left padding of 60 is her room. Locked to light. Built-in themes list their images in `src/theme/mod.rs`; a test fails when a file is not listed.
 - `shapla`: a cool water-lily card (the national flower of Bangladesh), white and pale teal, a lily in the top-right corner and two ripples spreading at the bottom. Locked to light.
 - `borsha`: a rainy-day card, blue-grey with squarer corners, a cloud in the corner and raindrops falling through the window. Locked to light.
 - `jonaki`: a night card, deep indigo with a gold border, a crescent moon in the corner and three fireflies drifting and glowing. Locked to dark.

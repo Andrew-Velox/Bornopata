@@ -51,6 +51,26 @@ const BUILTINS: [(&str, &str, EmbeddedFiles); 5] = [
                 "images/petal.svg",
                 include_bytes!("../../themes/sakura/images/petal.svg"),
             ),
+            (
+                "images/character.svg",
+                include_bytes!("../../themes/sakura/images/character.svg"),
+            ),
+            (
+                "images/charm.svg",
+                include_bytes!("../../themes/sakura/images/charm.svg"),
+            ),
+            (
+                "images/bow.svg",
+                include_bytes!("../../themes/sakura/images/bow.svg"),
+            ),
+            (
+                "images/crown.svg",
+                include_bytes!("../../themes/sakura/images/crown.svg"),
+            ),
+            (
+                "images/sparkle.svg",
+                include_bytes!("../../themes/sakura/images/sparkle.svg"),
+            ),
         ],
     ),
     (
@@ -351,6 +371,33 @@ fn builtin_source(id: &str) -> Option<&'static str> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// An image added to a theme directory but not listed in `BUILTINS` is silently missing in the real window, while
+    /// the directory-based preview still draws it.
+    #[test]
+    fn every_image_of_a_builtin_theme_is_embedded() {
+        for (id, _, embedded) in BUILTINS {
+            let directory = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("themes")
+                .join(id)
+                .join("images");
+            let mut on_disk: Vec<String> = std::fs::read_dir(&directory)
+                .map(|entries| {
+                    entries
+                        .flatten()
+                        .map(|entry| format!("images/{}", entry.file_name().to_string_lossy()))
+                        .collect()
+                })
+                .unwrap_or_default();
+            let mut listed: Vec<String> = embedded
+                .iter()
+                .map(|(path, _)| (*path).to_owned())
+                .collect();
+            on_disk.sort();
+            listed.sort();
+            assert_eq!(listed, on_disk, "{id}");
+        }
+    }
 
     #[test]
     fn builtin_themes_parse_without_problems() {

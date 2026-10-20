@@ -4,6 +4,7 @@ Written by hand by the maintainers at release time; pull requests do not edit it
 
 ## Unreleased
 
+- The Sakura theme has a mascot: Pata peeks over the corner of the window, with a hanging leaf charm, a bow, a crown, petals and a ribbon of Bangla.
 - A new logo: a white ব with two leaves on green, in the settings program, the launcher entry, Fcitx5's list of input methods and the website.
 
 - Words the letters cannot spell are found too: `moddhe` gives মধ্যে, `porjonto` পর্যন্ত, `dukkho` দুঃখ.

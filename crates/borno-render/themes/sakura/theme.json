@@ -1,4 +1,6 @@
-// Sakura: a pink-and-lavender glass card with a blossom on the corner and two petals drifting down.
+// Sakura: a lavender glass card with Pata, the Bornopata mascot, peeking over its corner, a hanging leaf charm, a bow,
+// a crown, falling petals and a ribbon with two lines of Bangla. The left padding of 60 leaves room for her body and
+// the charm; move the character and the padding together.
 // All artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
 // The pictures are light, so the theme is locked to the light appearance.
 {
@@ -9,79 +11,129 @@
   "variables": {
     "text": "#47344f",
     "dim": "#47344f99",
-    "gloss": "#47344fa6",
-    "faint": "#8a6f94",
-    "accent": "#d0508f",
+    "gloss": "#ab8bb7",
+    "faint": "#c3a9cc",
+    "accent": "#c54f98",
     "star": "#e39a2d",
-    "line": "#d0508f26",
-    "border": "#efa9c7",
-    "border_inner": "#d0508fb3",
-    "surface_top": "#fffafc",
-    "surface_bottom": "#fbe8f2",
-    "pill_top": "#ffdcec",
-    "pill_bottom": "#ffc6df",
-    "chip": "#d0508f24"
+    "line": "#dab4db",
+    "border": "#dab4db",
+    "border_inner": "#ffffff00",
+    "surface_top": "#f9eeff",
+    "surface_bottom": "#f2e7fa",
+    "pill_top": "#ffe9f7",
+    "pill_bottom": "#f8cbe9",
+    "chip": "#c54f9824",
+    "ink": "#62486e",
+    "ui": "#806289"
+  },
+
+  "text": {
+    "styles": {
+      "preedit": { "size": 16, "line_height": 22 },
+      "ui": { "size": 13, "line_height": 17 },
+      "small": { "size": 10, "line_height": 14 },
+      "tagline": { "size": 12, "line_height": 16, "style": "italic" },
+      "tag": { "size": 8, "line_height": 9 }
+    }
   },
 
   "components": {
-    "petals": {
-      "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0],
+    "sakura_top": {
+      "type": "frame", "padding": [2, 0, 6, 0], "align_self": "stretch",
       "children": [
-        { "type": "frame", "position": "absolute", "inset": [6, "auto", "auto", 54], "width": 11, "height": 11,
-          "fill": { "image": "images/petal.svg" },
-          "animation": { "duration": 5200, "easing": "ease-in-out", "loop": true, "keyframes": [
-            { "at": 0, "x": 0, "y": -4, "rotate": 0, "opacity": 0 },
-            { "at": 0.15, "opacity": 0.95 },
-            { "at": 0.6, "x": 12, "y": 22, "rotate": 140, "opacity": 0.9 },
-            { "at": 1, "x": -4, "y": 46, "rotate": 300, "opacity": 0 }
-          ] } },
-        { "type": "frame", "position": "absolute", "inset": [4, 70, "auto", "auto"], "width": 9, "height": 9,
-          "fill": { "image": "images/petal.svg" },
-          "animation": { "duration": 6400, "easing": "ease-in-out", "loop": true, "keyframes": [
-            { "at": 0, "x": 0, "y": -2, "rotate": 40, "opacity": 0 },
-            { "at": 0.2, "opacity": 0.85 },
-            { "at": 0.65, "x": -14, "y": 26, "rotate": -120, "opacity": 0.8 },
-            { "at": 1, "x": 6, "y": 50, "rotate": -280, "opacity": 0 }
-          ] } }
+        { "type": "preedit", "when": "preedit", "font": "preedit",
+          "typed": "@ink", "rest": "#9c84a6", "caret": { "width": 1.5, "color": "@ink" } },
+        { "type": "frame", "when": "hint", "margin": [3, 0, 0, 12], "padding": [1, 7, 1, 7], "fill": "@chip", "radius": 6,
+          "children": [{ "type": "text", "bind": "hint", "font": "annotation", "color": "@accent" }] },
+        { "type": "text", "text": "বাংলা", "when": "!mode.english", "font": "ui", "color": "@ui", "margin": [4, 0, 0, "auto"] },
+        { "type": "text", "text": "EN", "when": "mode.english", "font": "ui", "color": "@ui", "margin": [4, 0, 0, "auto"] }
       ]
     },
-    "corner": {
-      "type": "frame", "position": "absolute", "inset": [-16, -14, "auto", "auto"], "width": 40, "height": 40,
-      "fill": { "image": "images/blossom.svg" },
-      "animation": { "duration": 9000, "easing": "ease-in-out", "loop": true, "keyframes": [
-        { "at": 0, "rotate": -6 },
-        { "at": 0.5, "rotate": 6 },
-        { "at": 1, "rotate": -6 }
-      ] }
+
+    "ribbon": {
+      "type": "frame", "align_self": "stretch", "height": 22, "radius": 11, "gap": 16,
+      "fill": { "linear": 90, "stops": ["#d99ecfa6", ["#ffe3f5a6", 0.5], "#dbb7e9a6"] },
+      "children": [
+        { "type": "text", "text": "চলুন, আনন্দের গল্প লিখি।", "font": "small", "color": "#a98ab1", "margin": [4, 0, 0, 10] },
+        { "type": "text", "text": "বর্ণপাতা তোমার সাথে লেখে।", "font": "tagline", "color": "#ad83ad", "margin": [3, 12, 0, "auto"] }
+      ]
+    },
+
+    "petal": {
+      "type": "frame", "width": 14, "height": 14, "fill": { "image": "images/petal.svg" },
+      "animation": { "duration": 3600, "easing": "ease-in-out", "loop": true,
+        "keyframes": [{ "at": 0, "y": 0, "rotate": 0 }, { "at": 0.5, "y": 3, "rotate": 14 }, { "at": 1, "y": 0, "rotate": 0 }] }
+    },
+
+    "pata": {
+      "type": "frame", "position": "absolute", "inset": [-72, "auto", "auto", -24], "width": 137, "height": 150,
+      "fill": { "image": "images/character.svg" },
+      "animation": { "duration": 5200, "easing": "ease-in-out", "loop": true,
+        "keyframes": [{ "at": 0, "y": 0 }, { "at": 0.5, "y": -1.5 }, { "at": 1, "y": 0 }] }
     }
   },
 
   "windows": {
     "vertical": {
-      "type": "frame", "direction": "column", "padding": [10, 10, 10, 10], "min_width": 200,
-      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 16,
-      "border": { "width": 3, "color": "@border" },
-      "effects": [],
+      "type": "frame", "direction": "column", "padding": [10, 16, 8, 60], "min_width": 280, "radius": 18,
+      "fill": { "linear": 180, "stops": [["@surface_top", 0], ["#fff6fc", 0.55], ["@surface_bottom", 1]] },
+      "border": { "width": 1.5, "color": "@border" },
+      "effects": [
+        { "type": "drop-shadow", "y": 6, "blur": 14, "color": "#b889b540" },
+        { "type": "inner-shadow", "blur": 4, "color": "#ffffffcc" }
+      ],
       "children": [
-        { "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0], "radius": 13,
-          "border": { "width": 1, "color": "@border_inner" } },
-        { "type": "use", "component": "petals" },
-        { "type": "use", "component": "top_line" },
+        { "type": "use", "component": "sakura_top" },
+        { "type": "frame", "when": "candidates", "align_self": "stretch", "height": 1, "fill": "#ffffffe6", "margin": [0, 0, 4, 0] },
         { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
           "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] },
-        { "type": "use", "component": "corner" }
+        { "type": "use", "component": "ribbon", "margin": [8, -8, 0, -52] },
+
+        { "type": "use", "component": "pata" },
+        { "type": "frame", "position": "absolute", "inset": [-12, -20, "auto", "auto"], "width": 28, "height": 44,
+          "fill": { "image": "images/charm.svg" } },
+        { "type": "frame", "position": "absolute", "inset": [-11, 30, "auto", "auto"], "width": 26, "height": 18,
+          "fill": { "image": "images/bow.svg" } },
+        { "type": "frame", "position": "absolute", "inset": [-17, 86, "auto", "auto"], "width": 22, "height": 17,
+          "fill": { "image": "images/crown.svg" } },
+        { "type": "frame", "position": "absolute", "inset": [-12, 116, "auto", "auto"], "width": 9, "height": 9,
+          "fill": { "image": "images/sparkle.svg" } },
+        { "type": "frame", "position": "absolute", "inset": ["auto", 24, -9, "auto"], "width": 22, "height": 22,
+          "fill": { "image": "images/blossom.svg" } },
+        { "type": "use", "component": "petal", "position": "absolute", "inset": ["auto", "auto", -8, 90] }
       ]
     },
+
     "horizontal": {
-      "type": "frame", "direction": "column", "padding": 10,
-      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 16,
-      "border": { "width": 3, "color": "@border" },
-      "effects": [],
+      "type": "frame", "direction": "column", "padding": [10, 16, 8, 60], "min_width": 440, "radius": 18,
+      "fill": { "linear": 180, "stops": [["@surface_top", 0], ["#fff6fc", 0.55], ["@surface_bottom", 1]] },
+      "border": { "width": 1.5, "color": "@border" },
+      "effects": [
+        { "type": "drop-shadow", "y": 6, "blur": 14, "color": "#b889b540" },
+        { "type": "inner-shadow", "blur": 4, "color": "#ffffffcc" }
+      ],
       "children": [
-        { "type": "use", "component": "top_line" },
-        { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 10,
+        { "type": "use", "component": "sakura_top" },
+        { "type": "frame", "when": "candidates", "align_self": "stretch", "height": 1, "fill": "#ffffffe6" },
+        { "type": "frame", "when": "candidates", "align_self": "stretch", "margin": [4, 0, 0, 0], "gap": 10,
           "children": [{ "type": "repeat", "bind": "candidates", "component": "item" }] },
-        { "type": "use", "component": "corner" }
+        { "type": "use", "component": "ribbon", "margin": [8, -8, 0, -52] },
+
+        { "type": "use", "component": "pata" },
+        { "type": "frame", "position": "absolute", "inset": [-12, -30, "auto", "auto"], "width": 28, "height": 44,
+          "fill": { "image": "images/charm.svg" } },
+        { "type": "frame", "position": "absolute", "inset": [-12, 36, "auto", "auto"], "width": 30, "height": 21,
+          "fill": { "image": "images/bow.svg" } },
+        { "type": "frame", "position": "absolute", "inset": [-19, 190, "auto", "auto"], "width": 26, "height": 20,
+          "fill": { "image": "images/crown.svg" } },
+        { "type": "use", "component": "petal", "position": "absolute", "inset": [-7, "auto", "auto", 140] },
+        { "type": "frame", "position": "absolute", "inset": ["auto", "auto", -14, 230], "width": 30, "height": 30,
+          "fill": { "image": "images/blossom.svg" } },
+        { "type": "frame", "position": "absolute", "inset": ["auto", 28, -9, "auto"], "width": 22, "height": 22,
+          "fill": { "image": "images/blossom.svg" } },
+        { "type": "use", "component": "petal", "position": "absolute", "inset": ["auto", "auto", -9, 110] },
+        { "type": "frame", "position": "absolute", "inset": [-14, 236, "auto", "auto"], "width": 10, "height": 10,
+          "fill": { "image": "images/sparkle.svg" } }
       ]
     }
   }
