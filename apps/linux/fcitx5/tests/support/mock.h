@@ -135,6 +135,9 @@ struct Mock {
                 if (mode == "popup") push(opened.at("context"), ++buffers, 0x7f);
                 outcome = "Consumed";
             }
+            // A key the Server passes on to the application and that leaves nothing to show (Backspace after a space).
+            if (mode == "popup" && event.contains("Key") && !event.at("Key").at("release").get<bool>()
+                && event.at("Key").at("event").at("character") == "x") frame = emptyFrame();
             if (mode == "popup" && event.contains("Focus") && !event.at("Focus").at("focused").get<bool>()) {
                 // A bitmap that was already on its way when the focus left, then the hide the Server sends for it.
                 push(opened.at("context"), ++buffers, 0x11);

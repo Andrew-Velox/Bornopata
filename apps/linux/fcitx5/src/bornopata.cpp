@@ -374,6 +374,9 @@ void BornopataEngine::render(InputContext *context, const nlohmann::json &frame)
     // When the Server shows the frame in its own window the Fcitx5 panel stays empty; only the inline preedit remains.
     const bool native = frame.value("native", false);
     session->showing = native && (!items.empty() || !roman.empty());
+    // A key the Server passes on (Backspace, an arrow) reaches the application as soon as this returns, and the
+    // application moves its cursor under the popup. The Server's own Hide message comes later, so take the popup away now.
+    if (!session->showing && popup_) popup_->hide(context);
     auto list = std::make_unique<CommonCandidateList>();
     list->setPageSize(PANEL_CANDIDATES);
     if (suggesting) list->setLabels({"Tab", "", "", "", "", "", "", "", ""});

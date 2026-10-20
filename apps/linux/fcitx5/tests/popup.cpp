@@ -57,6 +57,13 @@ int main(int argc, char **argv) {
             pump(instance);
             assert(has(mock, "Released", "buffer", 1) && has(mock, "Scale", "scale_120", 150));
         }
+        if (scenario == "passthrough") {
+            // A key the Server passes on leaves nothing to show: the popup is gone when process() returns, before the
+            // application has moved its cursor and long before the Server's own Hide could arrive.
+            assert(fake->visible);
+            assert(!engine.process(&context, fcitx::Key(FcitxKey_x)));
+            assert(!fake->visible);
+        }
         if (scenario == "stale") {
             // The focus leaves: the popup goes at once; the bitmap that was already on its way is refused and given back.
             const int before = fake->hides;
