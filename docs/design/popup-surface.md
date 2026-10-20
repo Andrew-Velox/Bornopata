@@ -39,7 +39,7 @@ The Server keeps three slots; a frame is skipped when all are in use. A bitmap b
 
 ## The shape of the bitmap
 
-The compositor puts the top-left corner of the popup at the caret. The popup therefore shows the card only: the bitmap is cropped to the content rectangle and the shadow and the parts of decorations that hang over the card (the Sakura blossom) are cut off. A theme variant that fits is possible later.
+The compositor puts the top-left corner of the popup at the caret. The popup therefore shows the card only: the bitmap is cropped to the content rectangle and a shadow would show as a tint in the rounded corners, and the parts of decorations that hang over the card (the Sakura blossom) are cut off. The Sakura theme therefore has no shadow and a 2 pt border. A theme variant that fits is possible later.
 
 ## Which window shows what
 
