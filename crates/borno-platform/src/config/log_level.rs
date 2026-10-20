@@ -19,7 +19,8 @@ impl LogLevel {
             Self::Error => "error",
             Self::Warn => "warn",
             Self::Info => "info",
-            Self::Debug => "debug",
+            // Our own crates only: the text shaping library is far too chatty at debug level.
+            Self::Debug => "info,borno_linux_server=debug,borno_panel=debug",
         }
     }
 }

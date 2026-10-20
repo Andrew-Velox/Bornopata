@@ -284,7 +284,7 @@ impl Worker {
             logical_width: logical(width),
             logical_height: logical(height),
         };
-        tracing::debug!(buffer, scale_120, "popup frame presented");
+        tracing::trace!(buffer, scale_120, "popup frame presented");
         channel.in_flight.insert(buffer, (pool.id(), slot));
         if send_message(
             &mut channel.stream,

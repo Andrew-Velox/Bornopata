@@ -8,6 +8,7 @@ use crate::session::Session;
 impl Router {
     pub(super) fn event(&mut self, id: SessionId, event: Event) -> ServerMessage {
         let learning = self.config.general.learning;
+        let what = describe(&event);
         // A focus or capability change may have taken the popup away on the shell's side, so it is drawn again whatever it
         // shows.
         if matches!(event, Event::Focus { .. } | Event::Capabilities(_)) {
@@ -75,7 +76,21 @@ impl Router {
         }
         let identity = session.next_identity();
         let mut frame = session.frame();
+        let was_visible = self.visible.is_some();
         frame.native = self.present(id, &frame);
+        // What happened, never the typed text: the kind of event, the shape of the frame and where it was drawn.
+        tracing::debug!(
+            session = id.0,
+            event = %what,
+            outcome = ?reply.outcome,
+            rows = frame.candidates.len(),
+            suggesting = frame.suggesting,
+            composing = !frame.roman.is_empty(),
+            native = frame.native,
+            was_visible,
+            visible = ?self.visible.map(|(_, shown)| shown),
+            "event"
+        );
         ServerMessage::Result {
             session: id,
             outcome: reply.outcome,
@@ -129,5 +144,21 @@ fn key(
     Reply {
         outcome: reply.outcome,
         commit: reply.commit,
+    }
+}
+
+/// The kind of event for the log. Keys that produce a character are not named, so what is typed stays out of it.
+fn describe(event: &Event) -> String {
+    match event {
+        Event::Capabilities(_) => "capabilities".into(),
+        Event::Reset => "reset".into(),
+        Event::Key { event, release } => match event.character {
+            Some(_) => format!("key(char, release={release})"),
+            None => format!("key(code={:#x}, release={release})", event.virtual_key),
+        },
+        Event::Deactivate { focus_out, .. } => format!("deactivate(focus_out={focus_out})"),
+        Event::Focus { focused } => format!("focus({focused})"),
+        Event::Cursor(_) => "cursor".into(),
+        Event::Candidate { .. } => "candidate".into(),
     }
 }
