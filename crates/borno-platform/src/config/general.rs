@@ -20,6 +20,10 @@ pub struct GeneralConfig {
     /// Typing `tarikh`, `somoy` or `bar` also offers today's date, the time or the weekday, in Bangla.
     pub shortcuts: bool,
 
+    /// Offer emoji next to the words they stand for (`hridoy` also offers ❤️), and for English words typed in Roman
+    /// letters (`heart`).
+    pub emoji: bool,
+
     pub log_level: LogLevel,
 }
 
@@ -30,6 +34,7 @@ impl Default for GeneralConfig {
             bangla_digits: true,
             gloss: true,
             shortcuts: true,
+            emoji: true,
             log_level: LogLevel::default(),
         }
     }

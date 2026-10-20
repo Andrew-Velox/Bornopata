@@ -28,6 +28,10 @@ pub struct Args {
     #[arg(long)]
     pub dict: Option<PathBuf>,
 
+    /// Offer emoji next to the words they stand for, as the input method does.
+    #[arg(long)]
+    pub emoji: bool,
+
     /// Ignore any dictionary file and use only the built-in scaffold word list.
     #[arg(long, conflicts_with = "dict")]
     pub no_dict: bool,

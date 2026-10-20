@@ -4,6 +4,7 @@
 //! has to be one table, so the engines talk to these shared handles.
 
 mod clock;
+mod emoji;
 mod learner;
 mod model;
 mod phrases;
@@ -12,12 +13,14 @@ mod words;
 use std::sync::{Arc, Mutex};
 
 use borno_core::Engine;
+use borno_emoji::EmojiSet;
 use borno_gloss::Glossary;
 use borno_learning::FrequencyLearner;
 use borno_lm::BigramModel;
 use borno_transliteration::WordSource;
 
 use clock::SystemClock;
+use emoji::SharedEmoji;
 use learner::SharedLearner;
 use model::SharedModel;
 use phrases::SharedPhrases;
@@ -36,6 +39,7 @@ pub struct Shared {
     glossary: Option<Arc<Glossary>>,
     phrases: Option<Arc<FilePhrases>>,
     shortcuts: bool,
+    emoji: Option<Arc<EmojiSet>>,
 }
 
 impl Shared {
@@ -52,6 +56,7 @@ impl Shared {
             glossary: None,
             phrases: None,
             shortcuts: false,
+            emoji: None,
         }
     }
 
@@ -73,6 +78,12 @@ impl Shared {
         self
     }
 
+    /// Offers emoji next to the words they stand for; the table is built into the program.
+    pub fn with_emoji(mut self, enabled: bool) -> Self {
+        self.emoji = enabled.then(|| Arc::new(EmojiSet::bundled()));
+        self
+    }
+
     /// A new engine for one input context.
     pub fn engine(&self) -> Engine {
         let mut engine = Engine::new(Box::new(SharedWords(self.words.clone())))
@@ -82,6 +93,9 @@ impl Shared {
         }
         if let Some(model) = &self.model {
             engine = engine.with_language_model(Box::new(SharedModel(model.clone())));
+        }
+        if let Some(emoji) = &self.emoji {
+            engine = engine.with_emoji(Box::new(SharedEmoji(emoji.clone())));
         }
         if self.shortcuts {
             engine = engine.with_clock(Box::new(SystemClock));

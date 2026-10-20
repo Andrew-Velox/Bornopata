@@ -16,3 +16,5 @@ commercial license. The themes' pictures are new; none of Qingjian's theme artwo
 `wayland-protocols-misc` crate; its own copyright and permission notice (MIT) is in the file.
 
 Third-party components are listed with their licenses in `docs/design/bangla-reuse-plan.md` and in each `assets/*/README.md`.
+
+The emoji table (`assets/emoji/emoji.tsv`, built into the Server) is derived from Unicode's `emoji-test.txt` and the CLDR annotations, Copyright © 1991-2026 Unicode, Inc., used under the Unicode License v3; the notice is in `assets/emoji/LICENSE-unicode.txt` and is installed with the program.

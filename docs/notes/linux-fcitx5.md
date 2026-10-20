@@ -86,6 +86,7 @@ Then typing `bangl` offers বাংল first (what you typed) followed by ব�
 [general]
 learning = true          # remember choices (kept in ~/.local/share/bornopata)
 bangla_digits = true
+emoji = true             # emoji next to the words they stand for, at most three per list
 shortcuts = true         # tarikh, somoy and bar also offer today's date, the time and the weekday in Bangla
 gloss = true             # English gloss with part of speech beside each candidate ("n. rice"); needs gloss-en.bnd
 log_level = "info"       # logs in ~/.local/state/bornopata/logs
@@ -105,6 +106,8 @@ layout = "vertical"      # or "horizontal"
 Fonts: the window needs a Bengali font (Noto Sans Bengali from `noto-fonts` on Arch); `journalctl --user -u bornopata` or the log says which panel was chosen.
 
 The gloss file `gloss-en.bnd` (installed next to `words.bnd` by `install.sh`, or `$BORNOPATA_GLOSS`) is mapped at Server start when `gloss = true`; the log says how many entries were loaded. See [../design/glosses.md](../design/glosses.md).
+
+Emoji (`[general] emoji`, on by default): the best-ranked word that has emoji gets up to two right after it (`hridoy` shows হৃদয়, 🫀, ❤️), and the first word also gets those of the English word typed in lower-case Roman letters of three or more (`heart` shows the Avro conversion, then ❤️ and another heart). At most three emoji per list; the emoji name (Bangla, else English) shows where the gloss does. Choosing an emoji is learned for that input like any word, so it comes first next time. The table is `assets/emoji/emoji.tsv`, compiled into the Server (Unicode CLDR names and keywords, Emoji up to 15.1; see `assets/emoji/README.md`); the candidate window needs a color emoji font (`noto-fonts-emoji` or Twemoji).
 
 Forgetting (`[shortcut] forget`, `shift+delete` by default): while a word is being typed, the key removes what the learner knows about the highlighted candidate, so a word chosen by mistake stops coming first; while next-word suggestions are shown, it removes the highlighted one from the personal bigram so it is not offered again. Words that come from the dictionary or the Avro rules stay in the list. The key is consumed whenever a word or suggestions are shown, so it does not also cut text in the application; with nothing shown it goes to the application. The change is saved with the other learned data a few seconds later. The rule in the learner: the choice for that input goes; the word's count and its place among followers go too unless another input still chooses it.
 

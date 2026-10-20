@@ -11,6 +11,7 @@ workspace = true
 [dependencies]
 borno-core.workspace = true
 borno-dictionary.workspace = true
+borno-emoji.workspace = true
 borno-learning.workspace = true
 borno-lm.workspace = true
 borno-platform.workspace = true

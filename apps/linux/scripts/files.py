@@ -43,6 +43,7 @@ def main():
              prefix / 'bin/borno-linux-server': server,
              prefix / 'lib/fcitx5/bornopata.so': plugin}
     files[prefix / 'share/licenses/bornopata/GLOSS-ATTRIBUTION.txt'] = root / 'assets/gloss/ATTRIBUTION.txt'
+    files[prefix / 'share/licenses/bornopata/EMOJI-LICENSE-UNICODE.txt'] = root / 'assets/emoji/LICENSE-unicode.txt'
     files[data / 'bornopata/gloss-en.bnd'] = gloss
     for kind in ('addon', 'inputmethod'):
         files[data / f'fcitx5/{kind}/bornopata.conf'] = root / f'apps/linux/fcitx5/data/{kind}/bornopata.conf'

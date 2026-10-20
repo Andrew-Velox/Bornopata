@@ -57,6 +57,7 @@ fn run() -> Result<(), ServerError> {
     let shared = Shared::new(Arc::from(words), learner, model)
         .with_glossary(glossary)
         .with_shortcuts(config.general.shortcuts)
+        .with_emoji(config.general.emoji)
         .with_phrases(FilePhrases::open(paths::phrases_path()));
     let panel = borno_linux_server::panel::start(&config.panel);
     let popup = borno_linux_server::popup::start(&config.panel);

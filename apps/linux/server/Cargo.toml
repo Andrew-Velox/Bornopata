@@ -12,6 +12,7 @@ path = "src/main.rs"
 [dependencies]
 borno-core.workspace = true
 borno-dictionary.workspace = true
+borno-emoji.workspace = true
 borno-gloss.workspace = true
 borno-learning.workspace = true
 borno-lm.workspace = true

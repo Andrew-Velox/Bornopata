@@ -1,6 +1,7 @@
 //! Builds the engine from the arguments.
 
 use borno_core::{Engine, LanguageModel};
+use borno_emoji::EmojiSet;
 use borno_learning::FrequencyLearner;
 use borno_lm::BigramModel;
 
@@ -23,6 +24,9 @@ pub fn build_engine(args: &Args) -> Result<Engine, CliError> {
     };
     let words = borno_dictionary::word_source(dictionary.as_deref())?;
     let mut engine = Engine::new(words).with_learner(Box::new(learner));
+    if args.emoji {
+        engine = engine.with_emoji(Box::new(EmojiSet::bundled()));
+    }
     if let Some(model) = language_model(args)? {
         engine = engine.with_language_model(model);
     }

@@ -33,6 +33,7 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     # The gloss file goes next to the dictionary, and its attribution into the license directory.
     assert (data / 'bornopata/gloss-en.bnd').read_bytes() == b'test glosses\n'
     assert 'Wiktionary' in (prefix / 'share/licenses/bornopata/GLOSS-ATTRIBUTION.txt').read_text()
+    assert 'Unicode-3.0' in (prefix / 'share/licenses/bornopata/EMOJI-LICENSE-UNICODE.txt').read_text()
     manifest = json.loads((prefix / 'share/bornopata/install-manifest.json').read_text())
     assert all(Path(filename).is_file() for filename in manifest)
     user = data / 'bornopata/user.tsv'
@@ -50,6 +51,7 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     assert not (prefix / 'lib/fcitx5/bornopata.so').exists()
     assert not (data / 'bornopata/gloss-en.bnd').exists()
     assert not (prefix / 'share/licenses/bornopata/GLOSS-ATTRIBUTION.txt').exists()
+    assert not (prefix / 'share/licenses/bornopata/EMOJI-LICENSE-UNICODE.txt').exists()
     assert user.read_text() == 'learned data' and other.read_text() == 'another input method'
     assert modified.read_text() == 'edited by the user'
 print('install, reinstall, manifest and uninstall tests passed')
