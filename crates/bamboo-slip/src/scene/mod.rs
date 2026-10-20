@@ -39,6 +39,7 @@ pub use fill::Fill;
 pub use icon::Icon;
 pub use keyed::Keyed;
 pub use layer_place::LayerPlace;
+pub use located::Located;
 pub use node::SceneNode;
 pub use split::SplitMark;
 pub use visual::Visual;

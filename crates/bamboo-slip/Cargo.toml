@@ -20,6 +20,18 @@ serde.workspace = true
 # Only to tell whether a font has outlines that can be rasterized; same version as fontdb uses
 ttf-parser = { version = "0.25.1", default-features = false, features = ["std"] }
 
+# Window host (the `host` feature)
+winit = { workspace = true, optional = true }
+softbuffer = { workspace = true, optional = true }
+arboard = { workspace = true, optional = true }
+
+[features]
+host = ["dep:winit", "dep:softbuffer", "dep:arboard"]
+
+[[example]]
+name = "window"
+required-features = ["host"]
+
 [dev-dependencies]
 serde_json.workspace = true
 

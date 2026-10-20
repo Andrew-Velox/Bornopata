@@ -27,7 +27,7 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 - `tools/emoji-build`: `borno-emoji-build` builds `assets/emoji/emoji.tsv` from Unicode's `emoji-test.txt` and the CLDR annotations.
 - `tools/dict-build`: `borno-dict-build` counts Bengali words in corpus text (wiki XML included) and writes the dictionary. Corpora are never committed.
 - `crates/borno-platform`: the config file (`[general]`, `[shortcut]`) and the Server and shell wire protocol (`protocol`).
-- `crates/bamboo-slip`: the self-drawn UI engine (scene tree, layout, text shaping, animation to a bitmap), from Qingjian, GPL side of its dual license.
+- `crates/bamboo-slip`: the self-drawn UI engine (scene tree, layout, text shaping, animation to a bitmap, plus the widget kit, input handling and, behind the `host` feature, a winit window host), from Qingjian, GPL side of its dual license. The settings program is built on it.
 - `crates/borno-render`: the candidate window renderer: `Frame` + theme to a bitmap. Themes `bornopata` and `sakura` are in `themes/`; `cargo run -p borno-render --example preview` draws them to PNG.
 - `crates/borno-panel`: the Wayland window: a layer-shell surface on its own thread, popup placement, Hyprland geometry. `examples/show.rs` puts it on a real screen.
 - `apps/linux`: `server` (`Router` input logic, Unix socket IPC), `fcitx5` (C++ plugin; draws the Fcitx5 panel only when the Server's own window is not available, and shows the Server's bitmaps in the input-method popup of Wayland clients), `scripts` (user-level install and uninstall), `systemd` (user unit).
