@@ -1,0 +1,141 @@
+# Builds the Linux release from a version tag and publishes it as a GitHub release. Run by hand (workflow_dispatch) it
+# does everything except publish and keeps the files as a workflow artifact, to try the pipeline before a real tag.
+# Procedure and what each step guards: docs/plan/release.md. Actions are pinned to commits like in ci.yml.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      # For a tag: the tag, the Server version, the Fcitx5 addon version and the changelog must all agree, the tagged commit
+      # must be on main (so it went through CI), and a `-dev` version is never released.
+      - name: Check the version
+        shell: bash
+        run: |
+          version=$(awk -F'"' '/^version = /{print $2; exit}' apps/linux/server/Cargo.toml)
+          addon=$(sed -n 's/^Version=//p' apps/linux/fcitx5/data/addon/bornopata.conf)
+          section=$version
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            [[ "$version" != *-dev* ]] || { echo "::error::$version is a development version"; exit 1; }
+            [[ "$GITHUB_REF_NAME" == "v$version" ]] || { echo "::error::tag $GITHUB_REF_NAME is not v$version"; exit 1; }
+            git merge-base --is-ancestor "$GITHUB_SHA" origin/main || { echo "::error::the tagged commit is not on main"; exit 1; }
+          else
+            # A dry run on a development version: package it anyway, with the notes of the unreleased section.
+            echo "ALLOW_DEV=--allow-dev" >> "$GITHUB_ENV"
+            [[ "$version" != *-dev* ]] || section=Unreleased
+          fi
+          [[ "$addon" == "$version" ]] || { echo "::error::the addon says $addon, the Server $version"; exit 1; }
+          awk -v s="$section" '$0 ~ "^## " s "( |$)" {on=1; next} /^## /{on=0} on' CHANGELOG.md > release-notes.md
+          [[ -s release-notes.md ]] || { echo "::error::CHANGELOG.md has no '## $section' section"; exit 1; }
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
+        with:
+          toolchain: 1.96.0
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libfcitx5core-dev libfcitx5config-dev libfcitx5utils-dev nlohmann-json3-dev pkg-config libsystemd-dev libwayland-dev libwayland-bin wayland-protocols
+
+      # The dictionary is not in the repository. The release it comes from and its checksum are pinned in
+      # assets/dictionary/words.bnd.release, so a changed or replaced file fails here.
+      - name: Fetch the dictionary
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(sed -n 's/^tag=//p' assets/dictionary/words.bnd.release)
+          sha=$(sed -n 's/^sha256=//p' assets/dictionary/words.bnd.release)
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern words.bnd --dir target/release-inputs
+          echo "$sha  target/release-inputs/words.bnd" | sha256sum --check
+
+      - name: Test
+        run: cargo test --workspace --locked
+
+      - name: Build the Server
+        run: cargo build --release --locked -p borno-linux-server
+
+      - name: Build the Fcitx5 plugin
+        run: |
+          cmake -S apps/linux/fcitx5 -B target/fcitx5-release -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+          cmake --build target/fcitx5-release --parallel 2
+
+      - name: Build the glosses
+        run: apps/linux/scripts/build-gloss.sh target/release-inputs/gloss-en.bnd
+
+      - name: Collect the third-party license notices
+        run: |
+          cargo install cargo-about --version 0.9.2 --locked --features cli
+          cargo about generate -m apps/linux/server/Cargo.toml about.hbs -o target/release-inputs/THIRD-PARTY-LICENSES.txt
+
+      - name: Package
+        run: |
+          apps/linux/scripts/package.sh \
+            --server target/release/borno-linux-server \
+            --plugin target/fcitx5-release/bornopata.so \
+            --gloss target/release-inputs/gloss-en.bnd \
+            --dictionary target/release-inputs/words.bnd \
+            --licenses target/release-inputs/THIRD-PARTY-LICENSES.txt \
+            --out target/package $ALLOW_DEV
+          git archive --format=tar.gz --prefix="bornopata-$VERSION/" -o "target/package/bornopata-$VERSION-source.tar.gz" "$GITHUB_SHA"
+          (cd target/package && sha256sum "bornopata-$VERSION-source.tar.gz" > "bornopata-$VERSION-source.tar.gz.sha256")
+          mkdir -p target/upload
+          cp target/package/*.tar.gz target/package/*.sha256 target/upload/
+          cp release-notes.md target/upload/
+          ls -la target/upload
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-files
+          path: target/upload/*
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-files
+          path: files
+
+      # A version with a hyphen (0.1.0-alpha.1) is a pre-release. The release is created once; a second run for the same
+      # tag fails instead of replacing files people may already have downloaded.
+      - name: Create the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=()
+          [[ "$GITHUB_REF_NAME" != *-* ]] || flags+=(--prerelease)
+          gh release create "$GITHUB_REF_NAME" files/*.tar.gz files/*.sha256 \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --title "Bornopata ${GITHUB_REF_NAME#v}" \
+            --notes-file files/release-notes.md "${flags[@]}"
