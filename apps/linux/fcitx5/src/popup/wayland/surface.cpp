@@ -15,6 +15,9 @@ std::unique_ptr<Surface> Surface::create(Display &display, zwp_input_method_v2 *
     std::unique_ptr<Surface> self(new Surface(display, std::move(onScale)));
     self->surface_ = wl_compositor_create_surface(display.compositor);
     if (!self->surface_) return nullptr;
+    // Before anything can arrive for the surface: Fcitx5's pointer handler must find something harmless in its user data.
+    self->guard_.owner = self.get();
+    wl_surface_set_user_data(self->surface_, &self->guard_);
     // Its pointer and touch events are not wanted: the popup shows words, the keys choose them.
     if (auto *region = wl_compositor_create_region(display.compositor)) {
         wl_surface_set_input_region(self->surface_, region);
@@ -27,7 +30,7 @@ std::unique_ptr<Surface> Surface::create(Display &display, zwp_input_method_v2 *
         wp_fractional_scale_v1_add_listener(self->fractional_, &fractional, self.get());
     } else if (display.compositorVersion >= 6) {
         static const wl_surface_listener listener = {noop, noop, preferredBufferScale, noopTransform};
-        wl_surface_add_listener(self->surface_, &listener, self.get());
+        wl_surface_add_listener(self->surface_, &listener, &self->guard_);
     }
     if (display.viewporter) self->viewport_ = wp_viewporter_get_viewport(display.viewporter, self->surface_);
     self->popup_ = zwp_input_method_v2_get_input_popup_surface(input, self->surface_);
@@ -61,7 +64,7 @@ void Surface::attach(wl_buffer *buffer, const Bitmap &bitmap) {
 }
 
 void Surface::preferredBufferScale(void *data, wl_surface *, int32_t factor) {
-    auto *self = static_cast<Surface *>(data);
+    auto *self = static_cast<Surface *>(static_cast<Guard *>(data)->owner);
     if (self->onScale_ && factor > 0) self->onScale_(static_cast<uint32_t>(factor) * 120);
 }
 

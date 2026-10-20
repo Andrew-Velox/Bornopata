@@ -1,6 +1,7 @@
 //! The popup surface of one input context: the `wl_surface` the compositor places at the caret, and what shows a buffer on it at the right size.
 #pragma once
 #include "display.h"
+#include "guard.h"
 #include "popup/presenter.h"
 #include <functional>
 #include <memory>
@@ -31,6 +32,9 @@ private:
 
     Display &display_;
     std::function<void(uint32_t)> onScale_;
+
+    /// The surface's user data; see guard.h. It outlives the proxy.
+    Guard guard_;
     wl_surface *surface_ = nullptr;
     zwp_input_popup_surface_v2 *popup_ = nullptr;
     wp_viewport *viewport_ = nullptr;

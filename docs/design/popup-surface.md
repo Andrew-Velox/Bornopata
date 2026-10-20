@@ -53,6 +53,7 @@ The compositor puts the top-left corner of the popup at the caret. The popup the
 
 ## Limits and risks
 
+- **Fcitx5 crashes on a surface of its connection that it did not make, when the pointer or a finger meets it.** `classicui` turns the surface of a `wl_pointer.enter` into its wrapper object through the proxy's user data and calls `userData()` on it; for the popup surface that is a null pointer, and Fcitx5 dies (the keyboard goes with it until it is restarted). The popup surface therefore carries a zeroed guard block as its user data (`popup/wayland/guard.h`), which makes the handler take its "not my window" return. Seen once on a real session before the guard; after it a pointer swept over a visible popup does nothing.
 - Mouse clicks on rows do not work in the popup: compositors do not send pointer events to input-method popups. Keys select.
 - GNOME has no `input-method-v2`; nothing changes there. KDE uses the v1 protocol with a cursor rectangle that Fcitx5 does receive, so the layer-shell window keeps serving it where it works; a v1 panel surface is a possible later step.
 - The proxy search depends on Fcitx5 storing itself as the proxy's user data. If it ever stops, nothing is found and the feature switches itself off (logged once). The proper fix is an upstream function that exports the popup creation.
