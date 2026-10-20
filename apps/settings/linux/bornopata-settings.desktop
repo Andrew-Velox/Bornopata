@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Bornopata Settings
+Name[bn]=বর্ণপাতা সেটিংস
+GenericName=Bangla input method settings
+Comment=Choose how Bornopata types, looks and learns
+Exec=@PREFIX@/bin/bornopata-settings
+Icon=bornopata
+Terminal=false
+Categories=Settings;
+Keywords=bangla;bengali;bornopata;input;keyboard;fcitx;
+StartupWMClass=bornopata-settings

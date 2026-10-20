@@ -33,8 +33,14 @@ def main():
                 print(f'keeping modified file: {path}')
         manifest.unlink(missing_ok=True)
         return
+    # The settings program is optional: --settings FILE adds it, with its launcher entry and icon.
+    settings = None
+    if '--settings' in args:
+        at = args.index('--settings')
+        settings = Path(args[at + 1])
+        del args[at:at + 2]
     if len(args) not in (4, 5):
-        raise SystemExit('install needs: <prefix> <repo root> <server binary> <plugin> <gloss file> [dictionary file]')
+        raise SystemExit('install needs: <prefix> <repo root> <server binary> <plugin> <gloss file> [dictionary file] [--settings FILE]')
     root, server, plugin, gloss, *dictionary = map(Path, args)
     data = Path(os.environ.get('XDG_DATA_HOME', str(Path.home() / '.local/share')))
     if not data.is_absolute():
@@ -49,6 +55,11 @@ def main():
         # A packaged release brings the dictionary; installing from source leaves it to the user (docs/notes/linux-fcitx5.md).
         files[prefix / 'share/licenses/bornopata/DICTIONARY-ATTRIBUTION.txt'] = root / 'assets/dictionary/ATTRIBUTION.txt'
         files[data / 'bornopata/words.bnd'] = dictionary[0]
+    desktop = data / 'applications/bornopata-settings.desktop'
+    if settings:
+        files[prefix / 'bin/bornopata-settings'] = settings
+        files[desktop] = root / 'apps/settings/linux/bornopata-settings.desktop'
+        files[data / 'icons/hicolor/scalable/apps/bornopata.svg'] = root / 'apps/settings/linux/bornopata.svg'
     for kind in ('addon', 'inputmethod'):
         files[data / f'fcitx5/{kind}/bornopata.conf'] = root / f'apps/linux/fcitx5/data/{kind}/bornopata.conf'
     config = Path(os.environ.get('XDG_CONFIG_HOME', str(Path.home() / '.config')))
@@ -67,6 +78,8 @@ def main():
         shutil.copy2(source, temporary)
         if target == data / 'fcitx5/addon/bornopata.conf':
             temporary.write_text(temporary.read_text().replace('Library=bornopata\n', f'Library={prefix}/lib/fcitx5/bornopata\n'))
+        if target == desktop:
+            temporary.write_text(temporary.read_text().replace('@PREFIX@', str(prefix)))
         if target == unit:
             temporary.write_text(temporary.read_text().replace('@PREFIX@', str(prefix)))
         temporary.replace(target)

@@ -31,7 +31,7 @@ if ((${#missing[@]})); then
 fi
 install_prefix=$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$install_prefix")
 cargo_output=$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "${CARGO_TARGET_DIR:-$repo_root/target}")
-cargo_args=(build --manifest-path "$repo_root/Cargo.toml" --target-dir "$cargo_output" -p borno-linux-server --locked)
+cargo_args=(build --manifest-path "$repo_root/Cargo.toml" --target-dir "$cargo_output" -p borno-linux-server -p borno-settings --locked)
 [[ "$build_profile" != release ]] || cargo_args+=(--release)
 cargo "${cargo_args[@]}"
 # The English glosses beside the candidates: built from the table in assets/gloss and installed next to the dictionary.
@@ -42,6 +42,7 @@ gloss_flags=()
 cmake_output="$repo_root/target/fcitx5-install-$build_profile"
 cmake -S "$repo_root/apps/linux/fcitx5" -B "$cmake_output" "-DCMAKE_BUILD_TYPE=$cmake_type" -DBUILD_TESTING=OFF
 cmake --build "$cmake_output" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
-python3 "$repo_root/apps/linux/scripts/files.py" install "$install_prefix" "$repo_root" "$cargo_output/$build_profile/borno-linux-server" "$cmake_output/bornopata.so" "$gloss_file"
+python3 "$repo_root/apps/linux/scripts/files.py" install "$install_prefix" "$repo_root" "$cargo_output/$build_profile/borno-linux-server" "$cmake_output/bornopata.so" "$gloss_file" \
+  --settings "$cargo_output/$build_profile/bornopata-settings"
 printf 'Glosses: %s\n' "$(cat "$repo_root/assets/gloss/ATTRIBUTION.txt")"
-printf 'Installed.\nStart the Server: systemctl --user daemon-reload && systemctl --user enable --now bornopata   (or run %s/bin/borno-linux-server yourself)\nRestart Fcitx5, then add "Bornopata" in the configuration tool (untick "Only show current language").\n' "$install_prefix"
+printf 'Installed.\nSettings: search for "Bornopata Settings" in your application launcher, or run %s/bin/bornopata-settings.\nStart the Server: systemctl --user daemon-reload && systemctl --user enable --now bornopata   (or run %s/bin/borno-linux-server yourself)\nRestart Fcitx5, then add "Bornopata" in the configuration tool (untick "Only show current language").\n' "$install_prefix" "$install_prefix"

@@ -3,21 +3,22 @@
 # The parts are built by the release workflow (or by hand: cargo build --release, cmake, borno-gloss-build export).
 set -euo pipefail
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd)
-server='' plugin='' gloss='' dictionary='' licenses='' allow_dev=0 out="$repo_root/target/package"
+server='' settings='' plugin='' gloss='' dictionary='' licenses='' allow_dev=0 out="$repo_root/target/package"
 while (($#)); do
   case "$1" in
     --server) server=${2:?}; shift 2 ;;
+    --settings) settings=${2:?}; shift 2 ;;
     --plugin) plugin=${2:?}; shift 2 ;;
     --gloss) gloss=${2:?}; shift 2 ;;
     --dictionary) dictionary=${2:?}; shift 2 ;;
     --licenses) licenses=${2:?}; shift 2 ;;
     --out) out=${2:?}; shift 2 ;;
     --allow-dev) allow_dev=1; shift ;;
-    --help) echo 'usage: package.sh --server FILE --plugin FILE --gloss FILE --dictionary FILE [--licenses FILE] [--out DIR] [--allow-dev]'; exit 0 ;;
+    --help) echo 'usage: package.sh --server FILE --settings FILE --plugin FILE --gloss FILE --dictionary FILE [--licenses FILE] [--out DIR] [--allow-dev]'; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
-for part in "$server" "$plugin" "$gloss" "$dictionary"; do
+for part in "$server" "$settings" "$plugin" "$gloss" "$dictionary"; do
   [[ -f "$part" ]] || { echo "missing part: ${part:-<not given>} (see --help)" >&2; exit 2; }
 done
 version=$("$server" --version | awk '{print $NF}')
@@ -25,8 +26,9 @@ version=$("$server" --version | awk '{print $NF}')
 name="bornopata-$version-linux-x86_64"
 stage="$out/$name"
 rm -rf "$stage"
-mkdir -p "$stage"/{bin,lib,data,assets/gloss,assets/emoji,assets/dictionary,apps/linux/fcitx5/data,apps/linux/systemd}
+mkdir -p "$stage"/{bin,lib,data,assets/gloss,assets/emoji,assets/dictionary,apps/linux/fcitx5/data,apps/linux/systemd,apps/settings/linux}
 install -m 755 "$server" "$stage/bin/borno-linux-server"
+install -m 755 "$settings" "$stage/bin/bornopata-settings"
 install -m 644 "$plugin" "$stage/lib/bornopata.so"
 install -m 644 "$gloss" "$stage/data/gloss-en.bnd"
 install -m 644 "$dictionary" "$stage/data/words.bnd"
@@ -37,6 +39,7 @@ cp "$repo_root/assets/emoji/LICENSE-unicode.txt" "$stage/assets/emoji/"
 cp "$repo_root/assets/dictionary/ATTRIBUTION.txt" "$stage/assets/dictionary/"
 cp -r "$repo_root/apps/linux/fcitx5/data/addon" "$repo_root/apps/linux/fcitx5/data/inputmethod" "$stage/apps/linux/fcitx5/data/"
 cp "$repo_root/apps/linux/systemd/bornopata.service" "$stage/apps/linux/systemd/"
+cp "$repo_root/apps/settings/linux/bornopata-settings.desktop" "$repo_root/apps/settings/linux/bornopata.svg" "$stage/apps/settings/linux/"
 install -m 755 "$repo_root/apps/linux/scripts/package-install.sh" "$stage/install.sh"
 install -m 755 "$repo_root/apps/linux/scripts/uninstall.sh" "$stage/uninstall.sh"
 install -m 755 "$repo_root/apps/linux/scripts/files.py" "$stage/files.py"
@@ -45,6 +48,7 @@ Bornopata $version, a Bangla (Avro phonetic) input method for Fcitx5 on Linux.
 
 Install:    ./install.sh            (into ~/.local; --prefix DIR for another place)
 Uninstall:  ./uninstall.sh
+Settings:   search for "Bornopata Settings" in your application launcher
 Then:       systemctl --user daemon-reload && systemctl --user enable --now bornopata
             restart Fcitx5 and add "Bornopata" in its configuration tool.
 
