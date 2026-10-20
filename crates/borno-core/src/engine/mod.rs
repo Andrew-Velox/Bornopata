@@ -24,6 +24,7 @@ use crate::composition::Composition;
 use crate::learner::{Learner, NoLearner};
 use crate::lm::{LanguageModel, NoLanguageModel};
 use crate::phrase::{NoPhrases, PhraseSource};
+use crate::shortcut::Clock;
 
 /// The only entry point a shell needs. Single-threaded state: one engine per input context.
 pub struct Engine {
@@ -33,6 +34,7 @@ pub struct Engine {
     language_model: Box<dyn LanguageModel>,
     annotator: Box<dyn Annotator>,
     phrases: Box<dyn PhraseSource>,
+    clock: Option<Box<dyn Clock>>,
 
     /// The word being typed.
     composition: Composition,
@@ -66,6 +68,7 @@ impl Engine {
             language_model: Box::new(NoLanguageModel),
             annotator: Box::new(NoAnnotator),
             phrases: Box::new(NoPhrases),
+            clock: None,
             composition: Composition::default(),
             candidates: Vec::new(),
             highlighted: 0,
@@ -95,6 +98,12 @@ impl Engine {
     /// Adds the user's own phrases: a text given to exactly the typed code comes first in the list.
     pub fn with_phrases(mut self, phrases: Box<dyn PhraseSource>) -> Self {
         self.phrases = phrases;
+        self
+    }
+
+    /// Turns on the date and time shortcuts (`tarikh`, `somoy`, `bar`), which read the time from `clock`.
+    pub fn with_clock(mut self, clock: Box<dyn Clock>) -> Self {
+        self.clock = Some(clock);
         self
     }
 

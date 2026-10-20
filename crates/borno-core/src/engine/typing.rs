@@ -54,8 +54,14 @@ impl Engine {
     pub fn commit(&mut self) -> Option<String> {
         let candidate = self.candidates.get(self.highlighted)?;
         let text = candidate.text.clone();
-        // A phrase is typed on purpose and can be private (an address, a signature); the learner never sees it.
-        if self.learning && candidate.source != CandidateSource::Phrase {
+        // A phrase is typed on purpose and can be private (an address, a signature), and a date is only true today;
+        // the learner never sees either.
+        if self.learning
+            && !matches!(
+                candidate.source,
+                CandidateSource::Phrase | CandidateSource::Shortcut
+            )
+        {
             self.learner
                 .record(self.composition.as_str(), &text, self.previous.as_deref());
         }

@@ -10,6 +10,7 @@ pub mod engine;
 pub mod learner;
 pub mod lm;
 pub mod phrase;
+pub mod shortcut;
 pub mod storage;
 
 pub use annotator::{Annotation, Annotator, NoAnnotator};
@@ -19,3 +20,4 @@ pub use engine::{Engine, Query, Timings, Typed};
 pub use learner::{Learner, NoLearner};
 pub use lm::{LanguageModel, NoLanguageModel};
 pub use phrase::{NoPhrases, Parsed, PhraseBook, PhraseProblem, PhraseSource};
+pub use shortcut::{Clock, LocalTime};

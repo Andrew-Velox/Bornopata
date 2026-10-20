@@ -17,6 +17,9 @@ pub struct GeneralConfig {
     /// glossary file `gloss-en.bnd` in the data directory; without it nothing is shown.
     pub gloss: bool,
 
+    /// Typing `tarikh`, `somoy` or `bar` also offers today's date, the time or the weekday, in Bangla.
+    pub shortcuts: bool,
+
     pub log_level: LogLevel,
 }
 
@@ -26,6 +29,7 @@ impl Default for GeneralConfig {
             learning: true,
             bangla_digits: true,
             gloss: true,
+            shortcuts: true,
             log_level: LogLevel::default(),
         }
     }

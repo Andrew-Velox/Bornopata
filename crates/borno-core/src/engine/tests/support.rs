@@ -149,3 +149,12 @@ impl borno_transliteration::WordSource for StubSource {
 pub fn stub_engine(words: Vec<(&'static str, &'static str, u32)>) -> Engine {
     Engine::new(Box::new(StubSource(words)))
 }
+
+/// A clock stopped at one moment.
+pub struct FixedClock(pub crate::LocalTime);
+
+impl crate::Clock for FixedClock {
+    fn now(&self) -> Option<crate::LocalTime> {
+        Some(self.0)
+    }
+}

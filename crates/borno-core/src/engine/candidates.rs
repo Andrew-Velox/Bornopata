@@ -5,7 +5,8 @@ use std::time::Instant;
 
 use super::ranking::{Evidence, edit_distance};
 use super::{Engine, Query, Timings};
-use crate::candidate::Candidate;
+use crate::candidate::{Candidate, CandidateSource};
+use crate::shortcut;
 
 /// Longer inputs get the direct conversion only: the word source is built for words, not paragraphs.
 const MAX_SUGGEST_LEN: usize = 64;
@@ -119,8 +120,32 @@ impl Engine {
         });
         let mut ranked: Vec<Candidate> =
             ranked.into_iter().map(|(_, candidate)| candidate).collect();
+        self.insert_shortcuts(input, &mut ranked);
         ranked.truncate(self.candidate_limit);
         timings.ranking = started.elapsed();
         (ranked, timings)
+    }
+
+    /// Puts today's date or the time after the first candidate, so the word the code also spells stays on top.
+    fn insert_shortcuts(&self, input: &str, ranked: &mut Vec<Candidate>) {
+        let Some(time) = self.clock.as_ref().and_then(|clock| clock.now()) else {
+            return;
+        };
+        let score = ranked.first().map_or(0.0, |first| first.score);
+        let mut at = ranked.len().min(1);
+        for text in shortcut::expand(input, &time) {
+            if ranked.iter().any(|candidate| candidate.text == text) {
+                continue;
+            }
+            ranked.insert(
+                at,
+                Candidate {
+                    text,
+                    source: CandidateSource::Shortcut,
+                    score,
+                },
+            );
+            at += 1;
+        }
     }
 }

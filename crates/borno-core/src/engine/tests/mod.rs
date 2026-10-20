@@ -4,6 +4,7 @@ mod annotations;
 mod completion;
 mod learning;
 mod phrases;
+mod shortcuts;
 mod support;
 mod typing;
 mod words;

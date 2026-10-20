@@ -8,6 +8,9 @@ pub enum CandidateSource {
     /// The user's own phrase for exactly this input.
     Phrase,
 
+    /// Today's date or the time of day, from a code such as `tarikh`.
+    Shortcut,
+
     /// The user chose this text for exactly this input before.
     Learned,
 
@@ -25,6 +28,7 @@ impl fmt::Display for CandidateSource {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(match self {
             Self::Phrase => "phrase",
+            Self::Shortcut => "shortcut",
             Self::Learned => "learned",
             Self::Direct => "direct",
             Self::Dictionary => "dictionary",

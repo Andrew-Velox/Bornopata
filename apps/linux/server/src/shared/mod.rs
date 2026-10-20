@@ -3,6 +3,7 @@
 //! Each Fcitx5 input context gets its own [`Engine`] (its own word being typed), but what was learned
 //! has to be one table, so the engines talk to these shared handles.
 
+mod clock;
 mod learner;
 mod model;
 mod phrases;
@@ -16,6 +17,7 @@ use borno_learning::FrequencyLearner;
 use borno_lm::BigramModel;
 use borno_transliteration::WordSource;
 
+use clock::SystemClock;
 use learner::SharedLearner;
 use model::SharedModel;
 use phrases::SharedPhrases;
@@ -33,6 +35,7 @@ pub struct Shared {
     model: Option<Arc<BigramModel>>,
     glossary: Option<Arc<Glossary>>,
     phrases: Option<Arc<FilePhrases>>,
+    shortcuts: bool,
 }
 
 impl Shared {
@@ -48,6 +51,7 @@ impl Shared {
             model: model.map(Arc::new),
             glossary: None,
             phrases: None,
+            shortcuts: false,
         }
     }
 
@@ -63,6 +67,12 @@ impl Shared {
         self
     }
 
+    /// Turns on the date and time shortcuts (`tarikh`, `somoy`, `bar`).
+    pub fn with_shortcuts(mut self, enabled: bool) -> Self {
+        self.shortcuts = enabled;
+        self
+    }
+
     /// A new engine for one input context.
     pub fn engine(&self) -> Engine {
         let mut engine = Engine::new(Box::new(SharedWords(self.words.clone())))
@@ -72,6 +82,9 @@ impl Shared {
         }
         if let Some(model) = &self.model {
             engine = engine.with_language_model(Box::new(SharedModel(model.clone())));
+        }
+        if self.shortcuts {
+            engine = engine.with_clock(Box::new(SystemClock));
         }
         if let Some(phrases) = &self.phrases {
             engine = engine.with_phrases(Box::new(SharedPhrases(phrases.clone())));

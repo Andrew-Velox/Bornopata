@@ -86,6 +86,7 @@ Then typing `bangl` offers বাংল first (what you typed) followed by ব�
 [general]
 learning = true          # remember choices (kept in ~/.local/share/bornopata)
 bangla_digits = true
+shortcuts = true         # tarikh, somoy and bar also offer today's date, the time and the weekday in Bangla
 gloss = true             # English gloss with part of speech beside each candidate ("n. rice"); needs gloss-en.bnd
 log_level = "info"       # logs in ~/.local/state/bornopata/logs
 
@@ -103,6 +104,8 @@ layout = "vertical"      # or "horizontal"
 Fonts: the window needs a Bengali font (Noto Sans Bengali from `noto-fonts` on Arch); `journalctl --user -u bornopata` or the log says which panel was chosen.
 
 The gloss file `gloss-en.bnd` (installed next to `words.bnd` by `install.sh`, or `$BORNOPATA_GLOSS`) is mapped at Server start when `gloss = true`; the log says how many entries were loaded. See [../design/glosses.md](../design/glosses.md).
+
+Date and time shortcuts (`[general] shortcuts`, on by default): after the first candidate, `tarikh` (or `tarik`) offers today's date as `২০ অক্টোবর ২০২৬`, `২০/১০/২০২৬`, `২০২৬-১০-২০` and the Bengali-calendar date `৫ কার্তিক ১৪৩৩`; `somoy` (or `shomoy`) offers the time as `২:০৫`, `দুপুর ২:০৫` and `১৪:০৫`; `bar` offers the weekday and the weekday with the date. The first candidate stays the word the code also spells (তারিখ, সময়, বার). The Bengali date follows the calendar of Bangladesh (the 1987 revision: the year starts on 14 April, Falgun has 31 days in the year with 29 February). These texts are never learned, since a date is only true today. Core takes the time from a `Clock` the Server provides, so tests fix it.
 
 Your own phrases go in `~/.local/share/bornopata/phrases.tsv` (the Server writes a commented template on first start and never overwrites it). One phrase per line, `code<TAB>text`: a code is Roman letters only and is matched exactly as typed, `\n` `\t` `\\` in the text give a line break, a tab and a backslash, and several lines with one code give several candidates in file order. Typing the code puts the text first in the list (marked like a learned choice); the ordinary words stay behind it. Phrases are never learned, so private text lives only in that file. The Server reads the file again within a couple of seconds of a save; a bad line is skipped and logged as a warning with its line number.
 
