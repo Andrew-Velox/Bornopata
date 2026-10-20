@@ -2,6 +2,7 @@
 
 use super::Engine;
 use crate::annotator::Annotation;
+use crate::candidate::CandidateSource;
 
 impl Engine {
     /// The annotation of any `word`, for words that are not candidates (next-word suggestions).
@@ -14,7 +15,13 @@ impl Engine {
     pub fn annotations(&self) -> Vec<Option<Annotation>> {
         self.candidates
             .iter()
-            .map(|candidate| self.annotator.annotate(&candidate.text))
+            .map(|candidate| match candidate.source {
+                CandidateSource::Emoji => self.emoji.name(&candidate.text).map(|name| Annotation {
+                    pos: String::new(),
+                    text: name,
+                }),
+                _ => self.annotator.annotate(&candidate.text),
+            })
             .collect()
     }
 }

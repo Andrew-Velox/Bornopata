@@ -11,6 +11,9 @@ pub enum CandidateSource {
     /// Today's date or the time of day, from a code such as `tarikh`.
     Shortcut,
 
+    /// An emoji for a word in the list or for the English word typed.
+    Emoji,
+
     /// The user chose this text for exactly this input before.
     Learned,
 
@@ -29,6 +32,7 @@ impl fmt::Display for CandidateSource {
         f.write_str(match self {
             Self::Phrase => "phrase",
             Self::Shortcut => "shortcut",
+            Self::Emoji => "emoji",
             Self::Learned => "learned",
             Self::Direct => "direct",
             Self::Dictionary => "dictionary",

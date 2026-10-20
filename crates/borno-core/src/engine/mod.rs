@@ -2,6 +2,7 @@
 
 mod annotations;
 mod candidates;
+mod emoji;
 mod next_words;
 mod query;
 mod ranking;
@@ -21,6 +22,7 @@ use borno_transliteration::{Transliterator, WordSource};
 use crate::annotator::{Annotator, NoAnnotator};
 use crate::candidate::Candidate;
 use crate::composition::Composition;
+use crate::emoji::{EmojiSource, NoEmoji};
 use crate::learner::{Learner, NoLearner};
 use crate::lm::{LanguageModel, NoLanguageModel};
 use crate::phrase::{NoPhrases, PhraseSource};
@@ -34,6 +36,7 @@ pub struct Engine {
     language_model: Box<dyn LanguageModel>,
     annotator: Box<dyn Annotator>,
     phrases: Box<dyn PhraseSource>,
+    emoji: Box<dyn EmojiSource>,
     clock: Option<Box<dyn Clock>>,
 
     /// The word being typed.
@@ -68,6 +71,7 @@ impl Engine {
             language_model: Box::new(NoLanguageModel),
             annotator: Box::new(NoAnnotator),
             phrases: Box::new(NoPhrases),
+            emoji: Box::new(NoEmoji),
             clock: None,
             composition: Composition::default(),
             candidates: Vec::new(),
@@ -98,6 +102,12 @@ impl Engine {
     /// Adds the user's own phrases: a text given to exactly the typed code comes first in the list.
     pub fn with_phrases(mut self, phrases: Box<dyn PhraseSource>) -> Self {
         self.phrases = phrases;
+        self
+    }
+
+    /// Offers emoji from `emoji` next to the words they stand for.
+    pub fn with_emoji(mut self, emoji: Box<dyn EmojiSource>) -> Self {
+        self.emoji = emoji;
         self
     }
 

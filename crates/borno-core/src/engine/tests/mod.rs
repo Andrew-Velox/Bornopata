@@ -2,6 +2,7 @@
 
 mod annotations;
 mod completion;
+mod emoji;
 mod learning;
 mod phrases;
 mod shortcuts;

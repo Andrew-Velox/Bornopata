@@ -158,3 +158,20 @@ impl crate::Clock for FixedClock {
         Some(self.0)
     }
 }
+
+/// Emoji from a fixed list of keyword to emoji.
+pub struct FixedEmoji(pub &'static [(&'static str, &'static [&'static str])]);
+
+impl crate::EmojiSource for FixedEmoji {
+    fn lookup(&self, key: &str) -> Vec<String> {
+        self.0
+            .iter()
+            .filter(|(known, _)| *known == key)
+            .flat_map(|(_, emoji)| emoji.iter().map(|e| (*e).to_owned()))
+            .collect()
+    }
+
+    fn name(&self, emoji: &str) -> Option<String> {
+        Some(format!("name of {emoji}"))
+    }
+}

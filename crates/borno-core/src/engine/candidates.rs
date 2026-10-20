@@ -121,6 +121,7 @@ impl Engine {
         let mut ranked: Vec<Candidate> =
             ranked.into_iter().map(|(_, candidate)| candidate).collect();
         self.insert_shortcuts(input, &mut ranked);
+        self.insert_emoji(input, &mut ranked);
         ranked.truncate(self.candidate_limit);
         timings.ranking = started.elapsed();
         (ranked, timings)

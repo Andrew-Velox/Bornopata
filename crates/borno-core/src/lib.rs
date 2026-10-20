@@ -6,6 +6,7 @@
 pub mod annotator;
 pub mod candidate;
 pub mod composition;
+pub mod emoji;
 pub mod engine;
 pub mod learner;
 pub mod lm;
@@ -16,6 +17,7 @@ pub mod storage;
 pub use annotator::{Annotation, Annotator, NoAnnotator};
 pub use candidate::{Candidate, CandidateSource};
 pub use composition::Composition;
+pub use emoji::{EmojiSource, NoEmoji};
 pub use engine::{Engine, Query, Timings, Typed};
 pub use learner::{Learner, NoLearner};
 pub use lm::{LanguageModel, NoLanguageModel};
