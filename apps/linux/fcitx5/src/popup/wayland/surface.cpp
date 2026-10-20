@@ -39,6 +39,13 @@ std::unique_ptr<Surface> Surface::create(Display &display, zwp_input_method_v2 *
 }
 
 Surface::~Surface() {
+    // Unmap before destroying: a compositor that is only told the surface is gone may leave the last frame painted
+    // where it was (Hyprland does), while an unmap makes it repaint the whole area.
+    if (surface_) {
+        wl_surface_attach(surface_, nullptr, 0, 0);
+        wl_surface_commit(surface_);
+        wl_display_flush(display_.display);
+    }
     if (fractional_) wp_fractional_scale_v1_destroy(fractional_);
     if (viewport_) wp_viewport_destroy(viewport_);
     if (popup_) zwp_input_popup_surface_v2_destroy(popup_);
