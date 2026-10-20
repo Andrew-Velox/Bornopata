@@ -76,6 +76,14 @@ impl Engine {
         }
         timings.dictionary = started.elapsed();
 
+        for (position, text) in self.phrases.lookup(input).into_iter().enumerate() {
+            let entry = evidence.entry(text.clone()).or_insert_with(|| {
+                order.push(text);
+                Evidence::default()
+            });
+            entry.phrase.get_or_insert(position);
+        }
+
         let started = Instant::now();
         for (text, _) in self.learner.choices(input) {
             evidence.entry(text.clone()).or_insert_with(|| {

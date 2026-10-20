@@ -30,9 +30,16 @@ const MAX_DISTANCE: usize = 5;
 /// `log P` values below this add nothing: the model barely knows the pair.
 const LM_FLOOR: f64 = -10.0;
 
+/// A phrase of the user outranks everything else; later lines of the file go after earlier ones.
+const PHRASE_PRIOR: f64 = 1000.0;
+const PHRASE_STEP: f64 = 10.0;
+
 /// Everything known about one candidate text when it is scored.
 #[derive(Debug, Default)]
 pub(super) struct Evidence {
+    /// Position of this text among the user's phrases for the input, when it is one.
+    pub phrase: Option<usize>,
+
     /// The direct conversion produced this text.
     pub direct: bool,
 
@@ -57,7 +64,9 @@ pub(super) struct Evidence {
 impl Evidence {
     /// Learned wins over direct, direct over dictionary, dictionary over completion.
     pub fn source(&self) -> CandidateSource {
-        if self.choice_weight > 0 {
+        if self.phrase.is_some() {
+            CandidateSource::Phrase
+        } else if self.choice_weight > 0 {
             CandidateSource::Learned
         } else if self.direct {
             CandidateSource::Direct
@@ -90,7 +99,10 @@ impl Evidence {
         } else {
             0.0
         };
-        prior - spelling_gap
+        let phrase = self
+            .phrase
+            .map_or(0.0, |position| PHRASE_PRIOR - PHRASE_STEP * position as f64);
+        phrase + prior - spelling_gap
             + FREQUENCY_WEIGHT * f64::from(self.frequency).log10_1p()
             + CHOICE_WEIGHT * f64::from(self.choice_weight).ln_1p()
             + WORD_WEIGHT * f64::from(self.word_weight).ln_1p()

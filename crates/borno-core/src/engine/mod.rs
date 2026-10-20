@@ -23,6 +23,7 @@ use crate::candidate::Candidate;
 use crate::composition::Composition;
 use crate::learner::{Learner, NoLearner};
 use crate::lm::{LanguageModel, NoLanguageModel};
+use crate::phrase::{NoPhrases, PhraseSource};
 
 /// The only entry point a shell needs. Single-threaded state: one engine per input context.
 pub struct Engine {
@@ -31,6 +32,7 @@ pub struct Engine {
     learner: Box<dyn Learner>,
     language_model: Box<dyn LanguageModel>,
     annotator: Box<dyn Annotator>,
+    phrases: Box<dyn PhraseSource>,
 
     /// The word being typed.
     composition: Composition,
@@ -63,6 +65,7 @@ impl Engine {
             learner: Box::new(NoLearner),
             language_model: Box::new(NoLanguageModel),
             annotator: Box::new(NoAnnotator),
+            phrases: Box::new(NoPhrases),
             composition: Composition::default(),
             candidates: Vec::new(),
             highlighted: 0,
@@ -86,6 +89,12 @@ impl Engine {
     /// Sets the source of the annotation shown beside each candidate; see [`Engine::annotations`].
     pub fn with_annotator(mut self, annotator: Box<dyn Annotator>) -> Self {
         self.annotator = annotator;
+        self
+    }
+
+    /// Adds the user's own phrases: a text given to exactly the typed code comes first in the list.
+    pub fn with_phrases(mut self, phrases: Box<dyn PhraseSource>) -> Self {
+        self.phrases = phrases;
         self
     }
 

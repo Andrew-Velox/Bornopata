@@ -15,7 +15,8 @@ fn gloss(annotation: Option<Annotation>) -> Option<FrameGloss> {
 
 fn source(source: CandidateSource) -> Source {
     match source {
-        CandidateSource::Learned => Source::Learned,
+        // The user's own text is marked like a learned choice; the wire format has no separate kind for it.
+        CandidateSource::Phrase | CandidateSource::Learned => Source::Learned,
         CandidateSource::Direct => Source::Direct,
         CandidateSource::Dictionary => Source::Dictionary,
         CandidateSource::Completion => Source::Completion,

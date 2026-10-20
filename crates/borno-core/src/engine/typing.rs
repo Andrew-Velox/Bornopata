@@ -1,6 +1,7 @@
 //! Typing, editing the composition, highlighting and committing.
 
 use super::{Engine, Typed};
+use crate::candidate::CandidateSource;
 
 /// Characters that end a sentence: the context for the next word starts over after them.
 const SENTENCE_ENDS: [char; 3] = ['.', '?', '!'];
@@ -53,7 +54,8 @@ impl Engine {
     pub fn commit(&mut self) -> Option<String> {
         let candidate = self.candidates.get(self.highlighted)?;
         let text = candidate.text.clone();
-        if self.learning {
+        // A phrase is typed on purpose and can be private (an address, a signature); the learner never sees it.
+        if self.learning && candidate.source != CandidateSource::Phrase {
             self.learner
                 .record(self.composition.as_str(), &text, self.previous.as_deref());
         }
