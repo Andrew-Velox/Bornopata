@@ -33,9 +33,9 @@ def main():
                 print(f'keeping modified file: {path}')
         manifest.unlink(missing_ok=True)
         return
-    if len(args) != 4:
-        raise SystemExit('install needs: <prefix> <repo root> <server binary> <plugin> <gloss file>')
-    root, server, plugin, gloss = map(Path, args)
+    if len(args) not in (4, 5):
+        raise SystemExit('install needs: <prefix> <repo root> <server binary> <plugin> <gloss file> [dictionary file]')
+    root, server, plugin, gloss, *dictionary = map(Path, args)
     data = Path(os.environ.get('XDG_DATA_HOME', str(Path.home() / '.local/share')))
     if not data.is_absolute():
         raise SystemExit('XDG_DATA_HOME must be an absolute path')
@@ -45,6 +45,10 @@ def main():
     files[prefix / 'share/licenses/bornopata/GLOSS-ATTRIBUTION.txt'] = root / 'assets/gloss/ATTRIBUTION.txt'
     files[prefix / 'share/licenses/bornopata/EMOJI-LICENSE-UNICODE.txt'] = root / 'assets/emoji/LICENSE-unicode.txt'
     files[data / 'bornopata/gloss-en.bnd'] = gloss
+    if dictionary:
+        # A packaged release brings the dictionary; installing from source leaves it to the user (docs/notes/linux-fcitx5.md).
+        files[prefix / 'share/licenses/bornopata/DICTIONARY-ATTRIBUTION.txt'] = root / 'assets/dictionary/ATTRIBUTION.txt'
+        files[data / 'bornopata/words.bnd'] = dictionary[0]
     for kind in ('addon', 'inputmethod'):
         files[data / f'fcitx5/{kind}/bornopata.conf'] = root / f'apps/linux/fcitx5/data/{kind}/bornopata.conf'
     config = Path(os.environ.get('XDG_CONFIG_HOME', str(Path.home() / '.config')))

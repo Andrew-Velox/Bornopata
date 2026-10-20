@@ -35,14 +35,10 @@ cargo_args=(build --manifest-path "$repo_root/Cargo.toml" --target-dir "$cargo_o
 [[ "$build_profile" != release ]] || cargo_args+=(--release)
 cargo "${cargo_args[@]}"
 # The English glosses beside the candidates: built from the table in assets/gloss and installed next to the dictionary.
-gloss_args=(build --manifest-path "$repo_root/Cargo.toml" --target-dir "$cargo_output" -p borno-gloss-build --locked)
-[[ "$build_profile" != release ]] || gloss_args+=(--release)
-cargo "${gloss_args[@]}"
 gloss_file="$repo_root/target/gloss-install/gloss-en.bnd"
-mkdir -p "$(dirname "$gloss_file")"
-"$cargo_output/$build_profile/borno-gloss-build" export --entries "$repo_root/assets/gloss/gloss-en.tsv" -o "$gloss_file" \
-  --license CC-BY-SA-4.0 --attribution "$(cat "$repo_root/assets/gloss/ATTRIBUTION.txt")" \
-  --source https://kaikki.org/dictionary/Bengali/ --version 2026-10 --name "Bornopata English glosses"
+gloss_flags=()
+[[ "$build_profile" != debug ]] || gloss_flags+=(--debug)
+"$repo_root/apps/linux/scripts/build-gloss.sh" "$gloss_file" "${gloss_flags[@]}"
 cmake_output="$repo_root/target/fcitx5-install-$build_profile"
 cmake -S "$repo_root/apps/linux/fcitx5" -B "$cmake_output" "-DCMAKE_BUILD_TYPE=$cmake_type" -DBUILD_TESTING=OFF
 cmake --build "$cmake_output" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"

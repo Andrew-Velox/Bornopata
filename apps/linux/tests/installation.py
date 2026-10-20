@@ -54,4 +54,18 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     assert not (prefix / 'share/licenses/bornopata/EMOJI-LICENSE-UNICODE.txt').exists()
     assert user.read_text() == 'learned data' and other.read_text() == 'another input method'
     assert modified.read_text() == 'edited by the user'
+
+# A packaged release also brings the dictionary and its attribution.
+with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
+    directory = Path(temporary)
+    for name in ('server', 'plugin', 'gloss-en.bnd', 'words.bnd'):
+        (directory / name).write_bytes(f'test {name}\n'.encode())
+    env = dict(os.environ, XDG_DATA_HOME=str(directory / 'data'), XDG_CONFIG_HOME=str(directory / 'config'))
+    args = ['python3', str(helper), 'install', str(directory / 'prefix'), str(root)]
+    args += [str(directory / name) for name in ('server', 'plugin', 'gloss-en.bnd', 'words.bnd')]
+    subprocess.run(args, env=env, check=True)
+    assert (directory / 'data/bornopata/words.bnd').read_bytes() == b'test words.bnd\n'
+    assert 'CC BY-SA 4.0' in (directory / 'prefix/share/licenses/bornopata/DICTIONARY-ATTRIBUTION.txt').read_text()
+    subprocess.run(['python3', str(helper), 'uninstall', str(directory / 'prefix')], env=env, check=True)
+    assert not (directory / 'data/bornopata/words.bnd').exists()
 print('install, reinstall, manifest and uninstall tests passed')
