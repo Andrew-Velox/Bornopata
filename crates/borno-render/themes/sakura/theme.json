@@ -14,7 +14,8 @@
     "accent": "#d0508f",
     "star": "#e39a2d",
     "line": "#d0508f26",
-    "border": "#d0508f66",
+    "border": "#efa9c7",
+    "border_inner": "#d0508fb3",
     "surface_top": "#fffafc",
     "surface_bottom": "#fbe8f2",
     "pill_top": "#ffdcec",
@@ -59,9 +60,11 @@
     "vertical": {
       "type": "frame", "direction": "column", "padding": [10, 10, 10, 10], "min_width": 200,
       "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 16,
-      "border": { "width": 2, "color": "@border" },
+      "border": { "width": 3, "color": "@border" },
       "effects": [],
       "children": [
+        { "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0], "radius": 13,
+          "border": { "width": 1, "color": "@border_inner" } },
         { "type": "use", "component": "petals" },
         { "type": "use", "component": "top_line" },
         { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
@@ -72,7 +75,7 @@
     "horizontal": {
       "type": "frame", "direction": "column", "padding": 10,
       "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 16,
-      "border": { "width": 2, "color": "@border" },
+      "border": { "width": 3, "color": "@border" },
       "effects": [],
       "children": [
         { "type": "use", "component": "top_line" },
