@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="-22 -22 44 44">
+  <defs>
+    <linearGradient id="outer" x1="0" y1="0" x2="0" y2="-20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#fff1f6"/>
+      <stop offset="1" stop-color="#ff9fc3"/>
+    </linearGradient>
+    <linearGradient id="inner" x1="0" y1="0" x2="0" y2="-15" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffef2"/>
+      <stop offset="1" stop-color="#ffc6dc"/>
+    </linearGradient>
+    <path id="petal" d="M0,0 C-4.6,-5 -4.4,-14 0,-20 C4.4,-14 4.6,-5 0,0 Z"/>
+    <path id="small" d="M0,0 C-3.4,-4 -3.2,-10.5 0,-15 C3.2,-10.5 3.4,-4 0,0 Z"/>
+  </defs>
+  <g fill="url(#outer)" stroke="#ee86ae" stroke-width="0.5" stroke-opacity="0.7">
+    <use href="#petal" transform="rotate(0)"/>
+    <use href="#petal" transform="rotate(45)"/>
+    <use href="#petal" transform="rotate(90)"/>
+    <use href="#petal" transform="rotate(135)"/>
+    <use href="#petal" transform="rotate(180)"/>
+    <use href="#petal" transform="rotate(225)"/>
+    <use href="#petal" transform="rotate(270)"/>
+    <use href="#petal" transform="rotate(315)"/>
+  </g>
+  <g fill="url(#inner)" stroke="#ee86ae" stroke-width="0.4" stroke-opacity="0.6">
+    <use href="#small" transform="rotate(22.5)"/>
+    <use href="#small" transform="rotate(67.5)"/>
+    <use href="#small" transform="rotate(112.5)"/>
+    <use href="#small" transform="rotate(157.5)"/>
+    <use href="#small" transform="rotate(202.5)"/>
+    <use href="#small" transform="rotate(247.5)"/>
+    <use href="#small" transform="rotate(292.5)"/>
+    <use href="#small" transform="rotate(337.5)"/>
+  </g>
+  <circle r="3.8" fill="#ffe27a"/>
+  <g fill="#f2a61f">
+    <circle cx="0.00" cy="-5.60" r="0.9"/>
+    <circle cx="3.96" cy="-3.96" r="0.9"/>
+    <circle cx="5.60" cy="-0.00" r="0.9"/>
+    <circle cx="3.96" cy="3.96" r="0.9"/>
+    <circle cx="0.00" cy="5.60" r="0.9"/>
+    <circle cx="-3.96" cy="3.96" r="0.9"/>
+    <circle cx="-5.60" cy="0.00" r="0.9"/>
+    <circle cx="-3.96" cy="-3.96" r="0.9"/>
+  </g>
+</svg>

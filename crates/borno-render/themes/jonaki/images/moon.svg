@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-20 -20 40 40">
+  <defs>
+    <linearGradient id="m" x1="-10" y1="-14" x2="8" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff6c4"/>
+      <stop offset="1" stop-color="#ffc94d"/>
+    </linearGradient>
+    <mask id="cut" maskUnits="userSpaceOnUse" x="-20" y="-20" width="40" height="40">
+      <rect x="-20" y="-20" width="40" height="40" fill="#ffffff"/>
+      <circle cx="6" cy="-4" r="11.5" fill="#000000"/>
+    </mask>
+    <path id="star" d="M0,-3 L0.8,-0.8 L3,0 L0.8,0.8 L0,3 L-0.8,0.8 L-3,0 L-0.8,-0.8 Z"/>
+  </defs>
+  <circle r="14" fill="url(#m)" mask="url(#cut)"/>
+  <use href="#star" fill="#fff6c4" transform="translate(13,-12)"/>
+  <use href="#star" fill="#fff6c4" fill-opacity="0.8" transform="translate(16,2) scale(0.6)"/>
+</svg>

@@ -50,10 +50,10 @@ toggle = "ctrl+alt+space"
 # the layer-shell window. "fcitx": always Fcitx5's panel.
 mode = "auto"
 
-# "bornopata" or "sakura", or the path of a theme directory.
+# "bornopata", "sakura", "shapla", "borsha" or "jonaki", or the path of a theme directory.
 theme = "bornopata"
 
-# The dark variant of themes that have one (sakura is always light).
+# The dark variant of themes that have one (sakura, shapla and borsha are always light, jonaki always dark).
 dark = false
 
 # "vertical" or "horizontal".

@@ -218,3 +218,78 @@ fn the_sakura_theme_animates_and_keeps_its_blossom_inside_the_bitmap() {
         .unwrap();
     assert!(plain.next_frame.is_none());
 }
+
+#[test]
+fn every_built_in_theme_renders_both_layouts_and_the_decorated_ones_animate() {
+    let Some(mut renderer) = renderer() else {
+        return;
+    };
+    for id in ["sakura", "shapla", "borsha", "jonaki"] {
+        let theme = Theme::builtin(id, false).unwrap_or_else(|| panic!("{id} is built in"));
+        for layout in [Layout::Vertical, Layout::Horizontal] {
+            renderer.forget();
+            let first = renderer
+                .render(&shaping(), layout, &theme, 2.0)
+                .unwrap_or_else(|error| panic!("{id}: {error}"));
+            // A loop of petals, ripples, rain or fireflies asks for more frames.
+            assert!(first.next_frame.is_some(), "{id} does not animate");
+            assert!(
+                first.content_width > 150 && first.content_height > 60,
+                "{id}"
+            );
+        }
+    }
+}
+
+#[test]
+fn the_new_themes_move_over_time() {
+    let Some(mut renderer) = renderer() else {
+        return;
+    };
+    for id in ["shapla", "borsha", "jonaki"] {
+        let theme = Theme::builtin(id, false).unwrap();
+        let start = std::time::Instant::now();
+        let first = renderer
+            .render_at(&shaping(), Layout::Vertical, &theme, 2.0, start)
+            .unwrap();
+        // Part-way through the loops something has changed in the drawing.
+        let later = renderer
+            .tick_at(start + std::time::Duration::from_millis(1100))
+            .unwrap()
+            .unwrap_or_else(|| panic!("{id} stopped animating"));
+        assert_ne!(
+            first.pixmap.data(),
+            later.pixmap.data(),
+            "{id} did not change"
+        );
+        renderer.forget();
+    }
+}
+
+#[test]
+fn the_night_theme_is_dark_and_the_rain_theme_is_light() {
+    let Some(mut renderer) = renderer() else {
+        return;
+    };
+    let corner = |r: &Rendered| pixel(r, r.content_x + 40, r.content_y + 6);
+    let jonaki = renderer
+        .render(
+            &bangl(),
+            Layout::Vertical,
+            &Theme::builtin("jonaki", false).unwrap(),
+            2.0,
+        )
+        .unwrap();
+    renderer.forget();
+    let borsha = renderer
+        .render(
+            &bangl(),
+            Layout::Vertical,
+            &Theme::builtin("borsha", true).unwrap(),
+            2.0,
+        )
+        .unwrap();
+    // Jonaki is locked to the dark appearance and Borsha to the light one, whatever the setting says.
+    assert!(corner(&jonaki)[0] < 80, "{:?}", corner(&jonaki));
+    assert!(corner(&borsha)[0] > 180, "{:?}", corner(&borsha));
+}

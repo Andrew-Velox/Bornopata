@@ -121,7 +121,9 @@ mod tests {
             let families = theme.font_families();
             match theme.id() {
                 // The Bengali font goes first; `system` is the UI font and needs no lookup.
-                "bornopata" | "sakura" => assert_eq!(families, ["Noto Sans Bengali"]),
+                "bornopata" | "sakura" | "shapla" | "borsha" | "jonaki" => {
+                    assert_eq!(families, ["Noto Sans Bengali"])
+                }
                 id => assert!(families.is_empty(), "{id}"),
             }
         }

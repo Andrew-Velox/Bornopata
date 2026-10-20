@@ -1,0 +1,118 @@
+// Borsha: a rainy-day card (borsha is the monsoon): cool blue-grey, a cloud in the corner and raindrops falling through the
+// window in a loop. The pictures are light, so the theme is locked to the light appearance.
+// All artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+{
+  "extends": "bornopata",
+  "schema": 1,
+  "meta": { "id": "borsha", "name": "Borsha", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "light" },
+
+  "variables": {
+    "text": "#1e2b3b",
+    "dim": "#1e2b3b99",
+    "gloss": "#1e2b3ba6",
+    "faint": "#667c96",
+    "accent": "#2a78cc",
+    "star": "#e39a2d",
+    "line": "#2a78cc26",
+    "border": "#a7c1e3",
+    "border_inner": "#2a78cc99",
+    "surface_top": "#f7faff",
+    "surface_bottom": "#dbe6f3",
+    "pill_top": "#d6e6fa",
+    "pill_bottom": "#bcd3f1",
+    "chip": "#2a78cc24"
+  },
+
+  "components": {
+    "motion": {
+      "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": [0, "auto", "auto", 38], "width": 7, "height": 12,
+          "fill": { "image": "images/drop.svg" },
+          "animation": { "duration": 1700, "easing": "ease-in", "loop": true, "keyframes": [
+            { "at": 0, "y": -6, "opacity": 0 },
+            { "at": 0.15, "opacity": 0.9 },
+            { "at": 0.85, "opacity": 0.8 },
+            { "at": 1, "y": 66, "opacity": 0 }
+          ] } },
+        { "type": "frame", "position": "absolute", "inset": [0, "auto", "auto", 96], "width": 7, "height": 12,
+          "fill": { "image": "images/drop.svg" },
+          "animation": { "duration": 2200, "easing": "ease-in", "loop": true, "keyframes": [
+            { "at": 0, "y": -6, "opacity": 0 },
+            { "at": 0.15, "opacity": 0.9 },
+            { "at": 0.85, "opacity": 0.8 },
+            { "at": 1, "y": 66, "opacity": 0 }
+          ] } },
+        { "type": "frame", "position": "absolute", "inset": [0, "auto", "auto", 150], "width": 7, "height": 12,
+          "fill": { "image": "images/drop.svg" },
+          "animation": { "duration": 1450, "easing": "ease-in", "loop": true, "keyframes": [
+            { "at": 0, "y": -6, "opacity": 0 },
+            { "at": 0.15, "opacity": 0.9 },
+            { "at": 0.85, "opacity": 0.8 },
+            { "at": 1, "y": 66, "opacity": 0 }
+          ] } },
+        { "type": "frame", "position": "absolute", "inset": [0, 18, "auto", "auto"], "width": 7, "height": 12,
+          "fill": { "image": "images/drop.svg" },
+          "animation": { "duration": 1950, "easing": "ease-in", "loop": true, "keyframes": [
+            { "at": 0, "y": -6, "opacity": 0 },
+            { "at": 0.15, "opacity": 0.9 },
+            { "at": 0.85, "opacity": 0.8 },
+            { "at": 1, "y": 66, "opacity": 0 }
+          ] } }
+      ]
+    },
+    "top_line": {
+      "type": "frame", "when": "preedit|hint", "padding": [2, 36, 6, 4], "gap": 12, "align_self": "stretch",
+      "children": [
+        { "type": "preedit", "when": "preedit", "font": "annotation",
+          "typed": "@gloss", "rest": "@faint",
+          "caret": { "width": 1.5, "color": "@accent" } },
+        { "type": "frame", "when": "hint", "margin": [0, 0, 0, "auto"], "padding": [1, 7, 1, 7],
+          "fill": "@chip", "radius": 6, "children": [
+            { "type": "text", "bind": "hint", "font": "annotation", "color": "@accent" }
+          ] }
+      ]
+    },
+    "corner": {
+      "type": "frame", "position": "absolute", "inset": [4, 4, "auto", "auto"], "width": 38, "height": 23,
+      "fill": { "image": "images/cloud.svg" },
+      "animation": { "duration": 9000, "easing": "ease-in-out", "loop": true, "keyframes": [
+        { "at": 0, "x": -2 },
+        { "at": 0.5, "x": 3 },
+        { "at": 1, "x": -2 }
+      ] }
+    }
+  },
+
+  "windows": {
+    "vertical": {
+      "type": "frame", "direction": "column", "padding": [10, 10, 10, 10], "min_width": 200,
+      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 10,
+      "border": { "width": 3, "color": "@border" },
+      "effects": [],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0], "radius": 7,
+          "border": { "width": 1, "color": "@border_inner" } },
+        { "type": "use", "component": "motion" },
+        { "type": "use", "component": "top_line" },
+        { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] },
+        { "type": "use", "component": "corner" }
+      ]
+    },
+    "horizontal": {
+      "type": "frame", "direction": "column", "padding": 10,
+      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 10,
+      "border": { "width": 3, "color": "@border" },
+      "effects": [],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0], "radius": 7,
+          "border": { "width": 1, "color": "@border_inner" } },
+        { "type": "use", "component": "top_line" },
+        { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 10,
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "item" }] },
+        { "type": "use", "component": "corner" }
+      ]
+    }
+  }
+}

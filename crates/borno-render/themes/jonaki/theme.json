@@ -1,0 +1,111 @@
+// Jonaki: a night card (jonaki is the firefly): deep indigo, a crescent moon in the corner and three fireflies drifting and
+// glowing in a loop. The pictures are made for a dark card, so the theme is locked to the dark appearance.
+// All artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+{
+  "extends": "bornopata",
+  "schema": 1,
+  "meta": { "id": "jonaki", "name": "Jonaki", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "dark" },
+
+  "variables": {
+    "text": "#e9eefc",
+    "dim": "#e9eefc99",
+    "gloss": "#e9eefcb3",
+    "faint": "#98a4c8",
+    "accent": "#ffd45e",
+    "star": "#ffcf4a",
+    "line": "#ffffff1a",
+    "border": "#4b5ea8",
+    "border_inner": "#ffd45eb3",
+    "surface_top": "#1f2750",
+    "surface_bottom": "#121734",
+    "pill_top": "#3a4784",
+    "pill_bottom": "#2c3870",
+    "chip": "#ffd45e26"
+  },
+
+  "components": {
+    "motion": {
+      "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": [30, "auto", "auto", 18], "width": 14, "height": 14,
+          "fill": { "image": "images/firefly.svg" },
+          "animation": { "duration": 7000, "easing": "ease-in-out", "loop": true, "keyframes": [
+            { "at": 0, "x": 0, "y": 0, "opacity": 0.1 },
+            { "at": 0.25, "x": 14, "y": -8, "opacity": 1 },
+            { "at": 0.5, "x": 26, "y": 6, "opacity": 0.2 },
+            { "at": 0.75, "x": 12, "y": 16, "opacity": 0.95 },
+            { "at": 1, "x": 0, "y": 0, "opacity": 0.1 }
+          ] } },
+        { "type": "frame", "position": "absolute", "inset": ["auto", "auto", 26, 120], "width": 14, "height": 14,
+          "fill": { "image": "images/firefly.svg" },
+          "animation": { "duration": 9000, "easing": "ease-in-out", "loop": true, "keyframes": [
+            { "at": 0, "x": 0, "y": 0, "opacity": 0.8 },
+            { "at": 0.3, "x": -18, "y": -10, "opacity": 0.15 },
+            { "at": 0.6, "x": -30, "y": 4, "opacity": 1 },
+            { "at": 1, "x": 0, "y": 0, "opacity": 0.8 }
+          ] } },
+        { "type": "frame", "position": "absolute", "inset": [90, 14, "auto", "auto"], "width": 14, "height": 14,
+          "fill": { "image": "images/firefly.svg" },
+          "animation": { "duration": 6200, "easing": "ease-in-out", "loop": true, "keyframes": [
+            { "at": 0, "x": 0, "y": 0, "opacity": 0.3 },
+            { "at": 0.4, "x": -10, "y": 12, "opacity": 1 },
+            { "at": 0.7, "x": 4, "y": 24, "opacity": 0.1 },
+            { "at": 1, "x": 0, "y": 0, "opacity": 0.3 }
+          ] } }
+      ]
+    },
+    "top_line": {
+      "type": "frame", "when": "preedit|hint", "padding": [2, 36, 6, 4], "gap": 12, "align_self": "stretch",
+      "children": [
+        { "type": "preedit", "when": "preedit", "font": "annotation",
+          "typed": "@gloss", "rest": "@faint",
+          "caret": { "width": 1.5, "color": "@accent" } },
+        { "type": "frame", "when": "hint", "margin": [0, 0, 0, "auto"], "padding": [1, 7, 1, 7],
+          "fill": "@chip", "radius": 6, "children": [
+            { "type": "text", "bind": "hint", "font": "annotation", "color": "@accent" }
+          ] }
+      ]
+    },
+    "corner": {
+      "type": "frame", "position": "absolute", "inset": [3, 6, "auto", "auto"], "width": 28, "height": 28,
+      "fill": { "image": "images/moon.svg" },
+      "animation": { "duration": 7000, "easing": "ease-in-out", "loop": true, "keyframes": [
+        { "at": 0, "scale": 0.96 },
+        { "at": 0.5, "scale": 1.04 },
+        { "at": 1, "scale": 0.96 }
+      ] }
+    }
+  },
+
+  "windows": {
+    "vertical": {
+      "type": "frame", "direction": "column", "padding": [10, 10, 10, 10], "min_width": 200,
+      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 14,
+      "border": { "width": 3, "color": "@border" },
+      "effects": [],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0], "radius": 11,
+          "border": { "width": 1, "color": "@border_inner" } },
+        { "type": "use", "component": "motion" },
+        { "type": "use", "component": "top_line" },
+        { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] },
+        { "type": "use", "component": "corner" }
+      ]
+    },
+    "horizontal": {
+      "type": "frame", "direction": "column", "padding": 10,
+      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 14,
+      "border": { "width": 3, "color": "@border" },
+      "effects": [],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0], "radius": 11,
+          "border": { "width": 1, "color": "@border_inner" } },
+        { "type": "use", "component": "top_line" },
+        { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 10,
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "item" }] },
+        { "type": "use", "component": "corner" }
+      ]
+    }
+  }
+}

@@ -33,7 +33,7 @@ use file::{ColorRef, FontRef, LockedAppearance, SCHEMA, ThemeFile};
 type EmbeddedFiles = &'static [(&'static str, &'static [u8])];
 
 /// Built-in themes: id, source file and images, in the order a settings list shows them; the first is the default.
-const BUILTINS: [(&str, &str, EmbeddedFiles); 2] = [
+const BUILTINS: [(&str, &str, EmbeddedFiles); 5] = [
     (
         "bornopata",
         include_str!("../../themes/bornopata/theme.json"),
@@ -50,6 +50,48 @@ const BUILTINS: [(&str, &str, EmbeddedFiles); 2] = [
             (
                 "images/petal.svg",
                 include_bytes!("../../themes/sakura/images/petal.svg"),
+            ),
+        ],
+    ),
+    (
+        "shapla",
+        include_str!("../../themes/shapla/theme.json"),
+        &[
+            (
+                "images/lily.svg",
+                include_bytes!("../../themes/shapla/images/lily.svg"),
+            ),
+            (
+                "images/ripple.svg",
+                include_bytes!("../../themes/shapla/images/ripple.svg"),
+            ),
+        ],
+    ),
+    (
+        "borsha",
+        include_str!("../../themes/borsha/theme.json"),
+        &[
+            (
+                "images/cloud.svg",
+                include_bytes!("../../themes/borsha/images/cloud.svg"),
+            ),
+            (
+                "images/drop.svg",
+                include_bytes!("../../themes/borsha/images/drop.svg"),
+            ),
+        ],
+    ),
+    (
+        "jonaki",
+        include_str!("../../themes/jonaki/theme.json"),
+        &[
+            (
+                "images/moon.svg",
+                include_bytes!("../../themes/jonaki/images/moon.svg"),
+            ),
+            (
+                "images/firefly.svg",
+                include_bytes!("../../themes/jonaki/images/firefly.svg"),
             ),
         ],
     ),

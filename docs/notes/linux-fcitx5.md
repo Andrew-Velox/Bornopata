@@ -93,7 +93,7 @@ toggle = "ctrl+alt+space"
 [panel]
 mode = "auto"            # auto: popup for Wayland clients, layer-shell window for X11, else Fcitx5's panel;
                          # popup: only the input-method popup; native: only the layer-shell window; fcitx: always Fcitx5's panel
-theme = "bornopata"      # or "sakura", or the path of a theme directory
+theme = "bornopata"      # or "sakura", "shapla", "borsha", "jonaki", or the path of a theme directory
 dark = false             # dark variant of themes that have one
 layout = "vertical"      # or "horizontal"
 ```

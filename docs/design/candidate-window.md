@@ -41,7 +41,11 @@ Cost of the choice: the popup is placed at window origin + cursor rectangle, so 
 
 - `bornopata`: white-to-mint card, radius 14, layered shadow, green highlight pill with a gradient, star for learned words, trailing ellipsis for completions, arrow for next-word suggestions, a `Tab` chip.
 - `sakura`: pink-and-lavender glass, a blossom hanging over the corner, two petals drifting down in a loop (the animation is why the window asks for repeated frames). Locked to light.
-- All pictures are SVGs drawn for Bornopata (`themes/sakura/images`) under GPL-3.0-or-later. Nothing from Qingjian's themes, whose artwork has its own copyrights, is included.
+- `shapla`: a cool water-lily card (the national flower of Bangladesh), white and pale teal, a lily in the top-right corner and two ripples spreading at the bottom. Locked to light.
+- `borsha`: a rainy-day card, blue-grey with squarer corners, a cloud in the corner and raindrops falling through the window. Locked to light.
+- `jonaki`: a night card, deep indigo with a gold border, a crescent moon in the corner and three fireflies drifting and glowing. Locked to dark.
+- Their decoration sits inside the card (the top line leaves room for it), because the input-method popup shows the card cropped to its rectangle and would cut off anything hanging over the corner.
+- All pictures are SVGs drawn for Bornopata (`themes/*/images`) under GPL-3.0-or-later. Nothing from Qingjian's themes, whose artwork has its own copyrights, is included.
 
 ## Frame changes from Qingjian
 

@@ -1,0 +1,100 @@
+// Shapla: a cool water-lily card (the shapla is the national flower of Bangladesh): white and pale teal, a lily in
+// the corner and two ripples spreading at the bottom. The pictures are light, so the theme is locked to the light appearance.
+// All artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+{
+  "extends": "bornopata",
+  "schema": 1,
+  "meta": { "id": "shapla", "name": "Shapla", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "light" },
+
+  "variables": {
+    "text": "#1f3b3a",
+    "dim": "#1f3b3a99",
+    "gloss": "#1f3b3aa6",
+    "faint": "#5f8483",
+    "accent": "#1c8f87",
+    "star": "#e0a21a",
+    "line": "#1c8f8726",
+    "border": "#9bd8cf",
+    "border_inner": "#1c8f87b3",
+    "surface_top": "#fbfffe",
+    "surface_bottom": "#e1f4ef",
+    "pill_top": "#d3f3ea",
+    "pill_bottom": "#b4e6da",
+    "chip": "#1c8f8724"
+  },
+
+  "components": {
+    "motion": {
+      "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": ["auto", "auto", 6, 8], "width": 34, "height": 34,
+          "fill": { "image": "images/ripple.svg" },
+          "animation": { "duration": 4200, "easing": "ease-out", "loop": true, "keyframes": [
+            { "at": 0, "scale": 0.3, "opacity": 0 },
+            { "at": 0.12, "opacity": 0.85 },
+            { "at": 1, "scale": 1.2, "opacity": 0 }
+          ] } },
+        { "type": "frame", "position": "absolute", "inset": ["auto", 12, 4, "auto"], "width": 26, "height": 26,
+          "fill": { "image": "images/ripple.svg" },
+          "animation": { "duration": 5600, "easing": "ease-out", "loop": true, "keyframes": [
+            { "at": 0, "scale": 0.3, "opacity": 0 },
+            { "at": 0.15, "opacity": 0.7 },
+            { "at": 1, "scale": 1.25, "opacity": 0 }
+          ] } }
+      ]
+    },
+    "top_line": {
+      "type": "frame", "when": "preedit|hint", "padding": [2, 36, 6, 4], "gap": 12, "align_self": "stretch",
+      "children": [
+        { "type": "preedit", "when": "preedit", "font": "annotation",
+          "typed": "@gloss", "rest": "@faint",
+          "caret": { "width": 1.5, "color": "@accent" } },
+        { "type": "frame", "when": "hint", "margin": [0, 0, 0, "auto"], "padding": [1, 7, 1, 7],
+          "fill": "@chip", "radius": 6, "children": [
+            { "type": "text", "bind": "hint", "font": "annotation", "color": "@accent" }
+          ] }
+      ]
+    },
+    "corner": {
+      "type": "frame", "position": "absolute", "inset": [3, 5, "auto", "auto"], "width": 30, "height": 30,
+      "fill": { "image": "images/lily.svg" },
+      "animation": { "duration": 8000, "easing": "ease-in-out", "loop": true, "keyframes": [
+        { "at": 0, "rotate": -5 },
+        { "at": 0.5, "rotate": 5 },
+        { "at": 1, "rotate": -5 }
+      ] }
+    }
+  },
+
+  "windows": {
+    "vertical": {
+      "type": "frame", "direction": "column", "padding": [10, 10, 10, 10], "min_width": 200,
+      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 20,
+      "border": { "width": 3, "color": "@border" },
+      "effects": [],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0], "radius": 17,
+          "border": { "width": 1, "color": "@border_inner" } },
+        { "type": "use", "component": "motion" },
+        { "type": "use", "component": "top_line" },
+        { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] },
+        { "type": "use", "component": "corner" }
+      ]
+    },
+    "horizontal": {
+      "type": "frame", "direction": "column", "padding": 10,
+      "fill": { "linear": 160, "stops": ["@surface_top", "@surface_bottom"] }, "radius": 20,
+      "border": { "width": 3, "color": "@border" },
+      "effects": [],
+      "children": [
+        { "type": "frame", "position": "absolute", "inset": [0, 0, 0, 0], "radius": 17,
+          "border": { "width": 1, "color": "@border_inner" } },
+        { "type": "use", "component": "top_line" },
+        { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 10,
+          "children": [{ "type": "repeat", "bind": "candidates", "component": "item" }] },
+        { "type": "use", "component": "corner" }
+      ]
+    }
+  }
+}
