@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 pub use error::{PreviewError, ShotError};
 pub use shot::Shot;
 
-use crate::sample::{bangl, next_words, shaping};
+use crate::sample::{bangl, next_words, shaping, showcase};
 use crate::{FontLibrary, Frame, Layout, Renderer, Theme};
 
 /// Twice the point size, as sharp as a HiDPI screenshot.
@@ -34,6 +34,7 @@ pub fn write_previews(
         ("vertical.png", shaping(), Layout::Vertical, false),
         ("completion.png", bangl(), Layout::Vertical, false),
         ("next-words.png", next_words(), Layout::Vertical, false),
+        ("showcase.png", showcase(), Layout::Vertical, false),
     ];
     if theme.locked_dark().is_none() {
         shots.push(("vertical-dark.png", shaping(), Layout::Vertical, true));

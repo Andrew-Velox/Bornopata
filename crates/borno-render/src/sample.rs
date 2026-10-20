@@ -19,6 +19,31 @@ pub fn bangl() -> Frame {
     }
 }
 
+/// What typing `bhalobasha` shows: a word chosen before with its gloss, emoji with their names, other spellings and
+/// completions. The picture of the themes on the website and in the docs.
+pub fn showcase() -> Frame {
+    Frame {
+        preedit: Some(Preedit::plain("bhalobasha", 10)),
+        rows: vec![
+            row(
+                0,
+                "ভালোবাসা",
+                Source::Learned,
+                &[("v. ", Tone::Pos), ("love", Tone::Gloss)],
+            ),
+            row(1, "🫶", Source::Typed, &[("হৃদয়াকৃতির হাত", Tone::Gloss)]),
+            row(2, "🧡", Source::Typed, &[("কমলা হার্ট", Tone::Gloss)]),
+            row(3, "ভালবাসা", Source::Typed, &[]),
+            row(4, "ভালবাশা", Source::Typed, &[]),
+            row(5, "ভালোবাসার", Source::Completion, &[]),
+            row(6, "ভালোবাসায়", Source::Completion, &[]),
+        ],
+        highlighted: Some(0),
+        hint: None,
+        mode: Mode::default(),
+    }
+}
+
 /// A word with a learned choice, conjuncts and a spelling variant, to check shaping.
 pub fn shaping() -> Frame {
     Frame {
