@@ -80,7 +80,7 @@ Then typing `bangl` offers বাংল first (what you typed) followed by ব�
 
 ## Configuration
 
-`~/.config/bornopata/config.toml` is written with comments on first start. Restart the Server after editing (`systemctl --user restart bornopata`).
+`~/.config/bornopata/config.toml` is written with comments on first start. A saved change takes effect by itself: the Server checks the file once a second, and when it changed to something valid and no session is in the middle of a word, the process starts itself over (`exec` of the same program with the same arguments: same pid, so systemd notices nothing, and a shell reconnects on its next key). A file that does not parse is logged and ignored until it is fixed. Manual restart: `systemctl --user restart bornopata`.
 
 ```toml
 [general]

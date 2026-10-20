@@ -64,6 +64,7 @@ fn run() -> Result<(), ServerError> {
     let mut router = Router::new(config, shared)
         .with_panel(panel)
         .with_popup(popup.clone().map(|hub| Box::new(hub) as Box<dyn PopupSink>));
+    router.watch_config(config_path);
 
     extern "C" fn stop(_: libc::c_int) {
         ipc::request_shutdown();
@@ -75,7 +76,33 @@ fn run() -> Result<(), ServerError> {
     let socket = ipc::socket_path();
     tracing::info!(path = %socket.display(), "Bornopata Linux Server started");
     ipc::serve_with_popup(socket, &mut router, popup)?;
+    let reload = ipc::reload_requested();
+    // Dropping the Router writes the learned data, so nothing is lost when the process is replaced.
+    drop(router);
+    if reload {
+        return Err(restart().into());
+    }
     Ok(())
+}
+
+/// Starts over with the new settings: the same process becomes a fresh Server (same pid, so systemd sees nothing),
+/// and a shell reconnects on its next key. Only returns, with the reason, when that did not work.
+fn restart() -> std::io::Error {
+    use std::os::unix::process::CommandExt;
+    tracing::info!("starting over with the changed config");
+    // The first argument is the path the Server was started with: unlike /proc/self/exe it still names the right file
+    // when an upgrade has replaced the program while it was running.
+    let program = std::env::args_os()
+        .next()
+        .map(std::path::PathBuf::from)
+        .filter(|path| path.is_absolute())
+        .or_else(|| std::env::current_exe().ok());
+    match program {
+        Some(program) => std::process::Command::new(program)
+            .args(std::env::args_os().skip(1))
+            .exec(),
+        None => std::io::Error::other("cannot tell which program to start again"),
+    }
 }
 
 fn start_logging(

@@ -4,7 +4,7 @@ order: 1
 description: Every option in ~/.config/bornopata/config.toml with its default, and how to apply a change.
 ---
 
-Settings live in `~/.config/bornopata/config.toml`. The Server writes the file with comments the first time it starts, and never overwrites it afterwards. **Restart the Server after editing**:
+Settings live in `~/.config/bornopata/config.toml`. The Server writes the file with comments the first time it starts, and never overwrites it afterwards. **A saved change takes effect by itself**: the Server notices it within a second or two and starts over with the new settings, as long as nobody is in the middle of a word. If the file has a mistake, the Server keeps the old settings and writes the reason to its log. To restart it by hand:
 
 ```bash
 systemctl --user restart bornopata

@@ -6,7 +6,7 @@ description: The five candidate-window themes (bornopata, sakura, shapla, borsha
 
 ## Themes
 
-Set `theme` in `[panel]` of [the config file](config-file.md) and restart the Server.
+Set `theme` in `[panel]` of [the config file](config-file.md); the window changes within a second or two.
 
 | Theme | Look |
 |---|---|

@@ -30,11 +30,18 @@ const MAX_CONNECTIONS: usize = 64;
 const QUEUE: usize = 128;
 
 static STOP: AtomicBool = AtomicBool::new(false);
+static RELOAD: AtomicBool = AtomicBool::new(false);
 static CONNECTIONS: AtomicUsize = AtomicUsize::new(0);
 
 /// Asks [`serve`] to return at its next tick; safe to call from a signal handler.
 pub fn request_shutdown() {
     STOP.store(true, Ordering::Relaxed);
+}
+
+/// Whether [`serve`] returned because the config changed and the Server should start over (not because it was asked
+/// to stop).
+pub fn reload_requested() -> bool {
+    RELOAD.load(Ordering::Relaxed)
 }
 
 /// Serves `router` on `path` until [`request_shutdown`], without popup channels. Removes the socket file on the way out.
@@ -78,6 +85,10 @@ pub fn serve_with_popup(
         let now = Instant::now();
         if now >= due {
             router.tick();
+            if router.reload_due() {
+                RELOAD.store(true, Ordering::Relaxed);
+                break;
+            }
             due = Instant::now() + router.next_tick();
             continue;
         }

@@ -29,7 +29,7 @@ On a [next-word suggestion](next-words.md) the same key stops that suggestion be
 
 ## Switch it off, or start again
 
-To stop learning, set this in `~/.config/bornopata/config.toml` and restart the Server:
+To stop learning, set this in `~/.config/bornopata/config.toml` (the Server picks it up by itself):
 
 ```toml
 [general]

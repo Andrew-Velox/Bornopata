@@ -36,4 +36,4 @@ Installing and uninstalling never touch your config, phrases, learned data or lo
 
 ## Logs
 
-If something goes wrong, the log says why: `~/.local/state/bornopata/logs/server.<date>.log`, or `journalctl --user -u bornopata`. For more detail set `log_level = "debug"` in [the config file](../settings/config-file.md) and restart the Server. Debug logs describe what each key did, still without the text you typed.
+If something goes wrong, the log says why: `~/.local/state/bornopata/logs/server.<date>.log`, or `journalctl --user -u bornopata`. For more detail set `log_level = "debug"` in [the config file](../settings/config-file.md) Debug logs describe what each key did, still without the text you typed.

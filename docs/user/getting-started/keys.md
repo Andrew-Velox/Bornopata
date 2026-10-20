@@ -55,4 +55,4 @@ toggle = "ctrl+alt+space"
 forget = "shift+delete"
 ```
 
-A shortcut is one or more modifiers (`ctrl`, `alt`, `shift`, `super`) plus `space`, `delete`, a letter or a digit. A bare key is not allowed because it would break typing. Restart the Server after editing (`systemctl --user restart bornopata`).
+A shortcut is one or more modifiers (`ctrl`, `alt`, `shift`, `super`) plus `space`, `delete`, a letter or a digit. A bare key is not allowed because it would break typing. The Server picks the change up by itself.

@@ -19,4 +19,4 @@ Each text field keeps its own mode, so switching in one window does not change a
 toggle = "ctrl+alt+space"
 ```
 
-in `~/.config/bornopata/config.toml`. Restart the Server after editing. See [Keys and shortcuts](../getting-started/keys.md).
+in `~/.config/bornopata/config.toml`. The Server picks the change up by itself. See [Keys and shortcuts](../getting-started/keys.md).

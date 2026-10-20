@@ -50,7 +50,7 @@ Install a color emoji font (Noto Color Emoji) for the candidate window, and make
 
 ## A change to the config has no effect
 
-Restart the Server: `systemctl --user restart bornopata`. (Edits to [phrases](../input/phrases.md) need no restart.)
+The Server notices a saved change within a second or two and starts over with it, as long as nobody is in the middle of a word. If the file has a mistake (a bad value, a missing bracket) it keeps the old settings and writes the reason to its log, so check the log; the next valid save takes effect. To restart by hand: `systemctl --user restart bornopata`.
 
 ## Still stuck
 

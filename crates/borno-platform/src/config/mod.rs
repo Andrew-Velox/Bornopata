@@ -26,7 +26,7 @@ pub use shortcut::ShortcutConfig;
 use crate::error::ConfigError;
 
 /// What gets written when the file does not exist yet. Every value shown is the default.
-const TEMPLATE: &str = r#"# Bornopata configuration. Restart the Server after editing.
+const TEMPLATE: &str = r#"# Bornopata configuration. The Server notices a saved change within a second or two and starts over with it.
 
 [general]
 # Remember what you choose so it comes first next time. Learned data stays on this machine.

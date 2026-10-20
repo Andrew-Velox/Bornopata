@@ -25,7 +25,7 @@ The glosses come from English Wiktionary (via the Kaikki.org extract), cleaned u
 gloss = false
 ```
 
-in `~/.config/bornopata/config.toml`, then restart the Server. Without the file `gloss-en.bnd` in `~/.local/share/bornopata/` nothing is shown either.
+in `~/.config/bornopata/config.toml`. Without the file `gloss-en.bnd` in `~/.local/share/bornopata/` nothing is shown either.
 
 ## Licence
 
