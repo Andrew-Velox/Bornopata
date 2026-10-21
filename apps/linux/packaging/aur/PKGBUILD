@@ -16,7 +16,7 @@ _tag=${pkgver//_/-}
 source=("$pkgname-$_tag-source.tar.gz::$url/releases/download/v$_tag/$pkgname-$_tag-source.tar.gz"
         "words.bnd::$url/releases/download/data-v1/words.bnd"
         "lm.bnd::$url/releases/download/data-lm-v1/lm.bnd")
-sha256sums=('SKIP'
+sha256sums=('fd56152d4e1ed9f22d053ba5a94c8f45627b0e257869798b6d43a6bbe346612b'
             'db0da0846c795e4339d4b3257cd79e65324a0de3fe06105079edc4d0a3aa064d'
             '60a8ef66dde12085a4626ace1b8d8b1dc955229882fd1fe3118774c8f339a733')
 
