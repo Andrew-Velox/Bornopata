@@ -24,6 +24,9 @@ pub struct GeneralConfig {
     /// letters (`heart`).
     pub emoji: bool,
 
+    /// Turn English words typed as written into their Bangla spelling (`facebook` gives ফেসবুক, `facebooke` ফেসবুকে).
+    pub autocorrect: bool,
+
     /// The language of the settings program. The Server does not use it.
     pub language: Language,
 
@@ -38,6 +41,7 @@ impl Default for GeneralConfig {
             gloss: true,
             shortcuts: true,
             emoji: true,
+            autocorrect: true,
             language: Language::default(),
             log_level: LogLevel::default(),
         }

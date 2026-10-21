@@ -81,6 +81,16 @@ pub fn typing(ui: &mut Ui<Message>, page: &Page) -> Result<Vec<NodeId>, RenderEr
         toggle(
             ui,
             page,
+            t("English words"),
+            t(
+                "facebook types ফেসবুক and facebooke ফেসবুকে, instead of letters the Avro rules cannot spell.",
+            ),
+            ("general", "autocorrect"),
+            general.autocorrect,
+        )?,
+        toggle(
+            ui,
+            page,
             t("Date and time words"),
             t("tarikh offers today's date, somoy the time and bar the weekday, in Bangla."),
             ("general", "shortcuts"),

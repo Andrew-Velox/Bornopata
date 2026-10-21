@@ -20,6 +20,7 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 - `crates/borno-transliteration`: `Transliterator` (Avro conversion through `okkhor`) and the `WordSource` seam with the `upodesh` scaffold implementation.
 - `crates/borno-learning`: `FrequencyLearner` (word counts, per-input choices, personal bigram, time decay, TSV files in one directory).
 - `crates/borno-emoji`: `EmojiSet`, the emoji for Bangla words and English keywords (`assets/emoji/emoji.tsv`, compiled in), Core's `EmojiSource`.
+- `crates/borno-autocorrect`: `AutocorrectTable` (`assets/autocorrect/autocorrect.tsv`, compiled in): the Bangla spelling of English words typed as written, case rule and Bangla endings, Core's `AutocorrectSource`.
 - `crates/borno-gloss`: the English glosses (`gloss-en.bnd`): `Glossary` (mapped, hash lookup, Core's `Annotator`) and `GlossaryBuilder`.
 - `crates/borno-lm`: `BigramModel` language model, from TSV or `.bnd`, with next-word successors.
 - `crates/borno-format`: `.bnd` data container (mmap reader, zero-copy views, writer, hash index).

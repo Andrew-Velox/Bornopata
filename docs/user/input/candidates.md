@@ -9,11 +9,12 @@ Every time you type a letter, Bornopata builds a list of up to nine candidates f
 ## Where candidates come from
 
 1. **Your own phrases** for exactly this code come first; see [Your own phrases](phrases.md).
-2. **The Avro conversion** of exactly what you typed. This is always in the list, so any word can be typed even if it is in no dictionary.
-3. **Dictionary words** spelled like your input, or close to it. The dictionary has about 413,000 words with how often each occurs, so common words rank higher. A small built-in word list fills in spellings the dictionary does not have.
-4. **Words you chose before** for this input: they move up.
-5. **Completions**: longer words that *start* with what you typed. They are always listed after the real spellings of your input.
-6. **Extras**: the date, time and weekday for `tarikh`, `somoy` and `bar` ([Date, time and weekday](shortcuts.md)), and emoji ([Emoji](emoji.md)).
+2. **A corrected English word**, such as ফেসবুক for `facebook`, comes before the conversion; see [English words](autocorrect.md).
+3. **The Avro conversion** of exactly what you typed. This is always in the list, so any word can be typed even if it is in no dictionary.
+4. **Dictionary words** spelled like your input, or close to it. The dictionary has about 413,000 words with how often each occurs, so common words rank higher. A small built-in word list fills in spellings the dictionary does not have.
+5. **Words you chose before** for this input: they move up.
+6. **Completions**: longer words that *start* with what you typed. They are always listed after the real spellings of your input.
+7. **Extras**: the date, time and weekday for `tarikh`, `somoy` and `bar` ([Date, time and weekday](shortcuts.md)), and emoji ([Emoji](emoji.md)).
 
 ## How they are ordered
 

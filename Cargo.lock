@@ -209,9 +209,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "borno-autocorrect"
+version = "0.1.1"
+dependencies = [
+ "borno-core",
+]
+
+[[package]]
 name = "borno-cli"
 version = "0.1.1"
 dependencies = [
+ "borno-autocorrect",
  "borno-core",
  "borno-dictionary",
  "borno-emoji",
@@ -411,6 +419,7 @@ dependencies = [
 name = "borno-server"
 version = "0.1.1"
 dependencies = [
+ "borno-autocorrect",
  "borno-core",
  "borno-dictionary",
  "borno-emoji",

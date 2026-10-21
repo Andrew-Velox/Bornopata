@@ -20,6 +20,7 @@ pub use typed::Typed;
 use borno_transliteration::{Transliterator, WordSource};
 
 use crate::annotator::{Annotator, NoAnnotator};
+use crate::autocorrect::{AutocorrectSource, NoAutocorrect};
 use crate::candidate::Candidate;
 use crate::composition::Composition;
 use crate::emoji::{EmojiSource, NoEmoji};
@@ -36,6 +37,7 @@ pub struct Engine {
     language_model: Box<dyn LanguageModel>,
     annotator: Box<dyn Annotator>,
     phrases: Box<dyn PhraseSource>,
+    autocorrect: Box<dyn AutocorrectSource>,
     emoji: Box<dyn EmojiSource>,
     clock: Option<Box<dyn Clock>>,
 
@@ -71,6 +73,7 @@ impl Engine {
             language_model: Box::new(NoLanguageModel),
             annotator: Box::new(NoAnnotator),
             phrases: Box::new(NoPhrases),
+            autocorrect: Box::new(NoAutocorrect),
             emoji: Box::new(NoEmoji),
             clock: None,
             composition: Composition::default(),
@@ -102,6 +105,12 @@ impl Engine {
     /// Adds the user's own phrases: a text given to exactly the typed code comes first in the list.
     pub fn with_phrases(mut self, phrases: Box<dyn PhraseSource>) -> Self {
         self.phrases = phrases;
+        self
+    }
+
+    /// Puts the Bangla spelling of an English word typed as written (`facebook`) ahead of what the Avro rules make of it.
+    pub fn with_autocorrect(mut self, autocorrect: Box<dyn AutocorrectSource>) -> Self {
+        self.autocorrect = autocorrect;
         self
     }
 

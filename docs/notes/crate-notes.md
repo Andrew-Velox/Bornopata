@@ -465,3 +465,7 @@ Unix socket 用共享长度前缀与 Frame（当前公共版本 9，与 `PROTOCO
 候选回报绑定连接代次、上下文和服务端帧序号，仅当前聚焦页的有效释义进入 `note_displayed`，不把生成帧算作已展示。
 Linux 回包由 `dispatch/display/annotation` 给释义添加可选 `annotation`（词性与汉字段假名，`[general] translation_pos` 关掉时不带词性），Fcitx5 面板优先显示它；原始译文和快捷键提交不变，旧 Server 缺该字段时插件回退到 `text`。
 `[general] preedit` 使用已有 `both` / `inline` / `window`；没有新增 Linux 自绘配置。详见 [linux-fcitx5.md](linux-fcitx5.md)。
+
+## crates/borno-autocorrect
+
+`AutocorrectTable` implements Core's `AutocorrectSource` over `assets/autocorrect/autocorrect.tsv` (compiled in with `include_str!`, `word<TAB>Bangla`, repeated words give several spellings). The typed letters count as a written word when they are all lower case, one capital then lower case, or all capitals (`as_written`); anything else is Avro spelling. If the word is not a row, one ending from `suffix::SUFFIXES` is split off and the stem looked up; `suffix::fits` refuses a vowel sign after a vowel. Core ranks a corrected spelling with `AUTOCORRECT_PRIOR` (6.0) so it leads dictionary words, while the user's repeated choices (`CHOICE_WEIGHT`) still overtake it. Words whose Avro conversion is a common Bangla word are left out of the table; how to check one is in `assets/autocorrect/README.md`.

@@ -1,6 +1,6 @@
 ---
 title: English mode
-order: 6
+order: 7
 description: Switch between Bangla and English with Ctrl+Alt+Space; in English mode every key goes straight to the application.
 ---
 

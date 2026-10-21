@@ -21,6 +21,7 @@ An option you leave out keeps its default, and an unknown option is ignored. If 
 | `gloss` | `true` | Show the short English meaning beside candidates. See [English glosses](../learning/glosses.md). |
 | `shortcuts` | `true` | `tarikh`, `somoy` and `bar` also offer the date, time and weekday. See [Date, time and weekday](../input/shortcuts.md). |
 | `emoji` | `true` | Offer emoji next to the words that name them. See [Emoji](../input/emoji.md). |
+| `autocorrect` | `true` | Type English words as written in their Bangla spelling: `facebook` gives ফেসবুক. See [English words](../input/autocorrect.md). |
 | `language` | `"auto"` | The language of Bornopata Settings: `"auto"` follows the system language, `"en"` is English, `"bn"` is Bangla (বাংলা). The Server ignores it. |
 | `log_level` | `"info"` | `"error"`, `"warn"`, `"info"` or `"debug"`. Logs never contain what you type. |
 
@@ -53,6 +54,7 @@ bangla_digits = true
 gloss = true
 shortcuts = true
 emoji = true
+autocorrect = true
 language = "auto"
 log_level = "info"
 

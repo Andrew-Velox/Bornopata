@@ -9,6 +9,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
+borno-autocorrect.workspace = true
 borno-core.workspace = true
 borno-dictionary.workspace = true
 borno-emoji.workspace = true

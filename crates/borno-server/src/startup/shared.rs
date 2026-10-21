@@ -36,6 +36,7 @@ pub fn build_shared(config: &Config) -> Result<Shared, ServerError> {
         .with_glossary(glossary)
         .with_shortcuts(config.general.shortcuts)
         .with_emoji(config.general.emoji)
+        .with_autocorrect(config.general.autocorrect)
         .with_phrases(FilePhrases::open(paths::phrases_path())))
 }
 

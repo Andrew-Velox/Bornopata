@@ -8,6 +8,7 @@ members = [
     "crates/borno-format",
     "crates/borno-dictionary",
     "crates/borno-emoji",
+    "crates/borno-autocorrect",
     "crates/borno-gloss",
     "crates/bamboo-slip",
     "crates/borno-render",
@@ -47,6 +48,7 @@ borno-format = { path = "crates/borno-format" }
 borno-dictionary = { path = "crates/borno-dictionary" }
 borno-gloss = { path = "crates/borno-gloss" }
 borno-emoji = { path = "crates/borno-emoji" }
+borno-autocorrect = { path = "crates/borno-autocorrect" }
 bamboo-slip = { path = "crates/bamboo-slip" }
 borno-render = { path = "crates/borno-render" }
 borno-window = { path = "crates/borno-window" }

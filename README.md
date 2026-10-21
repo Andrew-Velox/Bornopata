@@ -69,6 +69,7 @@ You can also point the config at a folder of your own theme. More in [Themes and
 - **Beside the words**
   - **English meanings.** A short gloss like `n. rice`, from Wiktionary. It never reorders or delays the list.
   - **Emoji.** `hridoy` offers a 🫀.
+  - **English words.** `facebook` types ফেসবুক and `facebooke` ফেসবুকে, for about 360 common words.
   - **Date and time.** `tarikh`, `somoy` and `bar` give the date, time and weekday, with the Bengali calendar date.
   - **Your phrases.** `mymail` types your address, `sig` your signature. They come first and are never learned.
 

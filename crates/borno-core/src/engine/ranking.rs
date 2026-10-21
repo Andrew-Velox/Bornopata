@@ -35,6 +35,10 @@ const MAX_DISTANCE: usize = 5;
 /// `log P` values below this add nothing: the model barely knows the pair.
 const LM_FLOOR: f64 = -10.0;
 
+/// A corrected spelling beats any dictionary word, but the user's own repeated choice for the same input beats it
+/// again after a few picks (`CHOICE_WEIGHT` times the log of the count).
+const AUTOCORRECT_PRIOR: f64 = 6.0;
+
 /// A phrase of the user outranks everything else; later lines of the file go after earlier ones.
 const PHRASE_PRIOR: f64 = 1000.0;
 const PHRASE_STEP: f64 = 10.0;
@@ -44,6 +48,9 @@ const PHRASE_STEP: f64 = 10.0;
 pub(super) struct Evidence {
     /// Position of this text among the user's phrases for the input, when it is one.
     pub phrase: Option<usize>,
+
+    /// The autocorrect table gives this text for the input.
+    pub autocorrect: bool,
 
     /// The direct conversion produced this text.
     pub direct: bool,
@@ -76,6 +83,8 @@ impl Evidence {
             CandidateSource::Phrase
         } else if self.choice_weight > 0 {
             CandidateSource::Learned
+        } else if self.autocorrect {
+            CandidateSource::Autocorrect
         } else if self.direct {
             CandidateSource::Direct
         } else if self.dictionary {
@@ -115,7 +124,12 @@ impl Evidence {
         let phrase = self
             .phrase
             .map_or(0.0, |position| PHRASE_PRIOR - PHRASE_STEP * position as f64);
-        phrase + prior + explicit_case - spelling_gap
+        let autocorrect = if self.autocorrect {
+            AUTOCORRECT_PRIOR
+        } else {
+            0.0
+        };
+        phrase + autocorrect + prior + explicit_case - spelling_gap
             + FREQUENCY_WEIGHT * f64::from(self.frequency).log10_1p()
             + CHOICE_WEIGHT * f64::from(self.choice_weight).ln_1p()
             + WORD_WEIGHT * f64::from(self.word_weight).ln_1p()

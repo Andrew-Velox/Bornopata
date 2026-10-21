@@ -85,6 +85,14 @@ impl Engine {
             entry.phrase.get_or_insert(position);
         }
 
+        for text in self.autocorrect.lookup(input) {
+            let entry = evidence.entry(text.clone()).or_insert_with(|| {
+                order.push(text);
+                Evidence::default()
+            });
+            entry.autocorrect = true;
+        }
+
         let started = Instant::now();
         for (text, _) in self.learner.choices(input) {
             evidence.entry(text.clone()).or_insert_with(|| {

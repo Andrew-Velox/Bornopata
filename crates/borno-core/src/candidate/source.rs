@@ -11,6 +11,9 @@ pub enum CandidateSource {
     /// Today's date or the time of day, from a code such as `tarikh`.
     Shortcut,
 
+    /// The correct Bangla spelling of an English word typed as written, from the autocorrect table.
+    Autocorrect,
+
     /// An emoji for a word in the list or for the English word typed.
     Emoji,
 
@@ -32,6 +35,7 @@ impl fmt::Display for CandidateSource {
         f.write_str(match self {
             Self::Phrase => "phrase",
             Self::Shortcut => "shortcut",
+            Self::Autocorrect => "autocorrect",
             Self::Emoji => "emoji",
             Self::Learned => "learned",
             Self::Direct => "direct",

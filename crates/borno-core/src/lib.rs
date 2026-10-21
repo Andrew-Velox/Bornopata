@@ -4,6 +4,7 @@
 //! Test for the boundary: swapping Fcitx5 for another framework must not need a change here.
 
 pub mod annotator;
+pub mod autocorrect;
 pub mod candidate;
 pub mod composition;
 pub mod emoji;
@@ -15,6 +16,7 @@ pub mod shortcut;
 pub mod storage;
 
 pub use annotator::{Annotation, Annotator, NoAnnotator};
+pub use autocorrect::{AutocorrectSource, NoAutocorrect};
 pub use candidate::{Candidate, CandidateSource};
 pub use composition::Composition;
 pub use emoji::{EmojiSource, NoEmoji};

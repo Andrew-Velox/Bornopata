@@ -18,9 +18,10 @@ fn source(source: CandidateSource) -> Source {
         // The user's own text is marked like a learned choice; the wire format has no separate kind for it.
         CandidateSource::Phrase | CandidateSource::Learned => Source::Learned,
         CandidateSource::Direct => Source::Direct,
-        CandidateSource::Dictionary | CandidateSource::Shortcut | CandidateSource::Emoji => {
-            Source::Dictionary
-        }
+        CandidateSource::Dictionary
+        | CandidateSource::Autocorrect
+        | CandidateSource::Shortcut
+        | CandidateSource::Emoji => Source::Dictionary,
         CandidateSource::Completion => Source::Completion,
     }
 }

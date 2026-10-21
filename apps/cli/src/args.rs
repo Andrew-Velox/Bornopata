@@ -32,6 +32,10 @@ pub struct Args {
     #[arg(long)]
     pub emoji: bool,
 
+    /// Correct English words typed as written to their Bangla spelling, as the input method does.
+    #[arg(long)]
+    pub autocorrect: bool,
+
     /// Ignore any dictionary file and use only the built-in scaffold word list.
     #[arg(long, conflicts_with = "dict")]
     pub no_dict: bool,

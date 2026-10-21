@@ -3,6 +3,7 @@
 //! Each Fcitx5 input context gets its own [`Engine`] (its own word being typed), but what was learned
 //! has to be one table, so the engines talk to these shared handles.
 
+mod autocorrect;
 mod clock;
 mod emoji;
 mod learner;
@@ -12,6 +13,7 @@ mod words;
 
 use std::sync::{Arc, Mutex};
 
+use borno_autocorrect::AutocorrectTable;
 use borno_core::Engine;
 use borno_emoji::EmojiSet;
 use borno_gloss::Glossary;
@@ -19,6 +21,7 @@ use borno_learning::FrequencyLearner;
 use borno_lm::BigramModel;
 use borno_transliteration::WordSource;
 
+use autocorrect::SharedAutocorrect;
 use clock::SystemClock;
 use emoji::SharedEmoji;
 use learner::SharedLearner;
@@ -40,6 +43,7 @@ pub struct Shared {
     phrases: Option<Arc<FilePhrases>>,
     shortcuts: bool,
     emoji: Option<Arc<EmojiSet>>,
+    autocorrect: Option<Arc<AutocorrectTable>>,
 }
 
 impl Shared {
@@ -57,6 +61,7 @@ impl Shared {
             phrases: None,
             shortcuts: false,
             emoji: None,
+            autocorrect: None,
         }
     }
 
@@ -84,6 +89,12 @@ impl Shared {
         self
     }
 
+    /// Corrects English words typed as written to their Bangla spelling; the table is built into the program.
+    pub fn with_autocorrect(mut self, enabled: bool) -> Self {
+        self.autocorrect = enabled.then(|| Arc::new(AutocorrectTable::bundled()));
+        self
+    }
+
     /// A new engine for one input context.
     pub fn engine(&self) -> Engine {
         let mut engine = Engine::new(Box::new(SharedWords(self.words.clone())))
@@ -96,6 +107,9 @@ impl Shared {
         }
         if let Some(emoji) = &self.emoji {
             engine = engine.with_emoji(Box::new(SharedEmoji(emoji.clone())));
+        }
+        if let Some(autocorrect) = &self.autocorrect {
+            engine = engine.with_autocorrect(Box::new(SharedAutocorrect(autocorrect.clone())));
         }
         if self.shortcuts {
             engine = engine.with_clock(Box::new(SystemClock));

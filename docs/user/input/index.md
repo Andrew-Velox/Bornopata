@@ -1,7 +1,7 @@
 ---
 title: Typing
 order: 2
-description: How to spell Bangla in Roman letters, how the candidate list is built, your own phrases, date and time, emoji and English mode.
+description: How to spell Bangla in Roman letters, how the candidate list is built, your own phrases, date and time, emoji, English words and English mode.
 ---
 
 - [Typing Bangla](typing-bangla.md): the letters and what they give.
@@ -9,4 +9,5 @@ description: How to spell Bangla in Roman letters, how the candidate list is bui
 - [Your own phrases](phrases.md): a short code that types a long text.
 - [Date, time and weekday](shortcuts.md): `tarikh`, `somoy`, `bar`.
 - [Emoji](emoji.md): `hridoy` offers a heart.
+- [English words](autocorrect.md): `facebook` types ফেসবুক.
 - [English mode](english-mode.md): typing English without leaving Bornopata.

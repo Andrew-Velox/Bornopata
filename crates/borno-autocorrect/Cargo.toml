@@ -1,0 +1,12 @@
+[package]
+name = "borno-autocorrect"
+description = "The Bangla spelling of English words typed as written, from a table built into the program"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+borno-core.workspace = true

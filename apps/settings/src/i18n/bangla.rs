@@ -38,6 +38,11 @@ pub(super) const TABLE: &[(&str, &str)] = &[
         "Emoji next to the words that name them: hridoy offers a heart, and heart does too.",
         "যে শব্দ ইমোজির নাম, তার পাশে ইমোজি আসে: hridoy লিখলে একটি হৃদয় আসে, heart লিখলেও আসে।",
     ),
+    ("English words", "ইংরেজি শব্দ"),
+    (
+        "facebook types ফেসবুক and facebooke ফেসবুকে, instead of letters the Avro rules cannot spell.",
+        "facebook লিখলে ফেসবুক আর facebooke লিখলে ফেসবুকে আসে, আভ্রো নিয়মে যে বানান হয় না তার বদলে।",
+    ),
     ("Date and time words", "তারিখ ও সময়ের শব্দ"),
     (
         "tarikh offers today's date, somoy the time and bar the weekday, in Bangla.",
