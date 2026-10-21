@@ -9,25 +9,15 @@ mod socket;
 use std::io;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use std::sync::mpsc::{self, SyncSender};
+use std::sync::mpsc;
 use std::thread;
-use std::time::Instant;
 
-use borno_platform::protocol::{ClientMessage, ServerMessage};
+use borno_server::ipc::{Exit, MAX_CONNECTIONS, QUEUE, Request, run_router};
 
 use crate::popup::PopupHub;
 use crate::router::Router;
 
 pub use socket::{bind_socket, socket_path};
-
-/// A message for the Router with the channel for its answer.
-type Request = (ClientMessage, mpsc::Sender<Option<ServerMessage>>);
-
-/// Connections beyond this many are dropped; a broken client cannot exhaust threads.
-const MAX_CONNECTIONS: usize = 64;
-
-/// Requests waiting for the Router; bounded so a flooding client cannot grow memory.
-const QUEUE: usize = 128;
 
 static STOP: AtomicBool = AtomicBool::new(false);
 static RELOAD: AtomicBool = AtomicBool::new(false);
@@ -79,34 +69,9 @@ pub fn serve_with_popup(
             }
         }
     });
-    // The tick deadline is absolute, so a steady stream of messages cannot push it back forever.
-    let mut due = Instant::now() + router.next_tick();
-    while !STOP.load(Ordering::Relaxed) {
-        let now = Instant::now();
-        if now >= due {
-            router.tick();
-            if router.reload_due() {
-                RELOAD.store(true, Ordering::Relaxed);
-                break;
-            }
-            due = Instant::now() + router.next_tick();
-            continue;
-        }
-        match receiver.recv_timeout(due - now) {
-            Ok((message, reply)) => {
-                let _ = reply.send(router.handle(message));
-            }
-            Err(mpsc::RecvTimeoutError::Timeout) => {}
-            Err(mpsc::RecvTimeoutError::Disconnected) => break,
-        }
+    if run_router(router, &receiver, &STOP) == Exit::Reload {
+        RELOAD.store(true, Ordering::Relaxed);
     }
     std::fs::remove_file(path.as_ref())?;
     Ok(())
-}
-
-/// Sends one message to the Router and waits for its answer.
-fn ask(sender: &SyncSender<Request>, message: ClientMessage) -> Option<ServerMessage> {
-    let (reply, answer) = mpsc::channel();
-    sender.send((message, reply)).ok()?;
-    answer.recv().ok().flatten()
 }
