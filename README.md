@@ -44,47 +44,46 @@ You can also point the config at a folder of your own theme. More in [Themes and
 
 ## Features
 
-### Typing
+- **⌨️ Typing**
+  - **Avro phonetic.** Type the sound: `t` is ত, `T` is ট, `ng` is ং, `^` makes ঁ. [All the letters](docs/user/input/typing-bangla.md).
+  - **A 413,000-word dictionary.**
+    - Real words near your spelling, the common ones first.
+    - Completes from the first letters: `bangl` gives বাংলা, বাংলাদেশ.
+    - Spellings of one sound meet: `bhalobasha` and `valobasha` find ভালোবাসা.
+  - **Hard words too.** `moddhe` finds মধ্যে, `porjonto` পর্যন্ত, `dukkho` দুঃখ.
+  - **Never stuck.** The direct conversion of your letters is always on the list.
+  - **Bangla digits and marks.** `123` gives ১২৩, `.` gives `।`, `$` gives ৳.
+  - **English mode.** `Ctrl+Alt+Space` hands every key back to the application, per text field.
 
-- **Avro phonetic typing.** The familiar rules: `t` is ত and `T` is ট, `ng` is ং, `^` makes a chandrabindu. Conjuncts, vowel signs and Bangla digits are all handled. See [Typing Bangla](docs/user/input/typing-bangla.md).
-- **A dictionary of about 413,000 words.** Next to the converted spelling it offers the real words near it, ranked by how common they are, and completes a word from its first letters (`bangl` gives বাংলা, বাংলাদেশ). Different spellings of one sound (`bhalobasha`, `valobasha`) meet in the same word.
-- **Words the letters cannot spell.** `moddhe` finds মধ্যে, `porjonto` পর্যন্ত, `dukkho` দুঃখ.
-- **You can always type a word that is in no list.** The direct conversion of your letters is always offered.
-- **Bangla digits and punctuation.** `123` gives ১২৩, `.` gives the Bangla full stop `।`, `$` gives ৳. Both can be switched off.
-- **English mode.** `Ctrl+Alt+Space` hands every key straight to the application and back. Each text field keeps its own mode.
+- **🧠 It learns from you**
+  - **Your choice comes first.** Pick a word once and it leads next time, even if no dictionary has it.
+  - **Next-word suggestions.**
+    - Up to five words after a space, taken with `Tab`.
+    - Your own writing first, then a built-in word pair model (2 MB).
+    - The word before also helps pick the spelling.
+  - **It fades.** Words you stop using lose weight; nothing grows without limit.
+  - **You decide.**
+    - `Shift+Delete` forgets a wrong word or hides a suggestion.
+    - One switch turns learning off, one button erases it. [What it learns](docs/user/learning/learning.md).
 
-### It learns from you
+- **✨ Beside the words**
+  - **English meanings.** A short gloss like `n. rice`, from Wiktionary. It never reorders or delays the list.
+  - **Emoji.** `hridoy` offers 🫀 ❤️; English words such as `heart` work too.
+  - **Date and time.** `tarikh`, `somoy` and `bar` give the date, time and weekday, with the Bengali calendar date.
+  - **Your phrases.** `mymail` types your address, `sig` your signature. They come first and are never learned.
 
-- **Your choices come first.** Pick a word once for some letters and it comes first the next time, including words that are in no dictionary: names, slang, new words.
-- **Next-word suggestions.** After a space it offers up to five words that usually follow, from your own writing first, and from a small built-in word pair model (2 MB, from Bengali text) so there is help from the first day. Take one with `Tab`.
-- **Context helps pick the spelling.** The word before can decide between two spellings of the next.
-- **It fades and stays small.** What you stopped using loses weight over time; nothing grows without bound.
-- **You are in control.** `Shift+Delete` forgets a wrongly learned word or hides a suggestion for good. Learning can be switched off, or erased with one button. See [What it learns](docs/user/learning/learning.md).
+- **🪟 The candidate window**
+  - **At your cursor.**
+    - Wayland apps (Brave, Firefox, GTK, Qt) get it through the input-method popup.
+    - X11 gets a small overlay; anything else falls back to Fcitx5's own panel.
+  - **Five animated themes** with mascots, in a vertical or a horizontal list, light or dark.
+  - **Correct Bengali shaping.** Conjuncts like প্র, ক্রি and স্ব are drawn properly.
 
-### Beside the words
-
-- **English meanings.** A short gloss with its part of speech (`n. rice`) can show beside a candidate, from Wiktionary under CC BY-SA 4.0, so you pick up English as you write. It never changes the order and never delays the list. (It covers part of the 5,000 most frequent words, about 2,450 so far.)
-- **Emoji.** `hridoy` offers 🫀 ❤️ after হৃদয়, and `heart` works too. The names come from the Unicode CLDR in Bangla and English.
-- **Dates and times.** `tarikh`, `somoy` and `bar` give today's date, the time and the weekday in Bangla digits and words, including the Bengali calendar date of Bangladesh (`৫ কার্তিক ১৪৩৩`).
-- **Your own phrases.** Give any text a short code: `mymail` types your address, `sig` your signature. Phrases come first and are never learned.
-
-### The window
-
-- **At your text cursor.** In Wayland applications (Brave, Firefox, GTK and Qt programs) the candidate window appears at the cursor through the input-method popup, placed by your compositor. On X11 and XWayland it is a small overlay; everywhere else Fcitx5's own candidate panel shows the same list.
-- **Self-drawn and animated.** Bengali conjuncts are shaped correctly, themes animate, and the mascots hang over the edge of the card.
-- **Vertical or horizontal list**, light or dark, with the English meaning under each word in the horizontal one.
-
-### Settings
-
-**Bornopata Settings** is a small program in your application launcher. It speaks English and বাংলা, and every change applies within a second or two, without restarting anything:
-
-- **Typing:** learning, Bangla digits, glosses, shortcut words, emoji, the language of the program.
-- **Keys:** click a field and press the keys you want.
-- **Appearance:** the theme, light or dark, vertical or horizontal, with a live preview.
-- **Phrases:** your own short codes.
-- **Learning:** how much it has learned, and a button to forget it all.
-
-Everything is also in one plain text file, `~/.config/bornopata/config.toml`. See [the config file](docs/user/settings/config-file.md).
+- **⚙️ Settings**
+  - **Bornopata Settings**, in your launcher, in English or বাংলা.
+    - Typing, keys, appearance with a live preview, phrases and learning.
+    - Every change applies within a second or two.
+  - **One text file** for everything: `~/.config/bornopata/config.toml`. [The config file](docs/user/settings/config-file.md).
 
 ## Privacy
 
