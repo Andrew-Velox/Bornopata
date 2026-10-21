@@ -76,7 +76,7 @@
     },
 
     "mascot_lying": {
-      "type": "frame", "position": "absolute", "inset": [-52, "auto", "auto", 24], "width": 176, "height": 55,
+      "type": "frame", "position": "absolute", "inset": [-49, "auto", "auto", 24], "width": 176, "height": 55,
       "fill": { "image": "images/character-lying.png", "scale": 3 }
     },
 
