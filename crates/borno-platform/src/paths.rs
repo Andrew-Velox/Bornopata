@@ -1,4 +1,4 @@
-//! Where Bornopata keeps its files, following the XDG directories.
+//! Where Bornopata keeps its files: the XDG directories on Linux, `%APPDATA%` and `%LOCALAPPDATA%` on Windows.
 
 use std::path::PathBuf;
 
@@ -17,6 +17,7 @@ pub const PHRASES_FILE: &str = "phrases.tsv";
 /// A file the settings program drops to ask the Server to forget what it learned.
 pub const FORGET_MARKER: &str = "forget-learned";
 
+#[cfg(not(windows))]
 fn xdg(variable: &str, fallback: &str) -> PathBuf {
     std::env::var_os(variable)
         .map(PathBuf::from)
@@ -26,31 +27,61 @@ fn xdg(variable: &str, fallback: &str) -> PathBuf {
         .join("bornopata")
 }
 
-/// Learned data, the dictionary and the optional language model: `$XDG_DATA_HOME/bornopata`.
+/// `%APPDATA%\Bornopata` and `%LOCALAPPDATA%\Bornopata`: settings and learned data roam with the user, logs do not.
+#[cfg(windows)]
+fn app_dir(variable: &str) -> PathBuf {
+    std::env::var_os(variable)
+        .map(PathBuf::from)
+        .filter(|path| path.is_absolute())
+        .unwrap_or_else(|| PathBuf::from("."))
+        .join("Bornopata")
+}
+
+/// Learned data, the dictionary and the optional language model: `$XDG_DATA_HOME/bornopata`, on Windows
+/// `%APPDATA%\Bornopata`.
 pub fn user_dir() -> PathBuf {
+    #[cfg(windows)]
+    return app_dir("APPDATA");
+    #[cfg(not(windows))]
     xdg("XDG_DATA_HOME", ".local/share")
 }
 
-/// `$XDG_CONFIG_HOME/bornopata/config.toml`.
+/// `$XDG_CONFIG_HOME/bornopata/config.toml`, on Windows `%APPDATA%\Bornopata\config.toml`.
 pub fn config_path() -> PathBuf {
+    #[cfg(windows)]
+    return app_dir("APPDATA").join("config.toml");
+    #[cfg(not(windows))]
     xdg("XDG_CONFIG_HOME", ".config").join("config.toml")
 }
 
-/// Rolling Server logs: `$XDG_STATE_HOME/bornopata/logs`.
+/// Rolling Server logs: `$XDG_STATE_HOME/bornopata/logs`, on Windows `%LOCALAPPDATA%\Bornopata\logs`.
 pub fn log_dir() -> PathBuf {
+    #[cfg(windows)]
+    return app_dir("LOCALAPPDATA").join("logs");
+    #[cfg(not(windows))]
     xdg("XDG_STATE_HOME", ".local/state").join("logs")
 }
 
-/// The directories of system-wide data, `bornopata` inside each of `$XDG_DATA_DIRS` (default `/usr/local/share:/usr/share`),
-/// where a distribution package puts the dictionary.
+/// The directories of system-wide data, where a package puts the dictionary: `bornopata` inside each of
+/// `$XDG_DATA_DIRS` (default `/usr/local/share:/usr/share`); on Windows the `data` folder next to the program, where
+/// the installer puts it.
 fn system_dirs() -> Vec<PathBuf> {
-    let dirs = std::env::var_os("XDG_DATA_DIRS")
-        .filter(|value| !value.is_empty())
-        .unwrap_or_else(|| "/usr/local/share:/usr/share".into());
-    std::env::split_paths(&dirs)
-        .filter(|path| path.is_absolute())
-        .map(|path| path.join("bornopata"))
-        .collect()
+    #[cfg(windows)]
+    return std::env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(|dir| dir.join("data")))
+        .into_iter()
+        .collect();
+    #[cfg(not(windows))]
+    {
+        let dirs = std::env::var_os("XDG_DATA_DIRS")
+            .filter(|value| !value.is_empty())
+            .unwrap_or_else(|| "/usr/local/share:/usr/share".into());
+        std::env::split_paths(&dirs)
+            .filter(|path| path.is_absolute())
+            .map(|path| path.join("bornopata"))
+            .collect()
+    }
 }
 
 /// The first `name` that exists in `directories`, in order.

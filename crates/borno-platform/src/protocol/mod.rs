@@ -27,6 +27,9 @@ pub use mode::Mode;
 pub use popup::{PopupClientMessage, PopupFrame, PopupServerMessage};
 pub use session::SessionId;
 
+/// The named pipe the Windows Server listens on and the text service connects to.
+pub const DEFAULT_PIPE_NAME: &str = r"\\.\pipe\bornopata";
+
 /// Bumped whenever a message or a field changes meaning. The Server refuses a shell that sends another number;
 /// there is no compatibility layer, the Server and the plugin are installed together.
 pub const PROTOCOL_VERSION: u32 = 4;

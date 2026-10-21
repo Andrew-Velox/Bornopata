@@ -11,6 +11,7 @@ pub mod popup;
 pub mod router;
 pub mod session;
 pub mod shared;
+pub mod startup;
 
 pub use error::ServerError;
 pub use router::Router;
