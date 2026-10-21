@@ -1,0 +1,28 @@
+[package]
+name = "borno-windows-tsf"
+description = "Windows text service DLL: loaded into every application, it forwards the keys to the Server and writes the text into the document"
+version = "0.1.0-dev"
+edition.workspace = true
+license.workspace = true
+
+# The cdylib is `bornopata_tsf.dll`, the name regsvr32 and the installer know; the rlib is for the protocol tests.
+[lib]
+name = "bornopata_tsf"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+borno-platform.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+borno-core.workspace = true
+borno-server.workspace = true
+borno-transliteration.workspace = true
+
+[target."cfg(windows)".dependencies]
+windows = { version = "0.62", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_Security", "Win32_System_Com", "Win32_System_LibraryLoader", "Win32_System_Ole", "Win32_System_Pipes", "Win32_System_SystemInformation", "Win32_System_SystemServices", "Win32_System_Threading", "Win32_System_Variant", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_Shell", "Win32_UI_TextServices", "Win32_UI_WindowsAndMessaging"] }
+windows-core = "0.62.2"
+windows-registry = "0.6.1"

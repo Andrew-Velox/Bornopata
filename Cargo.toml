@@ -18,6 +18,7 @@ members = [
     "apps/cli",
     "apps/linux/server",
     "apps/windows/server",
+    "apps/windows/tsf",
     "apps/settings",
     "tools/corpus-text",
     "tools/dict-build",
