@@ -13,7 +13,7 @@ options=('!lto' '!debug')
 _tag=${pkgver//_/-}
 # The dictionary and the word pair model are not in the repository; the data releases pin them
 # (assets/dictionary/words.bnd.release and lm.bnd.release).
-source=("$pkgname-$_tag.tar.gz::$url/archive/refs/tags/v$_tag.tar.gz"
+source=("$pkgname-$_tag-source.tar.gz::$url/releases/download/v$_tag/$pkgname-$_tag-source.tar.gz"
         "words.bnd::$url/releases/download/data-v1/words.bnd"
         "lm.bnd::$url/releases/download/data-lm-v1/lm.bnd")
 sha256sums=('SKIP'
@@ -21,12 +21,12 @@ sha256sums=('SKIP'
             '60a8ef66dde12085a4626ace1b8d8b1dc955229882fd1fe3118774c8f339a733')
 
 prepare() {
-  cd "Bornopata-$_tag"
+  cd "$pkgname-$_tag"
   cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
 }
 
 build() {
-  cd "Bornopata-$_tag"
+  cd "$pkgname-$_tag"
   export RUSTUP_TOOLCHAIN=stable CARGO_TARGET_DIR=target
   cargo build --frozen --release -p borno-linux-server -p borno-settings
   apps/linux/scripts/build-gloss.sh target/gloss-en.bnd
@@ -35,7 +35,7 @@ build() {
 }
 
 package() {
-  cd "Bornopata-$_tag"
+  cd "$pkgname-$_tag"
   install -Dm755 target/release/borno-linux-server "$pkgdir/usr/bin/borno-linux-server"
   install -Dm755 target/release/bornopata-settings "$pkgdir/usr/bin/bornopata-settings"
   DESTDIR="$pkgdir" cmake --install target/fcitx5

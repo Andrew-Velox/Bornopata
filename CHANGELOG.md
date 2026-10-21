@@ -5,7 +5,7 @@ Written by hand by the maintainers at release time; pull requests do not edit it
 ## Unreleased
 
 - English words typed as written come out in Bangla: `facebook` gives ফেসবুক, `computer` কম্পিউটার, and an ending can follow (`facebooke` gives ফেসবুকে, `tvte` টিভিতে). About 360 words, built into the program; the setting is `autocorrect` under `[general]`, also on the Typing page of Bornopata Settings.
-- A Windows version, as an early preview: a text service for every application (`bornopata_tsf.dll`), the Server with the candidate window (`bornopata-server.exe`) and an installer for Windows 10 and 11. It builds and its automated tests pass, but it has not been run on a Windows machine yet, so it is not part of a release.
+- A Windows version, as an early preview: a text service for every application (`bornopata_tsf.dll`), the Server with the candidate window (`bornopata-server.exe`) and an installer for Windows 10 and 11. It builds and its automated tests pass, but nobody has run it on a real Windows machine yet, so expect problems. The installer is not signed, so Windows asks for confirmation (More info, then Run anyway). If something fails, the logs are in `%LOCALAPPDATA%\Bornopata\logs` and never contain what you type; please open an issue with them.
 - The Sakura theme has a pink mascot peeking over the corner of the window, with a bow, a crown that bobs and falling petals. The Wayland popup now shows decoration that hangs over the card, up to what the theme declares.
 - The Shapla, Borsha and Jonaki themes have mascots too: beside or on the vertical window, and lying along the top edge of the horizontal one. Every mascot wears modest long clothes.
 - The horizontal candidate list shows the English meaning under each word, like the vertical list does beside it.
@@ -14,7 +14,6 @@ Written by hand by the maintainers at release time; pull requests do not edit it
 - Bornopata Settings speaks Bangla: set `language = "bn"` in the config file or pick বাংলা on the Typing page; the default follows the system language.
 - Bengali conjuncts such as প্র, ক্রি, ন্ত্র and স্ব are drawn correctly in the candidate window and the settings program (they showed a stray hasanta and a full-width letter).
 - A built-in word pair model (2 MB, from the Common Voice Bengali sentences): next-word suggestions from the first day, and the previous word helps choose between spellings. `Shift+Delete` hides a suggestion for good.
-
 - Bornopata Settings: a settings program in the application launcher (typing, keys, appearance with a live preview, phrases, learning, about).
 - The Server starts over by itself within a second or two of a saved config change, and forgets everything learned when the settings program asks.
 

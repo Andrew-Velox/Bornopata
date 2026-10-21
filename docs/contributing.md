@@ -69,7 +69,7 @@ Design background is in [design/architecture.md](design/architecture.md) (inheri
 ## CI and releases
 
 - One CI job on Linux: fmt, cargo-deny, clippy, tests, then the Fcitx5 plugin build and tests against the real Server. Everything runs with `--locked`. A weekly `cargo audit` runs separately and Dependabot updates actions and crates.
-- Releases: `.github/workflows/release.yml` builds, packages and publishes a Linux release from a `v<version>` tag, after checking that the tag, the versions, the changelog, the dictionary checksum and the commit (on `main`) agree. Procedure and details: [plan/release.md](plan/release.md). Nothing has been published yet.
+- Releases: `.github/workflows/release.yml` builds, packages and publishes a Linux release from a `v<version>` tag, after checking that the tag, the versions, the changelog, the dictionary checksum and the commit (on `main`) agree. Procedure and details: [plan/release.md](plan/release.md). Windows installers come from the same tag.
 
 ## External PRs
 
