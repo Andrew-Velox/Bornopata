@@ -17,6 +17,7 @@ members = [
     "crates/borno-server",
     "apps/cli",
     "apps/linux/server",
+    "apps/windows/server",
     "apps/settings",
     "tools/corpus-text",
     "tools/dict-build",
