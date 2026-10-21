@@ -4,6 +4,7 @@ Written by hand by the maintainers at release time; pull requests do not edit it
 
 ## Unreleased
 
+- A Windows version, as an early preview: a text service for every application (`bornopata_tsf.dll`), the Server with the candidate window (`bornopata-server.exe`) and an installer for Windows 10 and 11. It builds and its automated tests pass, but it has not been run on a Windows machine yet, so it is not part of a release.
 - The Sakura theme has a pink mascot peeking over the corner of the window, with a bow, a crown that bobs and falling petals. The Wayland popup now shows decoration that hangs over the card, up to what the theme declares.
 - The Shapla, Borsha and Jonaki themes have mascots too: beside or on the vertical window, and lying along the top edge of the horizontal one. Every mascot wears modest long clothes.
 - The horizontal candidate list shows the English meaning under each word, like the vertical list does beside it.

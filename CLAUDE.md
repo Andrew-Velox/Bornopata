@@ -8,7 +8,8 @@ Bornopata is a cross-platform Bangla input method (phonetic, Avro-style first). 
 The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git fetch upstream` brings back any stripped file), and is being converted. Right now:
 
 - **Done:** the Bangla Core and the Linux path. `Engine` takes raw Roman letters (case kept), builds candidates from the direct Avro conversion, a `WordSource` and learned choices, ranks them and commits word by word. `borno-cli` drives it. `borno-linux-server` serves it over a Unix socket to the Fcitx5 plugin, so Bangla can be typed in real applications (`docs/notes/linux-fcitx5.md`).
-- **Not done:** packaging and releases, Windows and macOS shells. Our own dictionary (`words.bnd`) answers first; the MIT-licensed `upodesh` list is only the fallback (see `docs/design/bangla-reuse-plan.md`).
+- **Written, not yet run on a Windows machine:** the Windows shell (`apps/windows`: Server, text service DLL, installer; `docs/design/windows.md`). It builds and its engine layer is tested against the real Router, CI builds the installer, a friend has to try it.
+- **Not done:** releases, the macOS shell. Our own dictionary (`words.bnd`) answers first; the MIT-licensed `upodesh` list is only the fallback (see `docs/design/bangla-reuse-plan.md`).
 - Many comments in inherited files are still Chinese. Translate a file when you change it substantially; new code and docs are English.
 - Direction, decisions and open items: `docs/plan/roadmap.md`, `docs/design/bangla-engine.md`, `docs/design/bangla-reuse-plan.md`.
 
@@ -34,6 +35,7 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 - `crates/borno-window`: what every self-drawn candidate window shares: `PanelConfig`, finding the theme the config names, `Rect` and `place` (the window next to the text cursor, kept on the monitor). No window system.
 - `crates/borno-panel`: the Wayland window: a layer-shell surface on its own thread, popup placement, Hyprland geometry. `examples/show.rs` puts it on a real screen.
 - `apps/linux`: `server` (Unix socket IPC, the Wayland window and popup surfaces around `borno-server`), `fcitx5` (C++ plugin; draws the Fcitx5 panel only when the Server's own window is not available, and shows the Server's bitmaps in the input-method popup of Wayland clients), `scripts` (user-level install and uninstall), `systemd` (user unit).
+- `apps/windows`: `server` (`bornopata-server.exe`: the named pipe and the layered candidate window around `borno-server`), `tsf` (`bornopata_tsf.dll`: the TSF text service; `client` is portable and tested on Linux, `com` is Windows only), `installer` (Inno Setup, `build.ps1`). Windows code builds from Linux with `cargo check --target x86_64-pc-windows-gnu -p borno-windows-tsf -p borno-windows-server`.
 - `apps/settings`: `borno-settings` (`bornopata-settings`), the settings program drawn on `bamboo-slip` (pages in `view/pages/`, `linux/` holds the launcher entry and icon). Edits the config file and `phrases.tsv`; see `docs/design/settings.md`.
 - `vendor/cosmic-text`: cosmic-text 0.19.0 with its shaper moved to `harfrust` 0.14 so Bengali conjuncts form correctly; wired in by `[patch.crates-io]`, see `docs/notes/text-shaping.md`. Do not edit it for anything else.
 - `assets/`: sample data. Every directory has a README with source and license. Data without a verified license must not ship.
