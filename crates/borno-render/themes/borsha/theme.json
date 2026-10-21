@@ -1,10 +1,14 @@
 // Borsha: a rainy-day card (borsha is the monsoon): cool blue-grey, a cloud in the corner and raindrops falling through the
 // window in a loop. The pictures are light, so the theme is locked to the light appearance.
-// All artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+// The vector artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+// images/character*.png were supplied by the project owner (see README.md). In the vertical layout the mascot peeks from
+// behind the right edge of the card, outside it; in the horizontal layout she lies along its top edge. `popup_overhang` is how
+// far she may hang out in the popup (the bitmap only holds what the layout draws, so each layout takes what it needs).
 {
   "extends": "bornopata",
   "schema": 1,
-  "meta": { "id": "borsha", "name": "Borsha", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "light" },
+  "meta": { "id": "borsha", "name": "Borsha", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "light",
+            "popup_overhang": [60, 100, 0, 0] },
 
   "variables": {
     "text": "#1e2b3b",
@@ -73,6 +77,16 @@
           ] }
       ]
     },
+    "mascot": {
+      "type": "frame", "position": "absolute", "inset": [0, -97, "auto", "auto"], "width": 97, "height": 180,
+      "fill": { "image": "images/character.png", "scale": 3 }
+    },
+
+    "mascot_lying": {
+      "type": "frame", "position": "absolute", "inset": [-57, "auto", "auto", 20], "width": 144, "height": 60,
+      "fill": { "image": "images/character-lying.png", "scale": 3 }
+    },
+
     "corner": {
       "type": "frame", "position": "absolute", "inset": [4, 4, "auto", "auto"], "width": 38, "height": 23,
       "fill": { "image": "images/cloud.svg" },
@@ -97,6 +111,7 @@
         { "type": "use", "component": "top_line" },
         { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
           "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] },
+        { "type": "use", "component": "mascot" },
         { "type": "use", "component": "corner" }
       ]
     },
@@ -111,6 +126,7 @@
         { "type": "use", "component": "top_line" },
         { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 10,
           "children": [{ "type": "repeat", "bind": "candidates", "component": "item" }] },
+        { "type": "use", "component": "mascot_lying" },
         { "type": "use", "component": "corner" }
       ]
     }

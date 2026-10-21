@@ -1,10 +1,14 @@
 // Jonaki: a night card (jonaki is the firefly): deep indigo, a crescent moon in the corner and three fireflies drifting and
 // glowing in a loop. The pictures are made for a dark card, so the theme is locked to the dark appearance.
-// All artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+// The vector artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+// images/character*.png were supplied by the project owner (see README.md). In the vertical layout the mascot leans on the
+// right edge of the card, outside it; in the horizontal layout she lies along its top edge. `popup_overhang` is how far
+// she may hang out in the popup (the bitmap only holds what the layout draws, so each layout takes what it needs).
 {
   "extends": "bornopata",
   "schema": 1,
-  "meta": { "id": "jonaki", "name": "Jonaki", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "dark" },
+  "meta": { "id": "jonaki", "name": "Jonaki", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "dark" ,
+            "popup_overhang": [58, 110, 0, 0] },
 
   "variables": {
     "text": "#e9eefc",
@@ -66,6 +70,16 @@
           ] }
       ]
     },
+    "mascot": {
+      "type": "frame", "position": "absolute", "inset": [0, -108, "auto", "auto"], "width": 108, "height": 230,
+      "fill": { "image": "images/character.png", "scale": 3 }
+    },
+
+    "mascot_lying": {
+      "type": "frame", "position": "absolute", "inset": [-52, "auto", "auto", 24], "width": 176, "height": 55,
+      "fill": { "image": "images/character-lying.png", "scale": 3 }
+    },
+
     "corner": {
       "type": "frame", "position": "absolute", "inset": [3, 6, "auto", "auto"], "width": 28, "height": 28,
       "fill": { "image": "images/moon.svg" },
@@ -90,6 +104,7 @@
         { "type": "use", "component": "top_line" },
         { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
           "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] },
+        { "type": "use", "component": "mascot" },
         { "type": "use", "component": "corner" }
       ]
     },
@@ -104,6 +119,7 @@
         { "type": "use", "component": "top_line" },
         { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 10,
           "children": [{ "type": "repeat", "bind": "candidates", "component": "item" }] },
+        { "type": "use", "component": "mascot_lying" },
         { "type": "use", "component": "corner" }
       ]
     }

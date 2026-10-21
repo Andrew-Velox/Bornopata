@@ -1,10 +1,14 @@
 // Shapla: a cool water-lily card (the shapla is the national flower of Bangladesh): white and pale teal, a lily in
 // the corner and two ripples spreading at the bottom. The pictures are light, so the theme is locked to the light appearance.
-// All artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+// The vector artwork (images/*.svg) was drawn for Bornopata and is released under GPL-3.0-or-later with the theme.
+// images/character*.png were supplied by the project owner (see README.md). In the vertical layout the mascot sits on the top
+// edge of the card near the right corner, her legs and braid in front of its empty top-right; in the horizontal layout she lies
+// along the top edge. `popup_overhang` is how far she may hang out in the popup (each layout takes what it draws).
 {
   "extends": "bornopata",
   "schema": 1,
-  "meta": { "id": "shapla", "name": "Shapla", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "light" },
+  "meta": { "id": "shapla", "name": "Shapla", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "light",
+            "popup_overhang": [76, 0, 0, 0] },
 
   "variables": {
     "text": "#1f3b3a",
@@ -55,6 +59,16 @@
           ] }
       ]
     },
+    "mascot": {
+      "type": "frame", "position": "absolute", "inset": [-73, 36, "auto", "auto"], "width": 96, "height": 116,
+      "fill": { "image": "images/character.png", "scale": 3 }
+    },
+
+    "mascot_lying": {
+      "type": "frame", "position": "absolute", "inset": [-54, "auto", "auto", 20], "width": 150, "height": 56,
+      "fill": { "image": "images/character-lying.png", "scale": 3 }
+    },
+
     "corner": {
       "type": "frame", "position": "absolute", "inset": [3, 5, "auto", "auto"], "width": 30, "height": 30,
       "fill": { "image": "images/lily.svg" },
@@ -79,7 +93,8 @@
         { "type": "use", "component": "top_line" },
         { "type": "frame", "when": "candidates", "table": { "row_height": 30 }, "align_self": "stretch",
           "children": [{ "type": "repeat", "bind": "candidates", "component": "row" }] },
-        { "type": "use", "component": "corner" }
+        { "type": "use", "component": "corner" },
+        { "type": "use", "component": "mascot" }
       ]
     },
     "horizontal": {
@@ -93,7 +108,8 @@
         { "type": "use", "component": "top_line" },
         { "type": "frame", "when": "candidates", "align_self": "stretch", "padding": [0, 5, 0, 5], "gap": 10,
           "children": [{ "type": "repeat", "bind": "candidates", "component": "item" }] },
-        { "type": "use", "component": "corner" }
+        { "type": "use", "component": "corner" },
+        { "type": "use", "component": "mascot_lying" }
       ]
     }
   }

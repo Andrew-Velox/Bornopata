@@ -78,6 +78,14 @@ const BUILTINS: [(&str, &str, EmbeddedFiles); 5] = [
                 include_bytes!("../../themes/shapla/images/lily.svg"),
             ),
             (
+                "images/character.png",
+                include_bytes!("../../themes/shapla/images/character.png"),
+            ),
+            (
+                "images/character-lying.png",
+                include_bytes!("../../themes/shapla/images/character-lying.png"),
+            ),
+            (
                 "images/ripple.svg",
                 include_bytes!("../../themes/shapla/images/ripple.svg"),
             ),
@@ -95,6 +103,14 @@ const BUILTINS: [(&str, &str, EmbeddedFiles); 5] = [
                 "images/drop.svg",
                 include_bytes!("../../themes/borsha/images/drop.svg"),
             ),
+            (
+                "images/character.png",
+                include_bytes!("../../themes/borsha/images/character.png"),
+            ),
+            (
+                "images/character-lying.png",
+                include_bytes!("../../themes/borsha/images/character-lying.png"),
+            ),
         ],
     ),
     (
@@ -108,6 +124,14 @@ const BUILTINS: [(&str, &str, EmbeddedFiles); 5] = [
             (
                 "images/firefly.svg",
                 include_bytes!("../../themes/jonaki/images/firefly.svg"),
+            ),
+            (
+                "images/character.png",
+                include_bytes!("../../themes/jonaki/images/character.png"),
+            ),
+            (
+                "images/character-lying.png",
+                include_bytes!("../../themes/jonaki/images/character-lying.png"),
             ),
         ],
     ),
