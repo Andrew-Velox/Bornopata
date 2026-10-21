@@ -7,7 +7,7 @@ mod hyprland;
 
 pub use hyprland::Hyprland;
 
-use crate::geometry::Rect;
+use borno_window::Rect;
 
 /// A text cursor rectangle as the input method framework reports it.
 #[derive(Debug, Clone, Copy, PartialEq)]

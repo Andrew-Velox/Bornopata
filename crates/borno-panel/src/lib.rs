@@ -7,13 +7,10 @@ pub mod buffer;
 mod command;
 pub mod compositor;
 mod error;
-mod geometry;
-pub mod placement;
 mod theme;
 mod wayland;
 
-pub use command::PanelConfig;
+pub use borno_window::{PanelConfig, Rect, placement};
 pub use error::PanelError;
-pub use geometry::Rect;
 pub use theme::load_theme;
 pub use wayland::Panel;

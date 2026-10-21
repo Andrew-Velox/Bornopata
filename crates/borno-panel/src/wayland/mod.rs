@@ -11,10 +11,11 @@ use std::thread::{self, JoinHandle};
 
 use smithay_client_toolkit::reexports::calloop::channel;
 
-use crate::command::{Command, PanelConfig};
+use crate::command::Command;
 use crate::compositor::CursorRect;
 use crate::error::PanelError;
 use borno_render::Frame;
+use borno_window::PanelConfig;
 
 /// A running panel. Dropping it stops the thread.
 pub struct Panel {

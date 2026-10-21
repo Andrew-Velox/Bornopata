@@ -8,7 +8,7 @@ use std::time::Duration;
 use serde_json::Value;
 
 use super::{Compositor, CursorRect, Located};
-use crate::geometry::Rect;
+use borno_window::Rect;
 
 const TIMEOUT: Duration = Duration::from_millis(150);
 

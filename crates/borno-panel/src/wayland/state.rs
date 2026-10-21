@@ -22,12 +22,13 @@ use smithay_client_toolkit::shm::slot::SlotPool;
 use borno_render::{FontLibrary, Layout, Rendered, Renderer, Theme};
 
 use crate::buffer::rgba_to_argb8888;
-use crate::command::{Command, PanelConfig};
+use crate::command::Command;
 use crate::compositor::{self, Compositor, CursorRect, Located};
 use crate::error::PanelError;
-use crate::geometry::Rect;
-use crate::placement::place;
 use crate::theme::load_theme;
+use borno_window::PanelConfig;
+use borno_window::Rect;
+use borno_window::placement::place;
 
 /// What the next draw needs once the surface is configured.
 pub(super) struct Pending {

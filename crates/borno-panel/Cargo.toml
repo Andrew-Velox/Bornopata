@@ -14,3 +14,4 @@ serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 smithay-client-toolkit = { version = "0.21.1", default-features = false, features = ["calloop"] }
+borno-window.workspace = true

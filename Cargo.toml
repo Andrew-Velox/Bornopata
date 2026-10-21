@@ -12,6 +12,7 @@ members = [
     "crates/bamboo-slip",
     "crates/borno-render",
     "crates/borno-panel",
+    "crates/borno-window",
     "crates/borno-platform",
     "crates/borno-server",
     "apps/cli",
@@ -46,6 +47,7 @@ borno-gloss = { path = "crates/borno-gloss" }
 borno-emoji = { path = "crates/borno-emoji" }
 bamboo-slip = { path = "crates/bamboo-slip" }
 borno-render = { path = "crates/borno-render" }
+borno-window = { path = "crates/borno-window" }
 borno-panel = { path = "crates/borno-panel" }
 borno-server = { path = "crates/borno-server" }
 # External versions are pinned here; member crates use `xxx.workspace = true`

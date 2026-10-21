@@ -1,0 +1,13 @@
+[package]
+name = "borno-window"
+description = "What every self-drawn candidate window shares: its configuration, finding its theme and placing it next to the text cursor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+borno-render.workspace = true
+thiserror.workspace = true
