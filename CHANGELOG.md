@@ -2,7 +2,7 @@
 
 Written by hand by the maintainers at release time; pull requests do not edit it.
 
-## Unreleased
+## 0.1.0-alpha.2 - 2026-10-21
 
 - English words typed as written come out in Bangla: `facebook` gives ফেসবুক, `computer` কম্পিউটার, and an ending can follow (`facebooke` gives ফেসবুকে, `tvte` টিভিতে). About 360 words, built into the program; the setting is `autocorrect` under `[general]`, also on the Typing page of Bornopata Settings.
 - A Windows version, as an early preview: a text service for every application (`bornopata_tsf.dll`), the Server with the candidate window (`bornopata-server.exe`) and an installer for Windows 10 and 11. It builds and its automated tests pass, but nobody has run it on a real Windows machine yet, so expect problems. The installer is not signed, so Windows asks for confirmation (More info, then Run anyway). If something fails, the logs are in `%LOCALAPPDATA%\Bornopata\logs` and never contain what you type; please open an issue with them.
