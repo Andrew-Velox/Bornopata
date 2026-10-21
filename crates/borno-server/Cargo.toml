@@ -1,0 +1,28 @@
+[package]
+name = "borno-server"
+description = "The input logic every Server shares: sessions, the Router, the shared engine parts and the frame the window draws"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+borno-core.workspace = true
+borno-dictionary.workspace = true
+borno-emoji.workspace = true
+borno-gloss.workspace = true
+borno-learning.workspace = true
+borno-lm.workspace = true
+borno-platform.workspace = true
+borno-render.workspace = true
+borno-transliteration.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.189"
+
+[target."cfg(windows)".dependencies]
+windows-sys = { version = "0.61.2", features = ["Win32_System_SystemInformation"] }

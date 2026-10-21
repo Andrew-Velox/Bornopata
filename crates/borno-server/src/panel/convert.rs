@@ -1,21 +1,12 @@
 //! Protocol frame to renderer frame.
 
-use borno_panel::Rect;
-use borno_panel::compositor::CursorRect as WindowCursor;
-use borno_platform::protocol::{CursorRect, Frame, FrameGloss, Mode, Source};
+use borno_platform::protocol::{Frame, FrameGloss, Mode, Source};
 use borno_render::{
     Frame as RenderFrame, Mode as RenderMode, Preedit, Row, Source as RowSource, Tone,
 };
 
 /// The key that takes a next-word suggestion, shown on the window.
 const NEXT_WORD_HINT: &str = "Tab";
-
-pub fn render_rect(cursor: CursorRect) -> WindowCursor {
-    WindowCursor {
-        rect: Rect::new(cursor.x, cursor.y, cursor.width, cursor.height),
-        surface_relative: cursor.surface_relative,
-    }
-}
 
 /// The gloss as the segments drawn after the word: the part of speech in its own tone, then the meaning.
 fn annotation(gloss: Option<&FrameGloss>) -> Vec<(String, Tone)> {
@@ -157,18 +148,5 @@ mod tests {
             ..Frame::default()
         };
         assert_eq!(render_frame(&frame).highlighted, Some(0));
-    }
-
-    #[test]
-    fn the_cursor_rectangle_keeps_its_frame_of_reference() {
-        let rect = render_rect(CursorRect {
-            x: 1.0,
-            y: 2.0,
-            width: 3.0,
-            height: 4.0,
-            surface_relative: true,
-        });
-        assert_eq!(rect.rect, Rect::new(1.0, 2.0, 3.0, 4.0));
-        assert!(rect.surface_relative);
     }
 }

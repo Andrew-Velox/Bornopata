@@ -19,6 +19,7 @@ borno-lm.workspace = true
 borno-panel.workspace = true
 borno-platform.workspace = true
 borno-render.workspace = true
+borno-server.workspace = true
 borno-transliteration.workspace = true
 libc = "0.2.189"
 memmap2.workspace = true

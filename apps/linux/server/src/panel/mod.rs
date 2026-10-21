@@ -1,21 +1,17 @@
-//! The self-drawn candidate window as the Router sees it: a sink for frames, and the conversion from the
-//! protocol's frame to what the renderer draws.
+//! The layer-shell candidate window on Wayland, as a sink for the Router's frames.
 
-mod convert;
+pub use borno_server::panel::{PanelSink, render_frame};
 
-pub use convert::{render_frame, render_rect};
-
-use borno_panel::{Panel, PanelConfig as WindowConfig};
+use borno_panel::compositor::CursorRect as WindowCursor;
+use borno_panel::{Panel, PanelConfig as WindowConfig, Rect};
 use borno_platform::protocol::CursorRect;
 use borno_platform::{PanelConfig, PanelLayout, PanelMode};
 
-/// Where the Router sends the frame it wants drawn. A fake implements it in tests.
-pub trait PanelSink: Send {
-    /// Shows `frame` next to `cursor`. Returns `false` when the window is gone for good (the frame was not shown
-    /// and the Router should stop using it).
-    fn show(&mut self, frame: borno_render::Frame, cursor: CursorRect) -> bool;
-
-    fn hide(&mut self);
+pub fn render_rect(cursor: CursorRect) -> WindowCursor {
+    WindowCursor {
+        rect: Rect::new(cursor.x, cursor.y, cursor.width, cursor.height),
+        surface_relative: cursor.surface_relative,
+    }
 }
 
 struct NativePanel(Panel);
@@ -65,5 +61,23 @@ pub fn start(config: &PanelConfig) -> Option<Box<dyn PanelSink>> {
             tracing::info!(%error, "candidate window: Fcitx5 panel (the self-drawn one is not available here)");
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_cursor_rectangle_keeps_its_frame_of_reference() {
+        let rect = render_rect(CursorRect {
+            x: 1.0,
+            y: 2.0,
+            width: 3.0,
+            height: 4.0,
+            surface_relative: true,
+        });
+        assert_eq!(rect.rect, Rect::new(1.0, 2.0, 3.0, 4.0));
+        assert!(rect.surface_relative);
     }
 }

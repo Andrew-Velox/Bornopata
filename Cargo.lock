@@ -338,6 +338,7 @@ dependencies = [
  "borno-panel",
  "borno-platform",
  "borno-render",
+ "borno-server",
  "borno-transliteration",
  "libc",
  "memmap2",
@@ -405,6 +406,25 @@ dependencies = [
  "thiserror 2.0.21",
  "tiny-skia 0.12.0",
  "tracing",
+]
+
+[[package]]
+name = "borno-server"
+version = "0.1.1"
+dependencies = [
+ "borno-core",
+ "borno-dictionary",
+ "borno-emoji",
+ "borno-gloss",
+ "borno-learning",
+ "borno-lm",
+ "borno-platform",
+ "borno-render",
+ "borno-transliteration",
+ "libc",
+ "thiserror 2.0.21",
+ "tracing",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

@@ -4,6 +4,7 @@ use borno_core::{Clock, LocalTime};
 
 pub struct SystemClock;
 
+#[cfg(unix)]
 impl Clock for SystemClock {
     fn now(&self) -> Option<LocalTime> {
         // SAFETY: `time` accepts a null pointer, and `localtime_r` fills the `tm` it is given, which is
@@ -23,6 +24,27 @@ impl Clock for SystemClock {
             hour: u32::try_from(moment.tm_hour).ok()?,
             minute: u32::try_from(moment.tm_min).ok()?,
             weekday: u32::try_from(moment.tm_wday).ok()?,
+        })
+    }
+}
+
+#[cfg(windows)]
+impl Clock for SystemClock {
+    fn now(&self) -> Option<LocalTime> {
+        let mut moment =
+            std::mem::MaybeUninit::<windows_sys::Win32::Foundation::SYSTEMTIME>::uninit();
+        // SAFETY: `GetLocalTime` fills the whole `SYSTEMTIME` it is given and keeps no pointer.
+        let moment = unsafe {
+            windows_sys::Win32::System::SystemInformation::GetLocalTime(moment.as_mut_ptr());
+            moment.assume_init()
+        };
+        Some(LocalTime {
+            year: i32::from(moment.wYear),
+            month: u32::from(moment.wMonth),
+            day: u32::from(moment.wDay),
+            hour: u32::from(moment.wHour),
+            minute: u32::from(moment.wMinute),
+            weekday: u32::from(moment.wDayOfWeek),
         })
     }
 }

@@ -1,16 +1,11 @@
 //! Linux Server: holds the Bangla engines and serves the Fcitx5 plugin over a Unix socket.
 //!
-//! [`Router`] is the whole input logic and knows nothing about sockets; [`ipc`] only moves messages.
+//! The input logic ([`Router`] and the parts it uses) is `borno-server`, shared with the other platforms; this crate adds
+//! the Unix socket ([`ipc`]), the Wayland candidate window ([`panel`]) and the popup surfaces ([`popup`]).
 
-pub mod error;
 #[cfg(unix)]
 pub mod ipc;
 pub mod panel;
 pub mod popup;
-pub mod router;
-pub mod session;
-pub mod shared;
 
-pub use error::ServerError;
-pub use router::Router;
-pub use shared::Shared;
+pub use borno_server::{Router, ServerError, Shared, error, router, session, shared};
