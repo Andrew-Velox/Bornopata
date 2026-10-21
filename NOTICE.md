@@ -10,7 +10,7 @@ Bornopata is distributed under the same license, GPL-3.0-or-later; see `LICENSE`
 
 `crates/bamboo-slip` (with its widget kit, interaction layer and window host, restored from Qingjian for the settings program) and `crates/borno-render` (from Qingjian's `qingjian-render`) were dual-licensed upstream under the GPL or a
 commercial license, as their `LICENSE.md` files say. Bornopata uses and distributes them under the GPL side only and cannot offer the
-commercial license. The themes' pictures are new; none of Qingjian's theme artwork is included.
+commercial license. The themes' pictures are new; none of Qingjian's theme artwork is included. The character pictures of the Sakura, Shapla, Borsha and Jonaki themes are original art of the project owner and are not under the GPL, as Qingjian does for its own character art: they may be shared unchanged together with Bornopata, and anything else needs the owner's permission (`crates/borno-render/themes/README.md`). The rest of the theme files are GPL-3.0-or-later.
 
 `apps/linux/fcitx5/protocol/input-method-unstable-v2.xml` is the Wayland protocol description of the input-method popup, copied unchanged from the
 `wayland-protocols-misc` crate; its own copyright and permission notice (MIT) is in the file.

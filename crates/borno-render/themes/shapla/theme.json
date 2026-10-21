@@ -7,7 +7,7 @@
 {
   "extends": "bornopata",
   "schema": 1,
-  "meta": { "id": "shapla", "name": "Shapla", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "light",
+  "meta": { "id": "shapla", "name": "Shapla", "author": "Bornopata contributors", "license": "GPL-3.0-or-later AND LicenseRef-Character", "appearance": "light",
             "popup_overhang": [76, 0, 0, 0] },
 
   "variables": {

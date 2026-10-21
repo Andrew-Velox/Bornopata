@@ -7,7 +7,7 @@
 {
   "extends": "bornopata",
   "schema": 1,
-  "meta": { "id": "borsha", "name": "Borsha", "author": "Bornopata contributors", "license": "GPL-3.0-or-later", "appearance": "light",
+  "meta": { "id": "borsha", "name": "Borsha", "author": "Bornopata contributors", "license": "GPL-3.0-or-later AND LicenseRef-Character", "appearance": "light",
             "popup_overhang": [60, 100, 0, 0] },
 
   "variables": {

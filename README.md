@@ -154,5 +154,5 @@ Bug reports and words that rank wrongly are the most useful thing right now: [Fe
 - Bornopata is **GPL-3.0-or-later** ([LICENSE](LICENSE)). It started from the Qingjian pinyin input method, whose history and notice are kept ([NOTICE.md](NOTICE.md)).
 - Avro conversion by [`okkhor`](https://crates.io/crates/okkhor) and a fallback word list from [`upodesh`](https://github.com/OpenBangla/upodesh), both MIT, from the [OpenBangla](https://github.com/OpenBangla) project.
 - The **dictionary** is built from Bengali Wikipedia (CC BY-SA 4.0) and the Mozilla Common Voice Bengali sentences (CC0), and distributed under CC BY-SA 4.0. The **glosses** come from English Wiktionary (CC BY-SA 4.0). **Emoji** names are from the Unicode CLDR. The sources of every data set are recorded in `assets/*/README.md`.
-- The logo and the theme mascots were supplied by the project owner; each theme's folder records its provenance.
+- The logo and the theme mascots are the project owner's own work. The mascot pictures are not under the GPL: they may be shared unchanged with Bornopata, and other uses need permission ([theme art and its licenses](crates/borno-render/themes/README.md)).
 - Text shaping uses a patched `cosmic-text` with `harfrust` so Bengali conjuncts form correctly ([notes](docs/notes/text-shaping.md)).
