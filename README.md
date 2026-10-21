@@ -4,9 +4,9 @@
 
 # Bornopata · বর্ণপাতা
 
-**A free Bangla input method that learns your words, and keeps them on your computer.**
+**A free Bangla input method that learns your words.**
 
-Type Bangla the way you say it, in Roman letters. `ami bhalobasha` becomes `আমি ভালোবাসা`.
+Type Bangla the way you say it, in Roman letters. `ami bhalobashi` becomes `আমি ভালোবাসি`.
 
 [Website](https://andrew-velox.github.io/Bornopata-Web/) ·
 [User guide](docs/user/index.md) ·
