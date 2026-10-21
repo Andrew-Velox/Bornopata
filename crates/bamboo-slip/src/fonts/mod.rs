@@ -7,6 +7,8 @@
 mod linux;
 mod trak;
 mod ui_font;
+#[cfg(windows)]
+mod windows;
 
 use std::path::{Path, PathBuf};
 
@@ -20,6 +22,8 @@ pub use ui_font::UiFont;
 
 #[cfg(any(target_os = "linux", target_os = "freebsd"))]
 use linux as platform;
+#[cfg(windows)]
+use windows as platform;
 
 pub struct FontLibrary {
     /// 已加载的字体。
