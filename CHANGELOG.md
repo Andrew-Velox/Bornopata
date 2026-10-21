@@ -2,6 +2,8 @@
 
 Written by hand by the maintainers at release time; pull requests do not edit it.
 
+## Unreleased
+
 ## 0.1.0-alpha.2 - 2026-10-21
 
 - English words typed as written come out in Bangla: `facebook` gives ফেসবুক, `computer` কম্পিউটার, and an ending can follow (`facebooke` gives ফেসবুকে, `tvte` টিভিতে). About 360 words, built into the program; the setting is `autocorrect` under `[general]`, also on the Typing page of Bornopata Settings.
