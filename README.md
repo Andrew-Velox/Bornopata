@@ -44,7 +44,7 @@ You can also point the config at a folder of your own theme. More in [Themes and
 
 ## Features
 
-- **⌨️ Typing**
+- **Typing**
   - **Avro phonetic.** Type the sound: `t` is ত, `T` is ট, `ng` is ং, `^` makes ঁ. [All the letters](docs/user/input/typing-bangla.md).
   - **A 413,000-word dictionary.**
     - Real words near your spelling, the common ones first.
@@ -55,7 +55,7 @@ You can also point the config at a folder of your own theme. More in [Themes and
   - **Bangla digits and marks.** `123` gives ১২৩, `.` gives `।`, `$` gives ৳.
   - **English mode.** `Ctrl+Alt+Space` hands every key back to the application, per text field.
 
-- **🧠 It learns from you**
+- **It learns from you**
   - **Your choice comes first.** Pick a word once and it leads next time, even if no dictionary has it.
   - **Next-word suggestions.**
     - Up to five words after a space, taken with `Tab`.
@@ -66,20 +66,20 @@ You can also point the config at a folder of your own theme. More in [Themes and
     - `Shift+Delete` forgets a wrong word or hides a suggestion.
     - One switch turns learning off, one button erases it. [What it learns](docs/user/learning/learning.md).
 
-- **✨ Beside the words**
+- **Beside the words**
   - **English meanings.** A short gloss like `n. rice`, from Wiktionary. It never reorders or delays the list.
-  - **Emoji.** `hridoy` offers 🫀 ❤️; English words such as `heart` work too.
+  - **Emoji.** `hridoy` offers a heart; English words such as `heart` work too.
   - **Date and time.** `tarikh`, `somoy` and `bar` give the date, time and weekday, with the Bengali calendar date.
   - **Your phrases.** `mymail` types your address, `sig` your signature. They come first and are never learned.
 
-- **🪟 The candidate window**
+- **The candidate window**
   - **At your cursor.**
     - Wayland apps (Brave, Firefox, GTK, Qt) get it through the input-method popup.
     - X11 gets a small overlay; anything else falls back to Fcitx5's own panel.
   - **Five animated themes** with mascots, in a vertical or a horizontal list, light or dark.
   - **Correct Bengali shaping.** Conjuncts like প্র, ক্রি and স্ব are drawn properly.
 
-- **⚙️ Settings**
+- **Settings**
   - **Bornopata Settings**, in your launcher, in English or বাংলা.
     - Typing, keys, appearance with a live preview, phrases and learning.
     - Every change applies within a second or two.
