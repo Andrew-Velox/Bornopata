@@ -4,7 +4,7 @@ How a release is cut and what the workflow (`.github/workflows/release.yml`) che
 
 ## What a release contains
 
-A GitHub release named after the tag (`v0.1.0-alpha.1`; a version with a hyphen is marked pre-release) with:
+A GitHub release named after the tag (`v0.1.0-alpha.2`; marked Latest, so GitHub's repository page shows it. Only data releases are pre-releases) with:
 
 - `bornopata-<version>-linux-x86_64.tar.gz` (+ `.sha256`): the Server, the settings program, the Fcitx5 plugin, `words.bnd`, `lm.bnd`, `gloss-en.bnd`, the systemd unit, the Fcitx5 files, an `install.sh` that installs into `~/.local` without building anything, and every license and attribution (`LICENSE`, `NOTICE.md`, `THIRD-PARTY-LICENSES.txt`, the dictionary, gloss and emoji notices).
 - `bornopata-<version>-source.tar.gz` (+ `.sha256`): `git archive` of the tagged commit, with a stable checksum for packagers.

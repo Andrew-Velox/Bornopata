@@ -211,15 +211,14 @@ jobs:
           name: windows-files
           path: files
 
-      # A version with a hyphen (0.1.0-alpha.1) is a pre-release. The release is created once; a second run for the same
-      # tag fails instead of replacing files people may already have downloaded.
+      # Every version tag is a normal release marked Latest, so the repository page shows it: an alpha says so in its name
+      # and notes. The release is created once; a second run for the same tag fails instead of replacing files people may
+      # already have downloaded.
       - name: Create the release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          flags=()
-          [[ "$GITHUB_REF_NAME" != *-* ]] || flags+=(--prerelease)
           gh release create "$GITHUB_REF_NAME" files/*.tar.gz files/*.exe files/*.sha256 \
             --repo "$GITHUB_REPOSITORY" --verify-tag --title "Bornopata ${GITHUB_REF_NAME#v}" \
-            --notes-file files/release-notes.md "${flags[@]}"
+            --notes-file files/release-notes.md --latest
