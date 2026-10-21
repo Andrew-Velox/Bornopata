@@ -1,11 +1,11 @@
 ---
 title: Install on Windows
 order: 2
-description: Install the Bornopata preview on Windows 10 or 11, add it as a keyboard and type. It is untested on real machines, so please send the log if something does not work.
+description: Install the Bornopata preview on Windows 10 or 11, add it as a keyboard and type. It has worked on the one real machine it was tried on, so please send the log if something does not work for you.
 ---
 
-Bornopata for Windows is an **early preview**: it builds and passes its automated tests, but it has only just reached real Windows
-machines. If something does not work, the log files tell what happened; see [If something does not work](#if-something-does-not-work).
+Bornopata for Windows is an **early preview**: it builds, passes its automated tests and has worked on the one real Windows machine it was tried on, but few
+machines have seen it. If something does not work, the log files tell what happened; see [If something does not work](#if-something-does-not-work).
 
 ## Install
 

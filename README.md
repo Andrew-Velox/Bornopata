@@ -24,7 +24,7 @@ Type Bangla the way you say it, in Roman letters. `ami bhalobashi` becomes `আ�
 
 Bornopata (বর্ণপাতা, "leaf of letters") is a phonetic Bangla input method. You type the sound, it offers the words you meant, with a short English meaning beside them. It remembers what you choose and suggests what you are likely to write next. All of it works offline.
 
-> **Status: a preview.** Linux with Fcitx5 is the tested platform: Arch Linux with Hyprland and Brave. Other desktops are untested, so please tell us what you find. A Windows installer is in the [releases](https://github.com/Andrew-Velox/Bornopata/releases) too, but nobody has run it on a real Windows machine yet. macOS is planned.
+> **Status: a preview.** Linux with Fcitx5 is the tested platform: Arch Linux with Hyprland and Brave. Other desktops are untested, so please tell us what you find. A Windows installer is in the [releases](https://github.com/Andrew-Velox/Bornopata/releases) too: one tester has run it on a real Windows machine and reported that everything works, but it is unsigned and has seen few machines. macOS is planned.
 
 ## Themes
 
