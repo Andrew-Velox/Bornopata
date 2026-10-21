@@ -78,7 +78,10 @@ impl TextService_Impl {
             return false;
         };
         let eat = decision.eat;
-        *self.pending.borrow_mut() = Some((vk, decision));
+        // Only a key that is eaten comes back as `OnKeyDown`; one that is let through is the application's.
+        if eat {
+            *self.pending.borrow_mut() = Some((vk, decision));
+        }
         eat
     }
 
