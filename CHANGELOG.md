@@ -5,6 +5,7 @@ Written by hand by the maintainers at release time; pull requests do not edit it
 ## Unreleased
 
 - The Sakura theme has a pink mascot peeking over the corner of the window, with a bow, a crown that bobs and falling petals. The Wayland popup now shows decoration that hangs over the card, up to what the theme declares.
+- The Shapla, Borsha and Jonaki themes have mascots too: beside or on the vertical window, and lying along the top edge of the horizontal one. Every mascot wears modest long clothes.
 - The horizontal candidate list shows the English meaning under each word, like the vertical list does beside it.
 - A new logo: a white ব with two leaves on green, in the settings program, the launcher entry, Fcitx5's list of input methods and the website.
 - Words the letters cannot spell are found too: `moddhe` gives মধ্যে, `porjonto` পর্যন্ত, `dukkho` দুঃখ.

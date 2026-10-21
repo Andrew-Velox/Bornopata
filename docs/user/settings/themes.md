@@ -12,9 +12,9 @@ Set `theme` in `[panel]` of [the config file](config-file.md); the window change
 |---|---|
 | `bornopata` (default) | ![bornopata](images/theme-bornopata.png) Soft green and white. Has a dark variant (`dark = true`). |
 | `sakura` | ![sakura](images/theme-sakura.png) Bright pink, with a little mascot peeking over the corner of the window, a bow, a crown that bobs, and falling petals. Always light. |
-| `shapla` | ![shapla](images/theme-shapla.png) Mint and teal with a water lily (shapla), the national flower of Bangladesh. Always light. |
-| `borsha` | ![borsha](images/theme-borsha.png) Rain blue with a cloud. Always light. |
-| `jonaki` | ![jonaki](images/theme-jonaki.png) A night sky: deep blue with a moon and drifting fireflies (`jonaki`). Always dark. |
+| `shapla` | ![shapla](images/theme-shapla.png) Mint and teal with a water lily (shapla), the national flower of Bangladesh, and a girl with a long white braid who sits on the window's edge (lies along it in the horizontal layout). Always light. |
+| `borsha` | ![borsha](images/theme-borsha.png) Rain blue with a cloud, and a girl in a yellow raincoat who peeks from behind the window with an umbrella (lies along its edge in the horizontal layout). Always light. |
+| `jonaki` | ![jonaki](images/theme-jonaki.png) A night sky: deep blue with a moon and drifting fireflies, and a girl with a lantern of fireflies who leans on the window (lies along its edge in the horizontal layout). Always dark. |
 
 You can also point `theme` at the path of a theme folder of your own.
 
