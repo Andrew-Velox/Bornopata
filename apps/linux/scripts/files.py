@@ -54,6 +54,8 @@ def main():
     files = {prefix / 'share/licenses/bornopata/LICENSE': root / 'LICENSE',
              prefix / 'bin/borno-linux-server': server,
              prefix / 'lib/fcitx5/bornopata.so': plugin}
+    # The setup command sits next to this helper, in the repository and in a packaged release alike.
+    files[prefix / 'bin/bornopata-setup'] = Path(__file__).with_name('setup.py')
     files[prefix / 'share/licenses/bornopata/GLOSS-ATTRIBUTION.txt'] = root / 'assets/gloss/ATTRIBUTION.txt'
     files[prefix / 'share/licenses/bornopata/EMOJI-LICENSE-UNICODE.txt'] = root / 'assets/emoji/LICENSE-unicode.txt'
     files[data / 'bornopata/gloss-en.bnd'] = gloss

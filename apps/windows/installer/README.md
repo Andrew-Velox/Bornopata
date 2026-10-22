@@ -2,7 +2,8 @@
 
 An [Inno Setup](https://jrsoftware.org/isinfo.php) installer. It puts the text service DLL (a 64 bit and a 32 bit one), the
 Server, the settings program and the data into `C:\Program Files\Bornopata`, registers the text service, starts the Server at
-every login and starts it once when the wizard closes.
+every login, starts it once when the wizard closes and adds the keyboard to the language list of the user who ran the
+installer (`add-keyboard.ps1`, run as that user; its log is `%LOCALAPPDATA%\Bornopata\logs\add-keyboard.log`).
 
 ```text
 C:\Program Files\Bornopata\
@@ -34,6 +35,6 @@ The result is `target\installer\bornopata-<version>-windows-x86_64-setup.exe`. `
 
 ## Not signed yet
 
-The installer and the binaries have no code signature, so Windows SmartScreen warns before the first run ("Windows protected
-your PC": More info, Run anyway). Without a signature the Server cannot ask for `uiAccess` either, so the candidate window
+The installer and the binaries have no code signature, so Windows SmartScreen may warn before the first run ("Windows protected
+your PC": More info, Run anyway); on some machines it does not. Without a signature the Server cannot ask for `uiAccess` either, so the candidate window
 can be covered by the Start menu and the search box.

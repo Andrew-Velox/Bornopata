@@ -4,10 +4,12 @@
 set -euo pipefail
 here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 install_prefix="$HOME/.local"
+run_setup=1
 while (($#)); do
   case "$1" in
     --prefix) install_prefix=${2:?--prefix needs a path}; shift 2 ;;
-    --help) echo 'usage: install.sh [--prefix ABSOLUTE_USER_DIR]'; exit 0 ;;
+    --no-setup) run_setup=0; shift ;;
+    --help) echo 'usage: install.sh [--prefix ABSOLUTE_USER_DIR] [--no-setup]'; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -18,5 +20,10 @@ model=()
 [[ ! -f "$here/data/lm.bnd" ]] || model=(--lm "$here/data/lm.bnd")
 python3 "$here/files.py" install "$install_prefix" "$here" "$here/bin/borno-linux-server" "$here/lib/bornopata.so" \
   "$here/data/gloss-en.bnd" "$here/data/words.bnd" --settings "$here/bin/bornopata-settings" "${model[@]}"
-printf 'Installed.\nSettings: search for "Bornopata Settings" in your application launcher.\nStart the Server: systemctl --user daemon-reload && systemctl --user enable --now bornopata\nRestart Fcitx5, then add "Bornopata" in the configuration tool (untick "Only show current language").\n'
+printf 'Installed.\nSettings: search for "Bornopata Settings" in your application launcher.\n'
+if ((run_setup)); then
+  python3 "$here/setup.py"
+else
+  printf 'Next: %s/bin/bornopata-setup (starts the Server and adds Bornopata to Fcitx5).\n' "$install_prefix"
+fi
 printf 'If Fcitx5 cannot load the plugin, this release was built against a different Fcitx5: build from source instead (docs/notes/linux-fcitx5.md).\n'

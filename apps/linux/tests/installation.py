@@ -27,6 +27,7 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     addon = data / 'fcitx5/addon/bornopata.conf'
     assert f'Library={prefix}/lib/fcitx5/bornopata\n' in addon.read_text()
     assert (prefix / 'bin/borno-linux-server').stat().st_mode & 0o111
+    assert (prefix / 'bin/bornopata-setup').stat().st_mode & 0o111
     unit = config / 'systemd/user/bornopata.service'
     assert f'ExecStart={prefix}/bin/borno-linux-server\n' in unit.read_text()
     assert '@PREFIX@' not in unit.read_text()
@@ -48,7 +49,7 @@ with tempfile.TemporaryDirectory(prefix='borno-install-') as temporary:
     subprocess.run(['python3', str(helper), 'uninstall', str(prefix)], env=env, check=True)
     subprocess.run(['python3', str(helper), 'uninstall', str(prefix)], env=env, check=True)
     assert not addon.exists() and not (prefix / 'bin/borno-linux-server').exists()
-    assert not (prefix / 'lib/fcitx5/bornopata.so').exists()
+    assert not (prefix / 'lib/fcitx5/bornopata.so').exists() and not (prefix / 'bin/bornopata-setup').exists()
     assert not (data / 'bornopata/gloss-en.bnd').exists()
     assert not (prefix / 'share/licenses/bornopata/GLOSS-ATTRIBUTION.txt').exists()
     assert not (prefix / 'share/licenses/bornopata/EMOJI-LICENSE-UNICODE.txt').exists()

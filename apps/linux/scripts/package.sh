@@ -46,14 +46,15 @@ cp -r "$repo_root/apps/settings/linux/icons" "$stage/apps/settings/linux/"
 install -m 755 "$repo_root/apps/linux/scripts/package-install.sh" "$stage/install.sh"
 install -m 755 "$repo_root/apps/linux/scripts/uninstall.sh" "$stage/uninstall.sh"
 install -m 755 "$repo_root/apps/linux/scripts/files.py" "$stage/files.py"
+install -m 755 "$repo_root/apps/linux/scripts/setup.py" "$stage/setup.py"
 cat > "$stage/README.txt" <<TEXT
 Bornopata $version, a Bangla (Avro phonetic) input method for Fcitx5 on Linux.
 
 Install:    ./install.sh            (into ~/.local; --prefix DIR for another place)
+            It also starts the Server, adds Bornopata to Fcitx5 and restarts Fcitx5. Run
+            ~/.local/bin/bornopata-setup to do that part again.
 Uninstall:  ./uninstall.sh
 Settings:   search for "Bornopata Settings" in your application launcher
-Then:       systemctl --user daemon-reload && systemctl --user enable --now bornopata
-            restart Fcitx5 and add "Bornopata" in its configuration tool.
 
 The licenses and attributions of the program and its data are in this directory and are installed into
 share/licenses/bornopata. The program is GPL-3.0-or-later; the dictionary and the glosses are CC BY-SA 4.0.

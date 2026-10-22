@@ -12,13 +12,13 @@ The plugin passes your keys straight through when it cannot reach the Server. Ch
 systemctl --user status bornopata
 ```
 
-If it is not running, start it with `systemctl --user enable --now bornopata`. If it fails to start, `journalctl --user -u bornopata` and the log in `~/.local/state/bornopata/logs/` say why (a wrong value in `config.toml` is named there).
+If it is not running, run `bornopata-setup`, or start it with `systemctl --user enable --now bornopata`. If it fails to start, `journalctl --user -u bornopata` and the log in `~/.local/state/bornopata/logs/` say why (a wrong value in `config.toml` is named there).
 
 Also check that you really are in Bangla mode, not English mode: press `Ctrl+Alt+Space` and look for the `বাংলা` notice. See [English mode](../input/english-mode.md).
 
 ## Bornopata is not in the Fcitx5 list
 
-- Restart Fcitx5 (`fcitx5 -r`) after installing.
+- Run `bornopata-setup` again: it restarts Fcitx5 and adds Bornopata to your input methods if it is missing.
 - In the Fcitx5 configuration tool, untick **Only show current language**, or search for "Bornopata".
 - Make sure the files are there: `~/.local/share/fcitx5/addon/bornopata.conf` and `~/.local/lib/fcitx5/bornopata.so`. If Fcitx5 refuses to load the plugin, it was probably built against another Fcitx5 version; install from source. Running `fcitx5 -r` in a terminal, or `fcitx5-diagnose`, prints why.
 

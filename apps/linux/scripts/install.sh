@@ -5,11 +5,13 @@ repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd)
 install_prefix="$HOME/.local"
 build_profile=release
 cmake_type=Release
+run_setup=1
 while (($#)); do
   case "$1" in
     --prefix) install_prefix=${2:?--prefix needs a path}; shift 2 ;;
     --debug) build_profile=debug; cmake_type=Debug; shift ;;
-    --help) echo 'usage: install.sh [--prefix ABSOLUTE_USER_DIR] [--debug]'; exit 0 ;;
+    --no-setup) run_setup=0; shift ;;
+    --help) echo 'usage: install.sh [--prefix ABSOLUTE_USER_DIR] [--debug] [--no-setup]'; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -47,4 +49,9 @@ cmake -S "$repo_root/apps/linux/fcitx5" -B "$cmake_output" "-DCMAKE_BUILD_TYPE=$
 python3 "$repo_root/apps/linux/scripts/files.py" install "$install_prefix" "$repo_root" "$cargo_output/$build_profile/borno-linux-server" "$cmake_output/bornopata.so" "$gloss_file" \
   --settings "$cargo_output/$build_profile/bornopata-settings"
 printf 'Glosses: %s\n' "$(cat "$repo_root/assets/gloss/ATTRIBUTION.txt")"
-printf 'Installed.\nSettings: search for "Bornopata Settings" in your application launcher, or run %s/bin/bornopata-settings.\nStart the Server: systemctl --user daemon-reload && systemctl --user enable --now bornopata   (or run %s/bin/borno-linux-server yourself)\nRestart Fcitx5, then add "Bornopata" in the configuration tool (untick "Only show current language").\n' "$install_prefix" "$install_prefix"
+printf 'Installed.\nSettings: search for "Bornopata Settings" in your application launcher, or run %s/bin/bornopata-settings.\n' "$install_prefix"
+if ((run_setup)); then
+  python3 "$repo_root/apps/linux/scripts/setup.py"
+else
+  printf 'Next: %s/bin/bornopata-setup (starts the Server and adds Bornopata to Fcitx5).\n' "$install_prefix"
+fi

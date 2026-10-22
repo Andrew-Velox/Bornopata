@@ -44,8 +44,7 @@ Configuration, learned data and logs are never touched by install or uninstall.
    ```
 
    Do not set `GTK_IM_MODULE`: GTK3 and GTK4 apps talk to Fcitx5 through the Wayland text-input protocol. Chromium and Electron apps need `--enable-wayland-ime` (and `--wayland-text-input-version=3` on older builds).
-2. Start the Server: `systemctl --user daemon-reload && systemctl --user enable --now bornopata`. Without systemd, add `exec-once = ~/.local/bin/borno-linux-server` instead.
-3. Restart Fcitx5 (`fcitx5 -r`), open `fcitx5-configtool`, untick "Only show current language", add **Bornopata** to the input method list.
+2. `bornopata-setup` (`apps/linux/scripts/setup.py`, run by both installers; `--remove` undoes it) restarts the Server through systemd, adds an `Items` block for `bornopata` to the first group of `~/.config/fcitx5/profile` (backup beside it) and restarts Fcitx5. Fcitx5 is quit first and waited for, because it writes its own list of input methods when it exits and would overwrite ours. Without systemd, add `exec-once = ~/.local/bin/borno-linux-server` instead. Tests: `apps/linux/tests/setup.py`; never run the script itself in a test, it stops the real Server and Fcitx5.
 4. Select it with Fcitx5's own switch (default Ctrl+Space), then type.
 
 ## Keys

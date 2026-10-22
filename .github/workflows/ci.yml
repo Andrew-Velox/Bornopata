@@ -83,6 +83,7 @@ jobs:
         run: |
           mkdir -p target/ci-logs
           python3 apps/linux/tests/installation.py 2>&1 | tee target/ci-logs/linux-installation.log
+          python3 apps/linux/tests/setup.py 2>&1 | tee -a target/ci-logs/linux-installation.log
 
       - name: Upload Linux diagnostics
         if: failure()

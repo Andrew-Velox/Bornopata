@@ -107,12 +107,9 @@ You need Linux with Fcitx5 (version 5 or later), a Bengali font such as Noto San
 git clone https://github.com/Andrew-Velox/Bornopata.git
 cd Bornopata
 apps/linux/scripts/install.sh
-systemctl --user daemon-reload
-systemctl --user enable --now bornopata
-fcitx5 -r
 ```
 
-Then open the Fcitx5 configuration tool and add **Bornopata** to your input methods. Open any text field, switch to it and type `ami`: the window should show `আমি`, and `Space` types it.
+The installer also starts the Server, adds **Bornopata** to your Fcitx5 input methods and restarts Fcitx5. On Arch there is a package: `yay -S bornopata`, then `bornopata-setup`. Open any text field, switch to it and type `ami`: the window should show `আমি`, and `Space` types it.
 
 The installer does not include the dictionary. Put `words.bnd` from the dictionary data release into `~/.local/share/bornopata/`, or only a small built-in word list will answer. Packages for each distribution, the full steps and what to do when something does not work: [Install](docs/user/getting-started/install.md) and [Troubleshooting](docs/user/help/troubleshooting.md).
 

@@ -4,8 +4,8 @@
 ; settings program and the data. Then it (1) gives the folder read and execute rights to ALL APPLICATION PACKAGES, so
 ; sandboxed applications (the taskbar search, Settings) can load the DLL, (2) registers the text service with regsvr32,
 ; once for the 64 bit and once for the 32 bit DLL (the icon goes to %ProgramData%\Bornopata), (3) puts a shortcut to the
-; Server in the machine-wide Startup folder, so it runs at every login, and (4) starts the Server at once when the wizard
-; closes, so nobody has to sign out first.
+; Server in the machine-wide Startup folder, so it runs at every login, (4) starts the Server at once when the wizard
+; closes, so nobody has to sign out first, and (5) adds the keyboard to the user's language list.
 ; Uninstalling reverses it: stop the Server, unregister the DLLs, delete the files. The user's data in %APPDATA%\Bornopata
 ; stays.
 ;
@@ -69,7 +69,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Messages]
 ; The finish page: the DLL is loaded into every application, so one that was already open before the installation has to be
 ; restarted to use the new version (see "Upgrades"). That is the thing most likely to be taken for "it did not work".
-FinishedLabel=Bornopata is installed. Sign out and sign in again (or restart the computer) so that it works in every application.%n%nIf that is not convenient, close the applications you type in and open them again.%n%nThen add Bornopata in Settings > Time & language > Language & region, under your language's keyboards.
+FinishedLabel=Bornopata is installed and added to your keyboards. Press Win+Space in a text box to choose it.%n%nApplications that were already open need to be closed and opened again before they offer it (or sign out and sign in again). If Bornopata is not in the list, add it in Settings > Time & language > Language & region, under Bangla (Bangladesh).
 
 [Files]
 ; The binaries. The DLLs are installed side by side by version; uninstalling registers one still in use for deletion at restart.
@@ -77,6 +77,7 @@ Source: "{#Repo}\target\release\bornopata_tsf.dll"; DestDir: "{app}"; DestName: 
 Source: "{#Repo}\target\i686-pc-windows-msvc\release\bornopata_tsf.dll"; DestDir: "{app}"; DestName: "{#TsfDll32}"; Flags: ignoreversion uninsrestartdelete
 Source: "{#Repo}\target\release\bornopata-settings.exe"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#Repo}\apps\windows\tsf\resources\bornopata.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "add-keyboard.ps1"; DestDir: "{app}"; Flags: ignoreversion
 ; The data: the dictionary, the word pair model and the glosses, where the Server looks (data next to the program).
 Source: "{#Repo}\target\release-inputs\words.bnd"; DestDir: "{app}\data"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#Repo}\target\release-inputs\lm.bnd"; DestDir: "{app}\data"; Flags: ignoreversion skipifsourcedoesntexist
@@ -113,6 +114,10 @@ Filename: "{sys}\regsvr32.exe"; Parameters: "/s ""{app}\{#TsfDll}"""; \
 Filename: "{syswow64}\regsvr32.exe"; Parameters: "/s ""{app}\{#TsfDll32}"""; \
   Flags: runhidden waituntilterminated; StatusMsg: "Registering the input method (32 bit)..."
 ; (4) Starting the Server when the wizard closes is in [Code], NextButtonClick.
+; (5) Adds the keyboard to the language list of the user who ran the installer (not the administrator), see
+;     add-keyboard.ps1. The text service has to be registered first.
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\add-keyboard.ps1"""; \
+  Flags: runhidden runasoriginaluser waituntilterminated; StatusMsg: "Adding the Bornopata keyboard to your languages..."
 
 [UninstallRun]
 ; The reverse: stop the Server and the settings program, unregister the DLLs; Inno deletes the files afterwards.

@@ -9,18 +9,21 @@ machines have seen it. If something does not work, the log files tell what happe
 
 ## Install
 
-1. Download `bornopata-<version>-windows-x86_64-setup.exe` and run it. Windows may say "Windows protected your PC" because the
-   installer is not signed yet: choose **More info**, then **Run anyway**.
-2. Accept the administrator prompt. The installer puts Bornopata into `C:\Program Files\Bornopata`, registers it as an input
-   method and starts its background program (the Server), which also starts at every login.
-3. **Sign out and sign in again**, or restart. Programs that were open during the installation do not see the new input method
-   until they are restarted.
-4. Open **Settings > Time & language > Language & region**, choose your language, then **Language options**, **Add a keyboard**
-   and pick **Bornopata**. If Bangla (Bangladesh) is not in your list, add it first.
+1. Download `bornopata-<version>-windows-x86_64-setup.exe` and run it. If Windows says "Windows protected your PC" because the
+   installer is not signed yet, choose **More info**, then **Run anyway**.
+2. Accept the administrator prompt and click through the installer. It puts Bornopata into `C:\Program Files\Bornopata`,
+   registers it as an input method, adds the **Bornopata** keyboard to your languages (under Bangla (Bangladesh)) and starts its
+   background program (the Server), which also starts at every login.
+3. Programs that were open during the installation do not offer the new keyboard until they are closed and opened again; signing
+   out and in again does the same for all of them.
+
+If Bornopata is not in the language list afterwards, add it by hand: **Settings > Time & language > Language & region**, your
+language (add Bangla (Bangladesh) first if it is missing), **Language options**, **Add a keyboard**, **Bornopata**. What the
+installer did about it is written in `%LOCALAPPDATA%\Bornopata\logs\add-keyboard.log`.
 
 ## Type
 
-Switch to Bornopata with the language switcher in the taskbar (or `Win+Space`) in any text field and type `ami`. The letters show
+Switch to Bornopata with `Win+Space` (or the language switcher in the taskbar) in any text field and type `ami`. The letters show
 as underlined Bangla, a window lists the candidates, and `Space` types the highlighted one. Typing, learning, emoji, phrases and
 the keys work as on Linux: [Your first words](first-input.md) and [Keys and shortcuts](keys.md).
 

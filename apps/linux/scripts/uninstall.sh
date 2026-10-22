@@ -9,5 +9,8 @@ while (($#)); do
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
-python3 "$(dirname -- "${BASH_SOURCE[0]}")/files.py" uninstall "$install_prefix"
-echo 'Uninstalled. Run: systemctl --user disable --now bornopata (if you enabled it), then restart Fcitx5. User data is kept.'
+here=$(dirname -- "${BASH_SOURCE[0]}")
+# Stops the Server and takes Bornopata out of Fcitx5's list first; the files are removed afterwards.
+python3 "$here/setup.py" --remove
+python3 "$here/files.py" uninstall "$install_prefix"
+echo 'Uninstalled. User data is kept.'
