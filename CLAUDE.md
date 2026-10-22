@@ -9,7 +9,7 @@ The repo was imported from Qingjian, a Chinese pinyin IME (see `NOTICE.md`; `git
 
 - **Done:** the Bangla Core and the Linux path. `Engine` takes raw Roman letters (case kept), builds candidates from the direct Avro conversion, a `WordSource` and learned choices, ranks them and commits word by word. `borno-cli` drives it. `borno-linux-server` serves it over a Unix socket to the Fcitx5 plugin, so Bangla can be typed in real applications (`docs/notes/linux-fcitx5.md`).
 - **Windows, tried once:** the Windows shell (`apps/windows`: Server, text service DLL, installer; `docs/design/windows.md`). It builds, its engine layer is tested against the real Router and CI builds the installer. One tester installed `v0.1.0-alpha.2` on a real machine and reported that everything works; only one machine so far, so Windows versions and applications are still mostly unchecked.
-- **Released:** `v0.1.0-alpha.2` (Linux package, source, Windows installer) and the AUR package `bornopata`; procedure in `docs/plan/release.md`.
+- **Released:** `v0.1.0-alpha.3` (Linux package, source, Windows installer) and the AUR package `bornopata`; procedure in `docs/plan/release.md`.
 - **Not done:** the macOS shell, signing. Our own dictionary (`words.bnd`) answers first; the MIT-licensed `upodesh` list is only the fallback (see `docs/design/bangla-reuse-plan.md`).
 - Many comments in inherited files are still Chinese. Translate a file when you change it substantially; new code and docs are English.
 - Direction, decisions and open items: `docs/plan/roadmap.md`, `docs/design/bangla-engine.md`, `docs/design/bangla-reuse-plan.md`.

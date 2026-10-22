@@ -1,7 +1,7 @@
 [package]
 name = "borno-windows-server"
 description = "Windows Server: owns the Bangla engines and serves the text service DLL over a named pipe, and draws the candidate window"
-version = "0.1.0-alpha.3"
+version = "0.1.0-alpha.4-dev"
 edition.workspace = true
 license.workspace = true
 

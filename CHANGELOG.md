@@ -2,6 +2,8 @@
 
 Written by hand by the maintainers at release time; pull requests do not edit it.
 
+## Unreleased
+
 ## 0.1.0-alpha.3 - 2026-10-22
 
 - Installing is shorter. On Linux `install.sh` also starts the Server, adds Bornopata to your Fcitx5 input methods and restarts Fcitx5; after `yay -S bornopata` one command, `bornopata-setup`, does the same, and `uninstall.sh` takes it all out again. On Windows the installer adds the Bornopata keyboard to your language list itself, so after it you only press `Win+Space` (that part has not been tried on a real machine yet).
