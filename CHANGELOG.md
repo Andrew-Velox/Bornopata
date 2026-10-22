@@ -2,12 +2,11 @@
 
 Written by hand by the maintainers at release time; pull requests do not edit it.
 
-## Unreleased
+## 0.1.0-alpha.3 - 2026-10-22
 
-- Windows install is two steps: the installer adds the Bornopata keyboard to your language list itself (untested on a real machine), so after it you only press `Win+Space`.
-- Linux install is one step: `install.sh` (and `bornopata-setup` after `yay -S bornopata`) starts the Server, adds Bornopata to your Fcitx5 input methods and restarts Fcitx5. `uninstall.sh` takes it out again.
-
+- Installing is shorter. On Linux `install.sh` also starts the Server, adds Bornopata to your Fcitx5 input methods and restarts Fcitx5; after `yay -S bornopata` one command, `bornopata-setup`, does the same, and `uninstall.sh` takes it all out again. On Windows the installer adds the Bornopata keyboard to your language list itself, so after it you only press `Win+Space` (that part has not been tried on a real machine yet).
 - The candidate window can be moved: drag it with the mouse and it shows there from then on, in every application. In Wayland applications press `Ctrl+Alt+M` while a word is shown to get a window you can drag; right-click it or press the shortcut again to let it follow the text cursor. The shortcut is `pin` under `[shortcut]`. Dragging works on Windows too, but is untested there.
+- The Windows installer from `0.1.0-alpha.2` has now been run on a real Windows machine and everything worked. It is still unsigned, so Windows may ask for confirmation (More info, then Run anyway), and few machines have seen it.
 
 ## 0.1.0-alpha.2 - 2026-10-21
 
