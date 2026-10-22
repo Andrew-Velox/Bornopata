@@ -32,6 +32,7 @@ Cost of the choice: the popup is placed at window origin + cursor rectangle, so 
 - Placement: below the cursor by 6 px, flipped above it when there is no room below, pushed in from the monitor's edges. The monitor comes from Hyprland's `monitors`; the surface is created on that output.
 - Scale: rendered at the monitor's scale rounded up to an integer, with `set_buffer_scale`. Fractional scales (`wp_fractional_scale` with `wp_viewporter`) are not done yet, so a 1.25 monitor shows a slightly soft window.
 - Mouse clicks on rows are not handled yet; keys and Tab already select.
+- The mouse reaches the card only (the input region is the card rectangle; shadow and decoration let clicks through). Dragging with the left button moves the surface by changing its margins, applied once per pointer frame; the drop is clamped to the monitor and saved by `borno-window::Pin` in `window-position` (global logical pixels of the card's top-left). A pinned window ignores the text cursor, and the Router prefers it to the input-method popup, because a popup is placed by the compositor and receives no pointer events: `Ctrl+Alt+M` (`[shortcut] pin`) pins the window at the middle of the focused monitor, a little below the center, which is how a Wayland-native application gets a draggable window at all. Right click or the shortcut again frees it. Dragging to another monitor is not done (the surface belongs to one output).
 
 ## Text
 

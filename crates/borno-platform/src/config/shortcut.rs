@@ -13,6 +13,9 @@ pub struct ShortcutConfig {
     /// While a word is being typed, takes back what was learned about the highlighted candidate; on a next-word
     /// suggestion, stops it being offered. Needs a modifier like every shortcut.
     pub forget: KeyCombo,
+
+    /// While the candidate window shows, pins it where the user can drag it, or lets it follow the text cursor again.
+    pub pin: KeyCombo,
 }
 
 impl Default for ShortcutConfig {
@@ -24,6 +27,7 @@ impl Default for ShortcutConfig {
             forget: "shift+delete"
                 .parse()
                 .expect("the default shortcut is valid"),
+            pin: "ctrl+alt+m".parse().expect("the default shortcut is valid"),
         }
     }
 }

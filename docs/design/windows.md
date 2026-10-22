@@ -60,7 +60,7 @@ session number is the thread id (unique on the system, unlike TSF client ids).
 - **Router thread.** The Router stays on one thread; connections hand it requests over a channel (`borno-server::ipc`).
 - **Window.** A layered, topmost, no-activate tool window on its own thread, per-monitor DPI aware. The renderer's bitmap (shadow
   and decorations included) is put on it with `UpdateLayeredWindow`; it is placed with `borno-window`'s `place` in logical pixels
-  on the monitor of the cursor, and the theme's animations run on a timer. The mouse goes through it (no clicking candidates yet).
+  on the monitor of the cursor, and the theme's animations run on a timer. The left button drags it (`window/drag.rs`: capture, `SetWindowPos`, the drop is clamped to the monitor and saved through `borno-window`'s `Pin`), the right button frees it; where the bitmap is transparent the mouse goes through to the application. No clicking candidates yet.
 - **Config changes.** The Router watches `config.toml`; on a change the Server starts a new copy of itself that takes over the pipe.
 
 ## Files

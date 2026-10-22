@@ -21,6 +21,7 @@ The Server and the plugin talk through a private socket (`$XDG_RUNTIME_DIR/borno
 | `~/.local/share/bornopata/words.bnd` | The dictionary (CC BY-SA 4.0). |
 | `~/.local/share/bornopata/gloss-en.bnd` | The English glosses (CC BY-SA 4.0). |
 | `~/.local/share/bornopata/phrases.tsv` | Your own phrases. See [Your own phrases](../input/phrases.md). |
+| `~/.local/share/bornopata/window-position` | Where you dropped the candidate window, two numbers. Delete it (or right-click the window) to let it follow the text cursor again. See [Moving the window](../settings/themes.md#moving-the-window). |
 | `~/.local/share/bornopata/user-choices.tsv` | Which word you chose for which letters, with a count and the last day used. |
 | `~/.local/share/bornopata/user-words.tsv` | How often you committed each word. |
 | `~/.local/share/bornopata/user-ngram.tsv` | Which word you typed after which. |

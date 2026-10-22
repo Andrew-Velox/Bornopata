@@ -47,6 +47,10 @@ impl Hyprland {
 }
 
 impl Compositor for Hyprland {
+    fn focused_monitor(&mut self) -> Option<Rect> {
+        self.focused()
+    }
+
     fn locate(&mut self, cursor: CursorRect) -> Option<Located> {
         let global = if cursor.surface_relative {
             let window = self.request("j/activewindow")?;
@@ -81,6 +85,18 @@ impl Compositor for Hyprland {
             monitor_name: name,
             scale,
         })
+    }
+}
+
+impl Hyprland {
+    fn focused(&self) -> Option<Rect> {
+        let monitors = self.request("j/monitors")?;
+        monitors
+            .as_array()?
+            .iter()
+            .find(|entry| entry.get("focused").and_then(Value::as_bool) == Some(true))
+            .and_then(monitor)
+            .map(|(rect, _, _)| rect)
     }
 }
 

@@ -14,6 +14,9 @@ pub const LANGUAGE_MODEL_FILE: &str = "lm.bnd";
 /// The user's own phrases next to the dictionary.
 pub const PHRASES_FILE: &str = "phrases.tsv";
 
+/// Where the user left the candidate window after dragging it.
+pub const WINDOW_POSITION_FILE: &str = "window-position";
+
 /// A file the settings program drops to ask the Server to forget what it learned.
 pub const FORGET_MARKER: &str = "forget-learned";
 
@@ -129,6 +132,15 @@ pub fn phrases_path() -> PathBuf {
 /// The marker file that asks the Server to forget everything it learned; the Server deletes it once it has.
 pub fn forget_marker_path() -> PathBuf {
     user_dir().join(FORGET_MARKER)
+}
+
+/// The file that remembers where the user dropped the candidate window. It may not exist.
+pub fn window_position_path() -> PathBuf {
+    // Screens differ from one machine to the next, so on Windows this does not roam with the settings.
+    #[cfg(windows)]
+    return app_dir("LOCALAPPDATA").join(WINDOW_POSITION_FILE);
+    #[cfg(not(windows))]
+    user_dir().join(WINDOW_POSITION_FILE)
 }
 
 #[cfg(test)]

@@ -1,13 +1,14 @@
 //! The window thread: makes the window, then draws what the Router sends until the Router is gone.
 
+use std::sync::Arc;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::thread;
 use std::time::Duration;
 
 use borno_platform::protocol::CursorRect;
 use borno_render::{FontLibrary, Frame, Layout, Renderer, Theme};
-use borno_window::placement::place;
-use borno_window::{PanelConfig, Rect, load_theme};
+use borno_window::placement::{pinned, place};
+use borno_window::{PanelConfig, Pin, Rect, load_theme};
 use windows::Win32::Foundation::{E_FAIL, HWND, LPARAM, LRESULT, POINT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Threading::GetCurrentThreadId;
@@ -16,14 +17,16 @@ use windows::Win32::UI::HiDpi::{
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetCursorPos, GetMessageW,
-    HTTRANSPARENT, HWND_TOPMOST, IDC_ARROW, KillTimer, LoadCursorW, MA_NOACTIVATE, MSG, SW_HIDE,
-    SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW, SetTimer, SetWindowPos, ShowWindow,
-    TranslateMessage, WM_MOUSEACTIVATE, WM_NCHITTEST, WM_TIMER, WNDCLASSEXW, WS_EX_LAYERED,
-    WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TOPMOST, WS_POPUP,
+    HWND_TOPMOST, IDC_SIZEALL, KillTimer, LoadCursorW, MA_NOACTIVATE, MSG, SW_HIDE, SWP_NOACTIVATE,
+    SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SWP_SHOWWINDOW, SetTimer, SetWindowPos, ShowWindow,
+    TranslateMessage, WM_CAPTURECHANGED, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MOUSEACTIVATE,
+    WM_MOUSEMOVE, WM_RBUTTONDOWN, WM_TIMER, WNDCLASSEXW, WS_EX_LAYERED, WS_EX_NOACTIVATE,
+    WS_EX_TOOLWINDOW, WS_EX_TOPMOST, WS_POPUP,
 };
 use windows::core::{Error, PCWSTR, Result, w};
 
 use super::class::WindowClass;
+use super::drag::{self, Moved};
 use super::layered::present;
 use super::monitor::screen_at;
 use super::{Command, WM_WAKE};
@@ -36,13 +39,13 @@ const ANIMATION_TIMER: usize = 1;
 
 /// Starts the thread and waits until the window exists. Returns what the Router needs to reach it, or why it could not
 /// be made.
-pub(super) fn spawn(config: PanelConfig) -> Result<(Sender<Command>, u32)> {
+pub(super) fn spawn(config: PanelConfig, pin: Arc<Pin>) -> Result<(Sender<Command>, u32)> {
     // The thread id instead of a `Result`, so no Windows error has to cross threads.
     let (ready, started) = mpsc::channel::<Option<u32>>();
     let (sender, commands) = mpsc::channel::<Command>();
     thread::Builder::new()
         .name("bornopata-candidates".to_owned())
-        .spawn(move || run(&config, &commands, &ready))
+        .spawn(move || run(&config, pin, &commands, &ready))
         .map_err(|_| Error::from(E_FAIL))?;
     match started.recv() {
         Ok(Some(thread_id)) => Ok((sender, thread_id)),
@@ -59,12 +62,28 @@ struct Window {
 
     /// Where the bitmap's top-left corner is on the screen, so an animation frame lands on the same place.
     position: (i32, i32),
+
+    pin: Arc<Pin>,
+
+    /// The card inside the bitmap, for keeping a dragged window on the screen.
+    card: Option<Card>,
 }
 
-fn run(config: &PanelConfig, commands: &Receiver<Command>, ready: &Sender<Option<u32>>) {
+struct Card {
+    /// Where the card starts inside the bitmap, and its size, in physical pixels.
+    offset: (i32, i32),
+    size: (i32, i32),
+}
+
+fn run(
+    config: &PanelConfig,
+    pin: Arc<Pin>,
+    commands: &Receiver<Command>,
+    ready: &Sender<Option<u32>>,
+) {
     // Positions are in physical pixels, like the cursor rectangles the applications report. Already set is no problem.
     let _ = unsafe { SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) };
-    let mut window = match Window::new(config) {
+    let mut window = match Window::new(config, pin) {
         Ok(window) => window,
         Err(error) => {
             tracing::error!(%error, "cannot make the candidate window");
@@ -90,12 +109,15 @@ fn run(config: &PanelConfig, commands: &Receiver<Command>, ready: &Sender<Option
                 let _ = TranslateMessage(&message);
                 DispatchMessageW(&message);
             }
+            if let Some(moved) = drag::take() {
+                window.dragged(moved);
+            }
         }
     }
 }
 
 impl Window {
-    fn new(config: &PanelConfig) -> Result<Self> {
+    fn new(config: &PanelConfig, pin: Arc<Pin>) -> Result<Self> {
         let library = FontLibrary::system("en").map_err(|error| {
             tracing::error!(%error, "no usable fonts");
             Error::from(E_FAIL)
@@ -109,7 +131,7 @@ impl Window {
         CLASS.ensure(|| WNDCLASSEXW {
             lpfnWndProc: Some(window_proc),
             hInstance: unsafe { GetModuleHandleW(None) }.unwrap_or_default().into(),
-            hCursor: unsafe { LoadCursorW(None, IDC_ARROW) }.unwrap_or_default(),
+            hCursor: unsafe { LoadCursorW(None, IDC_SIZEALL) }.unwrap_or_default(),
             lpszClassName: CLASS_NAME,
             ..Default::default()
         })?;
@@ -136,6 +158,8 @@ impl Window {
             theme,
             layout: config.layout,
             position: (0, 0),
+            pin,
+            card: None,
         })
     }
 
@@ -152,10 +176,17 @@ impl Window {
             self.hide();
             return;
         }
-        let anchor = if cursor.is_known() {
-            cursor
-        } else {
-            mouse_cursor()
+        let corner = self.pin.get();
+        let anchor = match corner {
+            Some((x, y)) => CursorRect {
+                x,
+                y,
+                width: 0.0,
+                height: 0.0,
+                surface_relative: false,
+            },
+            None if cursor.is_known() => cursor,
+            None => mouse_cursor(),
         };
         let screen = screen_at(POINT {
             x: anchor.x as i32,
@@ -187,7 +218,17 @@ impl Window {
             rendered.content_height as f32 / factor,
         );
         let cursor_rect = Rect::new(anchor.x, anchor.y, anchor.width, anchor.height);
-        let (x, y) = place(logical(cursor_rect), card, logical(screen.work));
+        let (x, y) = match corner {
+            Some((cx, cy)) => pinned((cx / factor, cy / factor), card, logical(screen.work)),
+            None => place(logical(cursor_rect), card, logical(screen.work)),
+        };
+        self.card = Some(Card {
+            offset: (rendered.content_x as i32, rendered.content_y as i32),
+            size: (
+                rendered.content_width as i32,
+                rendered.content_height as i32,
+            ),
+        });
         // The bitmap reaches beyond the card (shadow, decoration): its corner is the card's minus that margin.
         self.position = (
             (x * factor).round() as i32 - rendered.content_x as i32,
@@ -212,6 +253,58 @@ impl Window {
         } {
             tracing::warn!(%error, "could not bring the candidate window to the front");
         }
+    }
+
+    /// The mouse moved the window: the animation draws it at the new place, and where it is dropped is pinned.
+    fn dragged(&mut self, moved: Moved) {
+        match moved {
+            Moved::To(x, y) => self.position = (x, y),
+            Moved::Dropped(x, y) => {
+                self.position = (x, y);
+                self.keep_on_screen();
+                let Some(card) = &self.card else { return };
+                self.pin.move_to((
+                    (self.position.0 + card.offset.0) as f32,
+                    (self.position.1 + card.offset.1) as f32,
+                ));
+                if let Err(error) = self.pin.save() {
+                    tracing::warn!(%error, "could not save where the window was dropped");
+                }
+            }
+            Moved::Freed => {
+                if let Err(error) = self.pin.clear() {
+                    tracing::warn!(%error, "could not forget where the window was pinned");
+                }
+            }
+        }
+    }
+
+    /// A window dropped half off the screen is pulled back onto the monitor it is mostly on.
+    fn keep_on_screen(&mut self) {
+        let Some(card) = &self.card else { return };
+        let corner = (
+            (self.position.0 + card.offset.0) as f32,
+            (self.position.1 + card.offset.1) as f32,
+        );
+        let size = (card.size.0 as f32, card.size.1 as f32);
+        let point = POINT {
+            x: corner.0 as i32,
+            y: corner.1 as i32,
+        };
+        let work = screen_at(point).work;
+        let (x, y) = pinned(corner, size, work);
+        self.position = (x as i32 - card.offset.0, y as i32 - card.offset.1);
+        let _ = unsafe {
+            SetWindowPos(
+                self.hwnd,
+                None,
+                self.position.0,
+                self.position.1,
+                0,
+                0,
+                SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE,
+            )
+        };
     }
 
     fn hide(&mut self) {
@@ -271,7 +364,9 @@ fn mouse_cursor() -> CursorRect {
     }
 }
 
-/// A layered window needs no painting. The mouse goes through it and it never takes the focus.
+/// A layered window needs no painting. It never takes the focus. Where its bitmap is transparent the mouse goes
+/// through to the application; elsewhere it drags the window (left button) or lets it follow the text cursor again
+/// (right button).
 unsafe extern "system" fn window_proc(
     hwnd: HWND,
     message: u32,
@@ -279,8 +374,27 @@ unsafe extern "system" fn window_proc(
     lparam: LPARAM,
 ) -> LRESULT {
     match message {
-        WM_NCHITTEST => LRESULT(HTTRANSPARENT as isize),
         WM_MOUSEACTIVATE => LRESULT(MA_NOACTIVATE as isize),
+        WM_LBUTTONDOWN => {
+            drag::press(hwnd);
+            LRESULT(0)
+        }
+        WM_MOUSEMOVE => {
+            drag::motion(hwnd);
+            LRESULT(0)
+        }
+        WM_LBUTTONUP => {
+            drag::release(hwnd);
+            LRESULT(0)
+        }
+        WM_CAPTURECHANGED => {
+            drag::lost(hwnd);
+            LRESULT(0)
+        }
+        WM_RBUTTONDOWN => {
+            drag::free();
+            LRESULT(0)
+        }
         _ => unsafe { DefWindowProcW(hwnd, message, wparam, lparam) },
     }
 }

@@ -1,11 +1,12 @@
 //! Which monitor the text cursor is on: its work area and its scale.
 
 use borno_window::Rect;
-use windows::Win32::Foundation::POINT;
+use windows::Win32::Foundation::{POINT, RECT};
 use windows::Win32::Graphics::Gdi::{
     GetMonitorInfoW, MONITOR_DEFAULTTONEAREST, MONITORINFO, MonitorFromPoint,
 };
 use windows::Win32::UI::HiDpi::{GetDpiForMonitor, MDT_EFFECTIVE_DPI};
+use windows::Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowRect};
 
 /// What the window needs to know about the screen at a point, in physical pixels.
 pub(super) struct Screen {
@@ -14,6 +15,25 @@ pub(super) struct Screen {
 
     /// The monitor's scale: 1.0 at 96 dpi, 2.0 at 192 dpi.
     pub(super) scale: f32,
+}
+
+/// Where a window pinned without being dragged goes: centred, a little below the middle of the monitor of the
+/// window the user is working in.
+pub(super) fn default_corner() -> (f32, f32) {
+    let mut rect = RECT::default();
+    let point = if unsafe { GetWindowRect(GetForegroundWindow(), &mut rect) }.is_ok() {
+        POINT {
+            x: (rect.left + rect.right) / 2,
+            y: (rect.top + rect.bottom) / 2,
+        }
+    } else {
+        POINT::default()
+    };
+    let screen = screen_at(point);
+    (
+        screen.work.x + screen.work.width * 0.5 - 130.0 * screen.scale,
+        screen.work.y + screen.work.height * 0.6,
+    )
 }
 
 /// The screen at `point`. A monitor that cannot be asked gives a huge work area and scale 1, so the window is at least

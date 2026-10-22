@@ -6,17 +6,20 @@
 
 mod canvas;
 mod class;
+mod drag;
 mod layered;
 mod monitor;
 mod thread;
 
+use std::sync::Arc;
 use std::sync::mpsc::Sender;
 
 use borno_platform::PanelConfig;
 use borno_platform::PanelLayout;
+use borno_platform::paths;
 use borno_platform::protocol::CursorRect;
 use borno_server::panel::PanelSink;
-use borno_window::PanelConfig as WindowConfig;
+use borno_window::{PanelConfig as WindowConfig, Pin};
 use windows::Win32::Foundation::{LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostThreadMessageW, WM_APP};
 
@@ -31,6 +34,7 @@ enum Command {
 
 /// The handle the Router draws with. Dropping it ends the window thread.
 pub struct CandidateWindow {
+    pin: Arc<Pin>,
     sender: Sender<Command>,
     thread_id: u32,
 }
@@ -46,10 +50,15 @@ pub fn start(config: &PanelConfig) -> Option<Box<dyn PanelSink>> {
             PanelLayout::Horizontal => borno_render::Layout::Horizontal,
         },
     };
-    match thread::spawn(window) {
+    let pin = Arc::new(Pin::load(paths::window_position_path()));
+    match thread::spawn(window, pin.clone()) {
         Ok((sender, thread_id)) => {
             tracing::info!(theme = %config.theme, "candidate window: ready");
-            Some(Box::new(CandidateWindow { sender, thread_id }))
+            Some(Box::new(CandidateWindow {
+                pin,
+                sender,
+                thread_id,
+            }))
         }
         Err(error) => {
             tracing::error!(%error, "the candidate window could not start, no candidates will show");
@@ -75,5 +84,21 @@ impl PanelSink for CandidateWindow {
 
     fn hide(&mut self) {
         self.post(Command::Hide);
+    }
+
+    fn pinned(&self) -> bool {
+        self.pin.get().is_some()
+    }
+
+    fn toggle_pin(&mut self) {
+        let result = if self.pin.get().is_some() {
+            self.pin.clear()
+        } else {
+            self.pin.move_to(monitor::default_corner());
+            self.pin.save()
+        };
+        if let Err(error) = result {
+            tracing::warn!(%error, "could not save where the window is pinned");
+        }
     }
 }

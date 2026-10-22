@@ -26,6 +26,9 @@ pub struct Session {
     /// Set when a key took something back from the learner, so the Router saves it soon. The Router clears it.
     pub(crate) forgot: bool,
 
+    /// Set when the pin shortcut was pressed, so the Router pins or frees the window. The Router clears it.
+    pub(crate) pin_toggled: bool,
+
     /// Virtual key of the last consumed press. Its release is consumed too, so the application never sees a
     /// release without a press.
     pub(crate) consumed_press: Option<u32>,
@@ -49,6 +52,7 @@ impl Session {
             suggestions: Vec::new(),
             suggestion_highlight: 0,
             forgot: false,
+            pin_toggled: false,
             consumed_press: None,
             cursor: None,
             popup: None,

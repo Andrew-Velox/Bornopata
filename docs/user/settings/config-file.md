@@ -31,6 +31,7 @@ An option you leave out keeps its default, and an unknown option is ignored. If 
 |---|---|---|
 | `toggle` | `"ctrl+alt+space"` | Switch between Bangla and English typing. |
 | `forget` | `"shift+delete"` | Forget the highlighted candidate or suggestion. |
+| `pin` | `"ctrl+alt+m"` | While the window shows: pin it where you can drag it, or let it follow the text cursor again. |
 
 A shortcut is one or more of `ctrl`, `alt`, `shift`, `super`, then `space`, `delete`, a letter or a digit, joined with `+`.
 
@@ -61,6 +62,7 @@ log_level = "info"
 [shortcut]
 toggle = "ctrl+alt+space"
 forget = "shift+delete"
+pin = "ctrl+alt+m"
 
 [panel]
 mode = "auto"

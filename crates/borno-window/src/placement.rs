@@ -21,6 +21,17 @@ pub fn place(cursor: Rect, size: (f32, f32), monitor: Rect) -> (f32, f32) {
     (cursor.x.clamp(monitor.x, max_x), y.clamp(monitor.y, max_y))
 }
 
+/// Top-left corner for a popup of `size` the user pinned at `corner`: where they left it, pulled back inside `monitor`
+/// when the monitor changed or the popup grew past an edge.
+pub fn pinned(corner: (f32, f32), size: (f32, f32), monitor: Rect) -> (f32, f32) {
+    let max_x = (monitor.right() - size.0).max(monitor.x);
+    let max_y = (monitor.bottom() - size.1).max(monitor.y);
+    (
+        corner.0.clamp(monitor.x, max_x),
+        corner.1.clamp(monitor.y, max_y),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -73,5 +84,18 @@ mod tests {
     fn a_popup_larger_than_the_monitor_sits_at_its_corner() {
         let (x, y) = place(Rect::new(10.0, 10.0, 2.0, 20.0), (4000.0, 4000.0), MONITOR);
         assert_eq!((x, y), (0.0, 0.0));
+    }
+
+    #[test]
+    fn a_pinned_popup_stays_where_it_was_left_unless_it_would_leave_the_monitor() {
+        assert_eq!(
+            pinned((300.0, 400.0), (200.0, 100.0), MONITOR),
+            (300.0, 400.0)
+        );
+        assert_eq!(
+            pinned((1900.0, 1070.0), (200.0, 100.0), MONITOR),
+            (1720.0, 980.0)
+        );
+        assert_eq!(pinned((-30.0, -5.0), (200.0, 100.0), MONITOR), (0.0, 0.0));
     }
 }

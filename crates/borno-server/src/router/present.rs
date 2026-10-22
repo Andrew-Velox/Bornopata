@@ -75,7 +75,8 @@ impl Router {
                 shown
             }
             Some(Shown::Window) => {
-                let cursor = self.sessions[&id].cursor.expect("a window needs a cursor");
+                // A pinned window ignores the cursor, so a session that never reported one still gets a window.
+                let cursor = self.sessions[&id].cursor.unwrap_or_default();
                 let shown = self
                     .panel
                     .as_mut()
@@ -116,8 +117,12 @@ impl Router {
         }
     }
 
-    /// The popup when the shell has one attached, else the window when the cursor is known.
+    /// The pinned window when there is one, else the popup when the shell has one attached, else the window when the
+    /// cursor is known.
     fn target(&self, popup: Option<u64>, cursor: Option<CursorRect>) -> Option<Shown> {
+        if self.panel.as_ref().is_some_and(|panel| panel.pinned()) {
+            return Some(Shown::Window);
+        }
         if let (Some(token), Some(sink)) = (popup, self.popup.as_ref())
             && sink.attached(token)
         {

@@ -1,11 +1,12 @@
 //! Shows a sample frame at a screen position for a few seconds, to check drawing and placement on a real compositor:
 //! `cargo run -p borno-panel --example show -- [THEME] [X] [Y] [SECONDS]`. The position is the text cursor in global
-//! coordinates.
+//! coordinates. The window can be dragged with the mouse meanwhile; where it is dropped is kept in memory only.
 
+use std::sync::Arc;
 use std::time::Duration;
 
 use borno_panel::compositor::CursorRect;
-use borno_panel::{Panel, PanelConfig, Rect};
+use borno_panel::{Panel, PanelConfig, Pin, Rect};
 use borno_render::sample::{bangl, shaping};
 
 fn main() {
@@ -15,10 +16,11 @@ fn main() {
         |text: Option<String>, default: f32| text.and_then(|t| t.parse().ok()).unwrap_or(default);
     let (x, y) = (number(args.next(), 600.0), number(args.next(), 400.0));
     let seconds = number(args.next(), 4.0);
-    let panel = match Panel::start(PanelConfig {
+    let config = PanelConfig {
         theme,
         ..PanelConfig::default()
-    }) {
+    };
+    let panel = match Panel::start(config, Arc::new(Pin::in_memory())) {
         Ok(panel) => panel,
         Err(error) => {
             eprintln!("cannot start the panel: {error}");

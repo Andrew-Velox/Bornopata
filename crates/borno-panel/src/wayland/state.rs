@@ -1,6 +1,6 @@
 //! The state of the panel thread and its event loop.
 
-use std::sync::mpsc;
+use std::sync::{Arc, mpsc};
 use std::time::{Duration, Instant};
 
 use smithay_client_toolkit::compositor::{CompositorState, Region};
@@ -12,6 +12,8 @@ use smithay_client_toolkit::reexports::client::globals::registry_queue_init;
 use smithay_client_toolkit::reexports::client::protocol::wl_shm;
 use smithay_client_toolkit::reexports::client::{Connection, QueueHandle};
 use smithay_client_toolkit::registry::RegistryState;
+use smithay_client_toolkit::seat::SeatState;
+use smithay_client_toolkit::seat::pointer::ThemedPointer;
 use smithay_client_toolkit::shell::WaylandSurface;
 use smithay_client_toolkit::shell::wlr_layer::{
     Anchor, KeyboardInteractivity, Layer, LayerShell, LayerSurface,
@@ -27,8 +29,10 @@ use crate::compositor::{self, Compositor, CursorRect, Located};
 use crate::error::PanelError;
 use crate::theme::load_theme;
 use borno_window::PanelConfig;
-use borno_window::Rect;
-use borno_window::placement::place;
+use borno_window::placement::{pinned, place};
+use borno_window::{Pin, Rect};
+
+use super::pointer::Drag;
 
 /// What the next draw needs once the surface is configured.
 pub(super) struct Pending {
@@ -36,8 +40,24 @@ pub(super) struct Pending {
     pub scale: i32,
 }
 
+/// Where the card of the window on screen is, so a drag can move it.
+struct Card {
+    /// Top-left corner and size in global logical coordinates.
+    corner: (f32, f32),
+    size: (f32, f32),
+
+    monitor: Rect,
+
+    /// Where the card starts inside the surface, which also holds its shadow and decoration.
+    offset: (f32, f32),
+}
+
 pub(super) struct State {
     pub registry_state: RegistryState,
+    pub seat_state: SeatState,
+    pub pointer: Option<ThemedPointer>,
+    pub pin: Arc<Pin>,
+    pub drag: Option<Drag>,
     pub output_state: OutputState,
     pub compositor_state: CompositorState,
     pub layer_shell: LayerShell,
@@ -54,6 +74,7 @@ pub(super) struct State {
     pub layer: Option<LayerSurface>,
     pub configured: bool,
     pub pending: Option<Pending>,
+    card: Option<Card>,
 
     /// When the next animation frame is due.
     tick_at: Option<Instant>,
@@ -63,10 +84,11 @@ pub(super) struct State {
 /// Thread body: set everything up, report readiness, then run the event loop until asked to stop.
 pub(super) fn run(
     config: PanelConfig,
+    pin: Arc<Pin>,
     commands: smithay_client_toolkit::reexports::calloop::channel::Channel<Command>,
     ready: mpsc::Sender<Result<(), PanelError>>,
 ) {
-    match setup(config) {
+    match setup(config, pin) {
         Ok((mut state, mut event_loop)) => {
             let handle = event_loop.handle();
             let inserted =
@@ -94,7 +116,10 @@ pub(super) fn run(
     }
 }
 
-fn setup(config: PanelConfig) -> Result<(State, EventLoop<'static, State>), PanelError> {
+fn setup(
+    config: PanelConfig,
+    pin: Arc<Pin>,
+) -> Result<(State, EventLoop<'static, State>), PanelError> {
     let connection =
         Connection::connect_to_env().map_err(|error| PanelError::Connect(error.to_string()))?;
     let (globals, event_queue) = registry_queue_init(&connection)
@@ -121,6 +146,10 @@ fn setup(config: PanelConfig) -> Result<(State, EventLoop<'static, State>), Pane
         .map_err(|error| PanelError::Protocol(error.to_string()))?;
     let state = State {
         registry_state: RegistryState::new(&globals),
+        seat_state: SeatState::new(&globals, &qh),
+        pointer: None,
+        pin,
+        drag: None,
         output_state: OutputState::new(&globals, &qh),
         compositor_state,
         layer_shell,
@@ -134,6 +163,7 @@ fn setup(config: PanelConfig) -> Result<(State, EventLoop<'static, State>), Pane
         layer: None,
         configured: false,
         pending: None,
+        card: None,
         tick_at: None,
         quit: false,
     };
@@ -154,6 +184,15 @@ impl State {
             self.hide();
             return;
         }
+        // A pinned window is placed by where it was dropped; the text cursor does not matter.
+        let corner = self.pin.get();
+        let cursor = match corner {
+            Some((x, y)) => CursorRect {
+                rect: Rect::new(x, y, 0.0, 0.0),
+                surface_relative: false,
+            },
+            None => cursor,
+        };
         let located = self
             .compositor
             .as_mut()
@@ -175,11 +214,24 @@ impl State {
             rendered.content_width as f32 / factor,
             rendered.content_height as f32 / factor,
         );
-        let (x, y) = place(located.cursor, content, located.monitor);
+        let (x, y) = match corner {
+            Some(corner) => pinned(corner, content, located.monitor),
+            None => place(located.cursor, content, located.monitor),
+        };
         // The bitmap reaches beyond the card (shadow, decorations): the surface origin is the content origin
         // minus that margin, in the monitor's own coordinates.
-        let left = x - rendered.content_x as f32 / factor - located.monitor.x;
-        let top = y - rendered.content_y as f32 / factor - located.monitor.y;
+        let offset = (
+            rendered.content_x as f32 / factor,
+            rendered.content_y as f32 / factor,
+        );
+        let left = x - offset.0 - located.monitor.x;
+        let top = y - offset.1 - located.monitor.y;
+        self.card = Some(Card {
+            corner: (x, y),
+            size: content,
+            monitor: located.monitor,
+            offset,
+        });
         let size = (
             (rendered.pixmap.width() as f32 / factor).ceil() as u32,
             (rendered.pixmap.height() as f32 / factor).ceil() as u32,
@@ -189,6 +241,7 @@ impl State {
         let layer = self.ensure_layer(&located.monitor_name);
         layer.set_size(size.0, size.1);
         layer.set_margin(top.round() as i32, 0, 0, left.round() as i32);
+        self.grab_input_on_card();
         if self.configured {
             self.draw();
         } else {
@@ -226,13 +279,50 @@ impl State {
             layer.set_anchor(Anchor::TOP | Anchor::LEFT);
             layer.set_keyboard_interactivity(KeyboardInteractivity::None);
             layer.set_exclusive_zone(-1);
-            if let Ok(region) = Region::new(&self.compositor_state) {
-                layer.set_input_region(Some(region.wl_region()));
-            }
             self.configured = false;
             self.layer = Some(layer);
         }
         self.layer.as_ref().expect("created above")
+    }
+
+    /// The mouse reaches the card (to drag it) and nothing else: the shadow and the decoration around it let clicks
+    /// through to the application.
+    fn grab_input_on_card(&self) {
+        let (Some(layer), Some(card)) = (self.layer.as_ref(), self.card.as_ref()) else {
+            return;
+        };
+        let Ok(region) = Region::new(&self.compositor_state) else {
+            return;
+        };
+        region.add(
+            card.offset.0.floor() as i32,
+            card.offset.1.floor() as i32,
+            card.size.0.ceil() as i32,
+            card.size.1.ceil() as i32,
+        );
+        layer.set_input_region(Some(region.wl_region()));
+    }
+
+    /// Moves the card by `dx`, `dy` logical pixels, keeping it on its monitor, and remembers the place.
+    pub(super) fn move_card_by(&mut self, dx: f32, dy: f32) {
+        let Some(card) = self.card.as_mut() else {
+            return;
+        };
+        card.corner = pinned(
+            (card.corner.0 + dx, card.corner.1 + dy),
+            card.size,
+            card.monitor,
+        );
+        self.pin.move_to(card.corner);
+        if let Some(layer) = self.layer.as_ref() {
+            layer.set_margin(
+                (card.corner.1 - card.offset.1 - card.monitor.y).round() as i32,
+                0,
+                0,
+                (card.corner.0 - card.offset.0 - card.monitor.x).round() as i32,
+            );
+        }
+        self.draw();
     }
 
     /// Copies the pending bitmap into a shared-memory buffer and shows it.
@@ -262,6 +352,8 @@ impl State {
 
     fn hide(&mut self) {
         self.layer = None;
+        self.card = None;
+        self.drag = None;
         self.configured = false;
         self.pending = None;
         self.tick_at = None;

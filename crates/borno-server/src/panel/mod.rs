@@ -14,4 +14,13 @@ pub trait PanelSink: Send {
     fn show(&mut self, frame: borno_render::Frame, cursor: CursorRect) -> bool;
 
     fn hide(&mut self);
+
+    /// Whether the user has pinned the window: it then shows at the pinned place whatever the text cursor does, and
+    /// needs no cursor position at all.
+    fn pinned(&self) -> bool {
+        false
+    }
+
+    /// The pin shortcut: pins the window at a place the user can drag it from, or frees it to follow the text cursor.
+    fn toggle_pin(&mut self) {}
 }

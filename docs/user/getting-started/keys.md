@@ -39,6 +39,7 @@ Digits that are not choosing a candidate are typed as Bangla digits (`123` gives
 | Key | What it does |
 |---|---|
 | `Ctrl+Alt+Space` | Switches between Bangla and English typing. A short notice (`বাংলা` or `English`) shows the new mode. |
+| `Ctrl+Alt+M` | While a word or suggestions are shown: pins the window where you can drag it, or lets it follow the text cursor again. See [Moving the window](../settings/themes.md#moving-the-window). |
 | Fcitx5's own switch key (often `Ctrl+Space`) | Switches between input methods, for example to your keyboard layout. |
 
 ## Fields Bornopata leaves alone
@@ -47,12 +48,13 @@ In password fields, and in fields an application marks as "disabled" for input m
 
 ## Changing shortcuts
 
-Both Bornopata shortcuts are in `~/.config/bornopata/config.toml`:
+The Bornopata shortcuts are in `~/.config/bornopata/config.toml`:
 
 ```toml
 [shortcut]
 toggle = "ctrl+alt+space"
 forget = "shift+delete"
+pin = "ctrl+alt+m"
 ```
 
 A shortcut is one or more modifiers (`ctrl`, `alt`, `shift`, `super`) plus `space`, `delete`, a letter or a digit. A bare key is not allowed because it would break typing. The Server picks the change up by itself.

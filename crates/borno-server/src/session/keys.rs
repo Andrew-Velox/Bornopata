@@ -88,6 +88,11 @@ impl Session {
         } else {
             NO_FUNCTION_KEY
         };
+        // Only while there is a window to pin; it comes before the command-key rule because it needs Ctrl and Alt.
+        if config.shortcut.pin.matches(&event) && (composing || !self.suggestions.is_empty()) {
+            self.pin_toggled = true;
+            return KeyReply::consumed(None);
+        }
         if event.modifiers.has_command_key() {
             return KeyReply::passthrough(self.commit_word());
         }

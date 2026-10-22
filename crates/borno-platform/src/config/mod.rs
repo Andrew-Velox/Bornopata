@@ -55,6 +55,10 @@ toggle = "ctrl+alt+space"
 # next-word suggestion: stop offering it. Written like the toggle; the key may also be "delete".
 forget = "shift+delete"
 
+# While the candidate window shows: pin it, so it stays where you drag it, or let it follow the text cursor again.
+# Dragging with the mouse pins it too; right-clicking the window lets it follow the cursor again.
+pin = "ctrl+alt+m"
+
 [panel]
 # "auto": Bornopata's own candidate window where it can be shown (the input-method popup in Wayland applications,
 # a layer-shell window for X11 ones), otherwise Fcitx5's panel. "popup": only the input-method popup. "native": only

@@ -3,9 +3,11 @@
 pub use borno_server::panel::{PanelSink, render_frame};
 
 use borno_panel::compositor::CursorRect as WindowCursor;
-use borno_panel::{Panel, PanelConfig as WindowConfig, Rect};
+use std::sync::Arc;
+
+use borno_panel::{Panel, PanelConfig as WindowConfig, Pin, Rect};
 use borno_platform::protocol::CursorRect;
-use borno_platform::{PanelConfig, PanelLayout, PanelMode};
+use borno_platform::{PanelConfig, PanelLayout, PanelMode, paths};
 
 pub fn render_rect(cursor: CursorRect) -> WindowCursor {
     WindowCursor {
@@ -23,6 +25,14 @@ impl PanelSink for NativePanel {
 
     fn hide(&mut self) {
         let _ = self.0.hide();
+    }
+
+    fn pinned(&self) -> bool {
+        self.0.pinned()
+    }
+
+    fn toggle_pin(&mut self) {
+        self.0.toggle_pin();
     }
 }
 
@@ -48,7 +58,7 @@ pub fn start(config: &PanelConfig) -> Option<Box<dyn PanelSink>> {
             PanelLayout::Horizontal => borno_render::Layout::Horizontal,
         },
     };
-    match Panel::start(window) {
+    match Panel::start(window, Arc::new(Pin::load(paths::window_position_path()))) {
         Ok(panel) => {
             tracing::info!(theme = %config.theme, "candidate window: self-drawn");
             Some(Box::new(NativePanel(panel)))

@@ -5,10 +5,12 @@
 mod config;
 mod error;
 mod geometry;
+mod pin;
 pub mod placement;
 mod theme;
 
 pub use config::PanelConfig;
 pub use error::WindowError;
 pub use geometry::Rect;
+pub use pin::{Corner, Pin};
 pub use theme::load_theme;

@@ -75,6 +75,12 @@ impl Router {
             self.unsaved_since
                 .get_or_insert_with(std::time::Instant::now);
         }
+        if std::mem::take(&mut session.pin_toggled)
+            && let Some(panel) = self.panel.as_mut()
+        {
+            panel.toggle_pin();
+            self.drawn = None;
+        }
         let identity = session.next_identity();
         let mut frame = session.frame();
         let was_visible = self.visible.is_some();

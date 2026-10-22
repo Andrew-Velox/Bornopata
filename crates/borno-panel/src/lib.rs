@@ -10,7 +10,7 @@ mod error;
 mod theme;
 mod wayland;
 
-pub use borno_window::{PanelConfig, Rect, placement};
+pub use borno_window::{PanelConfig, Pin, Rect, placement};
 pub use error::PanelError;
 pub use theme::load_theme;
 pub use wayland::Panel;

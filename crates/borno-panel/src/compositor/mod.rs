@@ -38,6 +38,11 @@ pub struct Located {
 pub trait Compositor: Send {
     /// Resolves `cursor` to global coordinates and the monitor it is on; `None` when the compositor cannot say.
     fn locate(&mut self, cursor: CursorRect) -> Option<Located>;
+
+    /// The monitor that has the keyboard focus, in global logical coordinates.
+    fn focused_monitor(&mut self) -> Option<Rect> {
+        None
+    }
 }
 
 /// The compositor of the running session, if it is one this crate knows.
