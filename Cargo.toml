@@ -77,7 +77,7 @@ zeno = { version = "0.3.3", default-features = false }
 winit = "0.30.13"
 softbuffer = "0.4.8"
 arboard = { version = "3.6.1", default-features = false }
-taffy = { version = "0.14.0", default-features = false, features = ["std", "taffy_tree", "flexbox", "grid"] }
+taffy = { version = "0.15.0", default-features = false, features = ["std", "taffy_tree", "flexbox", "grid"] }
 # Fast string-keyed hash tables for hot lookups (word counts, language model, personal bigram)
 foldhash = "0.2.0"
 # .bnd data container: opened with mmap, structs read without copying
