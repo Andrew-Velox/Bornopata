@@ -10,7 +10,7 @@ license = "GPL-3.0-or-later"
 [dependencies]
 tiny-skia.workspace = true
 # SVG images: parsed and rasterized into the same tiny-skia bitmaps; no SVG text, no system fonts, no embedded bitmaps
-resvg = { version = "0.48.1", default-features = false }
+resvg = { version = "0.50.0", default-features = false }
 cosmic-text.workspace = true
 zeno.workspace = true
 thiserror.workspace = true
